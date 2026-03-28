@@ -1,12 +1,20 @@
+// app/layout.js
 import './globals.css';
-import Navbar from '../components/Navbar';
+import { Inter } from 'next/font/google';
+import Navbar from '@/components/Navbar';
+
+const inter = Inter({ subsets: ['latin'] });
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className="bg-gray-100">
+      <body className={`${inter.className} antialiased bg-slate-950`}>
         <Navbar />
-        <main className="p-6">{children}</main>
+        {/* Removed max-w-7xl so sidebars can touch the edge */}
+        <main className="min-h-screen">
+          {children}
+        </main>
+        {/* Footer omitted for brevity */}
       </body>
     </html>
   );
