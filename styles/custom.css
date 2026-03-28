@@ -1,0 +1,114 @@
+/* ══════════════════ CUSTOM THEME VARIABLES ══════════════════ */
+:root {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --text: #f1f5f9;
+  --muted: #94a3b8;
+  --accent1: #38bdf8; /* Blue */
+  --accent2: #4ade80; /* Green */
+  --accent3: #c084fc; /* Purple */
+  --accent4: #fb923c; /* Orange */
+  --accent5: #f472b6; /* Pink */
+}
+
+/* ══════════════════ TYPOGRAPHY ══════════════════ */
+.font-syne { font-family: 'Syne', sans-serif; }
+.font-mono { font-family: 'DM Mono', monospace; }
+.font-sans { font-family: 'DM Sans', sans-serif; }
+
+/* ══════════════════ STATUS BADGES ══════════════════ */
+/* These match your original HTML styles exactly */
+.status {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: inline-block;
+}
+
+.status.occupied { background: rgba(56, 189, 248, 0.15); color: var(--accent1); border: 1px solid rgba(56, 189, 248, 0.3); }
+.status.vacant { background: rgba(251, 146, 60, 0.15); color: var(--accent4); border: 1px solid rgba(251, 146, 60, 0.3); }
+.status.paid { background: rgba(74, 222, 128, 0.15); color: var(--accent2); border: 1px solid rgba(74, 222, 128, 0.3); }
+.status.pending { background: rgba(192, 132, 252, 0.15); color: var(--accent3); border: 1px solid rgba(192, 132, 252, 0.3); }
+.status.overdue { background: rgba(244, 114, 182, 0.15); color: var(--accent5); border: 1px solid rgba(244, 114, 182, 0.3); }
+
+/* ══════════════════ TABLE STYLES ══════════════════ */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.data-table th {
+  text-align: left;
+  padding: 12px 8px;
+  color: var(--muted);
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.data-table td {
+  padding: 14px 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  color: var(--text);
+}
+
+.data-table tr:hover td {
+  background: rgba(255,255,255,0.02);
+}
+
+/* ══════════════════ DECORATIVE ELEMENTS ══════════════════ */
+.kw {
+  color: var(--accent1);
+  font-family: 'DM Mono', monospace;
+  font-weight: 500;
+}
+
+.section-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.3), transparent);
+  margin-left: 15px;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.av-blue { background: var(--accent1); color: #000; }
+.av-purple { background: var(--accent3); color: #000; }
+.av-green { background: var(--accent2); color: #000; }
+.av-orange { background: var(--accent4); color: #000; }
+
+/* ══════════════════ TOAST NOTIFICATION ══════════════════ */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--accent2);
+  color: #000;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  z-index: 1000;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(100px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
