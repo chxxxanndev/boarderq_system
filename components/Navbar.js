@@ -9,12 +9,12 @@ export default function Navbar() {
   const pathname = usePathname();
 
   const navLinks = [
-    { name: 'Home', href: '/' },
-    { name: 'Rooms', href: '/rooms' },
-    { name: 'Tenants', href: '/dashboard/applications' },
-    { name: 'Payments', href: '/dashboard/payments' },
-    { name: 'Maintenance', href: '/dashboard/maintenance' },
-    { name: 'Announcements', href: '/tenant/announcements' },
+  { name: 'Home', href: '/' },
+  { name: 'Rooms', href: '/public/rooms' },
+  { name: 'Tenants', href: '/admin/dashboard/applications' },
+  { name: 'Payments', href: '/admin/dashboard/payments' },
+  { name: 'Maintenance', href: '/admin/dashboard/maintenance' },
+  { name: 'Announcements', href: '/tenant/announcements' },
   ];
 
   return (
