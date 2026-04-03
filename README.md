@@ -197,104 +197,137 @@ IMPORTANT:
 
 
 FULL FOLDER STRUCTURE
+
 boarderqueue_system/
 │
-├── app/                         # Main App Router (pages + API)
-│   ├── layout.js                # Global layout - CHE
-│   ├── page.js                  # Landing page (/) - CHE
+├── app/                         
+│   ├── layout.js                
+│   ├── page.js                 
 │   ├── globals.css
 │
-│   ├── rooms/                   # Public rooms browsing
-│   │   └── page.js              # /rooms - CHE
+│   ├── rooms/                   
+│   │   └── page.js              
 │
-│   ├── apply/                   # Application form
-│   │   └── page.js              # /apply - XHYNDY
+│   ├── apply/                   
+│   │   └── page.js              
 │
 │   ├── login/
-│   │   └── page.js              - CHE
+│   │   └── page.js              
 │
 │   ├── register/
-│   │   └── page.js              - CHE
+│   │   └── page.js              
 │
-│   ├── dashboard/               # Landlord side
-│   │   ├── page.js              # /dashboard - CHE
+│   ├── dashboard/               
+│   │   ├── page.js              
 │   │   │
 │   │   ├── rooms/
-│   │   │   └── page.js          # Manage rooms - CHE 
+│   │   │   └── page.js         
 │   │   │
 │   │   ├── applications/
-│   │   │   └── page.js          - XHYNDY
+│   │   │   └── page.js          
 │   │   │
 │   │   ├── payments/
-│   │   │   └── page.js          - MAYMAY
+│   │   │   └── page.js          
 │   │   │
 │   │   └── maintenance/
-│   │       └── page.js          - XHYNDY
+│   │       └── page.js          
 │
-│   ├── tenant/                  # Tenant side
+│   ├── tenant/                  
 │   │   ├── dashboard/
-│   │   │   └── page.js          - CHE
+│   │   │   └── page.js          
 │   │   │
 │   │   ├── payments/
-│   │   │   └── page.js          - MAYMAY
+│   │   │   └── page.js          
 │   │   │
 │   │   ├── maintenance/
-│   │   │   └── page.js          - MAYMAY
+│   │   │   └── page.js          
 │   │   │
 │   │   └── announcements/
-│   │       └── page.js          - AKO
+│   │       └── page.js          
 │
-│   └── api/                     # Backend (later)
+│   └── api/                     
 │       ├── rooms/
-│       │   └── route.js
+│       │   └── route.js         
 │       │
 │       ├── applications/
-│       │   └── route.js
+│       │   └── route.js          
 │       │
 │       ├── auth/
-│       │   └── route.js
+│       │   └── route.js          
 │       │
 │       ├── payments/
-│       │   └── route.js
+│       │   └── route.js          
 │       │
 │       └── maintenance/
-│           └── route.js
+│           └── route.js          
 │
-├── components/                  # Reusable UI components
-│   ├── Navbar.js
-│   ├── RoomCard.js
-│   ├── Button.js
-│   ├── Sidebar.js
-│   └── Card.js
+├── components/                 
+│   ├── Navbar.js                 
+│   ├── Sidebar.js                
+│   ├── Button.js                 
+│   ├── Card.js                  
+│   ├── RoomCard.js               
+│   ├── PaymentCard.js            
+│   ├── MaintenanceCard.js        
+│   └── ApplicationCard.js        
 │
-├── lib/                         # Core logic (later)
-│   ├── db.js                    # MySQL connection
-│   └── auth.js                  # Authentication helpers
+├── lib/                         
+│   ├── db.js                    
+│   └── auth.js                 
 │
-├── utils/                       # Helper functions
-│   └── helpers.js
+├── utils/                       
+│   └── helpers.js               
 │
-├── public/                      # Static files
-│   ├── images/
-│   └── icons/
+├── public/                     
+│   ├── images/                 
+│   └── icons/                   
 │
-├── styles/                      # Optional extra styles
-│   └── custom.css
+├── styles/                      
+│   └── custom.css              
 │
 ├── .gitignore
 ├── package.json
 ├── next.config.js
 ├── README.md
-└── jsconfig.json               # Optional (path aliases)
+└── jsconfig.json              
 
 
+----------------------------------------------------------------------
+app/
+├── layout.js                # Global layout (optional shared)
+├── page.js                  # Landing page
+├── globals.css
+│
+├── admin/                   # Admin / Landlord dashboard
+│   ├── layout.js            # Optional admin-specific layout
+│   ├── dashboard/
+│   ├── rooms/
+│   ├── applications/
+│   ├── payments/
+│   └── maintenance/
+│
+├── public/                  # Public / unauthenticated pages
+│   ├── rooms/
+│   ├── apply/
+│   ├── login/
+│   ├── register/
+│   └── about/               # If you have public info pages
+│
+├── tenant/                  # Tenant dashboard
+│   ├── layout.js            # Optional tenant-specific layout
+│   ├── dashboard/
+│   ├── payments/
+│   ├── maintenance/
+│   └── announcements/
+│
+└── api/                     # API routes
+    ├── rooms/
+    ├── applications/
+    ├── auth/
+    ├── payments/
+    └── maintenance/
 
-
-
-
-
-
-
+----------------------------------------------------------------------
 
 
 NEW:
