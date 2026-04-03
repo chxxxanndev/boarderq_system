@@ -11,9 +11,9 @@ export default function Navbar() {
   const navLinks = [
   { name: 'Home', href: '/' },
   { name: 'Rooms', href: '/public/rooms' },
-  { name: 'Tenants', href: '/admin/dashboard/applications' },
-  { name: 'Payments', href: '/admin/dashboard/payments' },
-  { name: 'Maintenance', href: '/admin/dashboard/maintenance' },
+  { name: 'Tenants', href: '/admin/applications' },
+  { name: 'Payments', href: '/admin/payments' },
+  { name: 'Maintenance', href: '/admin/maintenance' },
   { name: 'Announcements', href: '/tenant/announcements' },
   ];
 
