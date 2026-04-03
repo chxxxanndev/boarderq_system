@@ -1,25 +1,20 @@
 'use client';
 
 import Link from 'next/link';
-import Button from '@/components/Button'; // Import your reusable button
+import Button from '@/components/Button'; 
 import { Home, User, ShieldCheck, LayoutDashboard, ArrowRight } from 'lucide-react';
 
 export default function LandingPage() {
   return (
-    /* CHANGED: Forcing bg-slate-50 (very light gray) for a clean look */
     <div className="min-h-screen flex flex-col items-center pt-20 pb-10 transition-colors duration-300 bg-slate-50">
       
-      {/* 1. TOP BADGE */}
-      {/* CHANGED: Adjusted border and background for better visibility on light bg */}
       <div className="border border-cyan-500/20 px-6 py-1.5 mb-10 animate-pulse bg-cyan-500/10">
         <span className="text-cyan-700 text-[10px] tracking-[0.4em] uppercase font-bold">
           Platform-Based Technology Project
         </span>
       </div>
 
-      {/* 2. MAIN LOGO & DESCRIPTION */}
       <header className="text-center mb-4 px-4">
-        {/* CHANGED: Using text-cyan-600 for high contrast */}
         <h1 className="text-6xl md:text-7xl font-black text-cyan-600 tracking-tighter glow-text-light uppercase italic leading-none transition-colors">
           BOARDER-Q
         </h1>
@@ -27,21 +22,15 @@ export default function LandingPage() {
           A streamlined boarding house management system designed for seamless tenant applications and efficient property oversight.
         </p>
         
-        {/* Tech Stack Subtitle */}
         <p className="text-slate-400 text-[10px] font-mono tracking-widest mt-6 uppercase">
           Next.js • MySQL <span className="mx-2 opacity-30">|</span> College of Computing Studies
         </p>
       </header>
 
-      {/* 3. GLOWING DIVIDER LINE */}
-      {/* CHANGED: Adjusted opacity to look better on white */}
       <div className="glow-line w-full max-w-4xl opacity-20 bg-cyan-500 h-[1px]"></div>
 
-      {/* 4. THE ACTION CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-5xl mt-12 px-6">
         
-        {/* TENANT CARD */}
-        {/* CHANGED: Added bg-white and subtle shadow to replace dark glass effect */}
         <div className="bg-white border border-slate-200 p-8 group hover:border-cyan-500/40 transition-all duration-500 relative overflow-hidden shadow-sm hover:shadow-xl">
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity pointer-events-none">
              <Home className="w-32 h-32 text-cyan-600" />
@@ -64,8 +53,6 @@ export default function LandingPage() {
           </Button>
         </div>
 
-        {/* LANDLORD CARD */}
-        {/* CHANGED: Added bg-white and subtle shadow */}
         <div className="bg-white border border-slate-200 p-8 group hover:border-purple-500/40 transition-all duration-500 shadow-sm hover:shadow-xl">
           <div className="flex items-center justify-between mb-6">
             <div className="bg-purple-500/10 p-3 border border-purple-500/20">
@@ -86,7 +73,6 @@ export default function LandingPage() {
 
       </div>
 
-      {/* 5. OVERVIEW SECTION */}
       <div className="w-full max-w-5xl mt-24 px-6 flex items-center gap-6">
         <div className="bg-cyan-500/10 border border-cyan-500/30 px-6 py-2 rounded-sm">
           <span className="text-cyan-700 font-black text-xs tracking-widest uppercase italic">Project Details</span>
@@ -95,7 +81,6 @@ export default function LandingPage() {
         <div className="flex-1 h-[1px] bg-slate-200"></div>
       </div>
 
-      {/* THREE PILLARS */}
       <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-3 gap-12 mt-10 px-6 pb-20">
         {[
           { title: "01. Real-time Search", desc: "Instant access to room availability and pricing details for students and workers." },

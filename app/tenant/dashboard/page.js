@@ -113,7 +113,6 @@ export default function TenantDashboard() {
         </div>
       </main>
 
-      {/* Mobile Bottom Nav */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-6 py-3 flex items-center justify-between md:hidden z-50">
         <Link href="/tenant/dashboard" className="flex flex-col items-center gap-1 text-blue-600">
           <Home className="w-6 h-6" />

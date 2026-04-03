@@ -5,9 +5,7 @@ export default function PaymentCard({ payment }) {
 
   return (
     <div className="bg-transparent flex flex-col md:flex-row items-center justify-between gap-4 py-2 group">
-      {/* 1. LEFT SECTION: Icon and Title */}
       <div className="flex items-center gap-5 w-full md:w-auto">
-        {/* Status Icon Box (Tactical Square) */}
         <div className={`w-12 h-12 flex items-center justify-center border transition-all duration-300 ${
           isPaid 
             ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.1)]' 
@@ -26,7 +24,6 @@ export default function PaymentCard({ payment }) {
         </div>
       </div>
 
-      {/* 2. RIGHT SECTION: Amount and Status Label */}
       <div className="flex flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto border-t border-slate-800/50 md:border-0 pt-4 md:pt-0">
         <div className="flex items-center gap-2">
           <span className="text-slate-500 font-mono text-xs">PHP</span>

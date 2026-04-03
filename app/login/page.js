@@ -7,10 +7,8 @@ import { Mail, Lock, ShieldCheck, User, Fingerprint } from 'lucide-react';
 export default function LoginPage() {
   return (
     <div className="min-h-[calc(100vh-140px)] flex items-center justify-center p-6">
-      {/* AUTH CONTAINER - Glass Panel Style */}
       <div className="glass-panel p-10 w-full max-w-md border-t-2 border-t-cyan-500/50 relative overflow-hidden">
         
-        {/* Subtle Background Icon Decoration */}
         <Fingerprint className="absolute -right-4 -top-4 w-32 h-32 text-slate-900/50 -rotate-12 pointer-events-none" />
 
         <div className="text-center mb-10 relative z-10">
@@ -28,7 +26,6 @@ export default function LoginPage() {
         </div>
 
         <form className="space-y-6 relative z-10">
-          {/* EMAIL INPUT */}
           <div className="space-y-2">
             <label className="text-[10px] font-mono uppercase tracking-[0.3em] text-slate-500 block">
               User Identification
@@ -43,7 +40,6 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* PASSWORD INPUT */}
           <div className="space-y-2">
             <label className="text-[10px] font-mono uppercase tracking-[0.3em] text-slate-500 block">
               Security Protocol
@@ -58,7 +54,6 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* SUB-ACTIONS */}
           <div className="flex items-center justify-between">
             <label className="flex items-center gap-2 cursor-pointer group">
               <input type="checkbox" className="w-3 h-3 border-slate-800 bg-slate-900 text-cyan-500 rounded-none focus:ring-0" />
@@ -67,7 +62,6 @@ export default function LoginPage() {
             <Link href="#" className="text-cyan-500/70 text-[10px] font-mono uppercase tracking-widest hover:text-cyan-400">Recovery</Link>
           </div>
 
-          {/* LOGIN BUTTONS */}
           <div className="pt-4 space-y-4">
             <Button 
               className="w-full py-4 text-[11px]" 
