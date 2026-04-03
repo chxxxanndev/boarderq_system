@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation';
 export default function DashboardLayout({ children }) {
   const pathname = usePathname();
   
-  // This automatically determines which sidebar item is active based on the URL
   const getActiveTab = () => {
     if (pathname.includes('/rooms')) return 'rooms';
     if (pathname.includes('/applications')) return 'applications';
@@ -16,13 +15,14 @@ export default function DashboardLayout({ children }) {
   };
 
   return (
-    <div className="flex h-[calc(100vh-80px)] overflow-hidden">
-      {/* 1. THE ONLY SIDEBAR INSTANCE */}
+    <div className="flex min-h-[calc(100vh-100px)]">
+      {/* 1. SIDEBAR - Stays on the far left */}
       <Sidebar active={getActiveTab()} />
 
-      {/* 2. PAGE CONTENT AREA */}
-      <div className="flex-1 overflow-y-auto bg-slate-950/50">
-        <div className="max-w-7xl mx-auto p-8 lg:p-12">
+      {/* 2. MAIN CONTENT - Takes up the rest of the space */}
+      <div className="flex-1 bg-transparent transition-colors duration-300">
+        {/* We move the max-width here so the text stays centered but the background is full-width */}
+        <div className="max-w-6xl mx-auto p-8 lg:p-12">
           {children}
         </div>
       </div>
