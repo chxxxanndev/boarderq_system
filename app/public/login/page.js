@@ -25,7 +25,7 @@ export default function LoginPage() {
     if (email === 'admin@boarderq.com' && password === 'admin123') {
       localStorage.setItem('role', 'landlord');
       localStorage.setItem('userEmail', email);
-      router.push('/admin');
+      router.push('/admin/dashboard');
       return;
     }
 

@@ -193,113 +193,18 @@ IMPORTANT:
 
 * Ayaw mo edit same files
 * Always create your own branch
-* Pull before starting
+* Pull before starting             
 
-
-FULL FOLDER STRUCTURE
-
-boarderqueue_system/
-│
-├── app/                         
-│   ├── layout.js                
-│   ├── page.js                 
-│   ├── globals.css
-│
-│   ├── rooms/                   
-│   │   └── page.js              
-│
-│   ├── apply/                   
-│   │   └── page.js              
-│
-│   ├── login/
-│   │   └── page.js              
-│
-│   ├── register/
-│   │   └── page.js              
-│
-│   ├── dashboard/               
-│   │   ├── page.js              
-│   │   │
-│   │   ├── rooms/
-│   │   │   └── page.js         
-│   │   │
-│   │   ├── applications/
-│   │   │   └── page.js          
-│   │   │
-│   │   ├── payments/
-│   │   │   └── page.js          
-│   │   │
-│   │   └── maintenance/
-│   │       └── page.js          
-│
-│   ├── tenant/                  
-│   │   ├── dashboard/
-│   │   │   └── page.js          
-│   │   │
-│   │   ├── payments/
-│   │   │   └── page.js          
-│   │   │
-│   │   ├── maintenance/
-│   │   │   └── page.js          
-│   │   │
-│   │   └── announcements/
-│   │       └── page.js          
-│
-│   └── api/                     
-│       ├── rooms/
-│       │   └── route.js         
-│       │
-│       ├── applications/
-│       │   └── route.js          
-│       │
-│       ├── auth/
-│       │   └── route.js          
-│       │
-│       ├── payments/
-│       │   └── route.js          
-│       │
-│       └── maintenance/
-│           └── route.js          
-│
-├── components/                 
-│   ├── Navbar.js                 
-│   ├── Sidebar.js                
-│   ├── Button.js                 
-│   ├── Card.js                  
-│   ├── RoomCard.js               
-│   ├── PaymentCard.js            
-│   ├── MaintenanceCard.js        
-│   └── ApplicationCard.js        
-│
-├── lib/                         
-│   ├── db.js                    
-│   └── auth.js                 
-│
-├── utils/                       
-│   └── helpers.js               
-│
-├── public/                     
-│   ├── images/                 
-│   └── icons/                   
-│
-├── styles/                      
-│   └── custom.css              
-│
-├── .gitignore
-├── package.json
-├── next.config.js
-├── README.md
-└── jsconfig.json              
-
-
-----------------------------------------------------------------------
+--------------------------------------------------------
+Final Full Folder Structure (Working Frontend only)
+--------------------------------------------------------
 app/
-├── layout.js                # Global layout (optional shared)
-├── page.js                  # Landing page
+├── layout.js               
+├── page.js                
 ├── globals.css
 │
 ├── admin/                   # Admin / Landlord dashboard
-│   ├── layout.js            # Optional admin-specific layout
+│   ├── layout.js            
 │   ├── dashboard/
 │   ├── rooms/
 │   ├── applications/
@@ -311,116 +216,52 @@ app/
 │   ├── apply/
 │   ├── login/
 │   ├── register/
-│   └── about/               # If you have public info pages
+│   └── about/              
 │
 ├── tenant/                  # Tenant dashboard
-│   ├── layout.js            # Optional tenant-specific layout
 │   ├── dashboard/
 │   ├── payments/
 │   ├── maintenance/
 │   └── announcements/
 │
-└── api/                     # API routes
-    ├── rooms/
-    ├── applications/
-    ├── auth/
-    ├── payments/
-    └── maintenance/
-
-----------------------------------------------------------------------
-
-
-NEW:
-
-boarderqueue_system/
+├── api/                     # API routes
+│   ├── rooms/
+│   ├── applications/
+│   ├── auth/
+│   ├── payments/
+│   └── maintenance/
 │
-├── app/                         # Main App Router (pages + API)
-│   ├── layout.js                # Global layout (SHARED — OWNER: IKAW)
-│   ├── page.js                  # Landing page (SHARED — OWNER: IKAW)
-│   ├── globals.css
+├── components/                  
+│   ├── Navbar.js                 
+│   ├── Sidebar.js                
+│   ├── Button.js                 
+│   ├── Card.js                   
+│   ├── RoomCard.js              
+│   ├── PaymentCard.js            
+│   ├── MaintenanceCard.js        
+│   └── ApplicationCard.js       
 │
-│   ├── rooms/                   # Public rooms browsing
-│   │   └── page.js              # /rooms (IKAW)
+├── lib/                        
+│   ├── db.js                    
+│   └── auth.js                 
+├── utils/                       
+│   └── helpers.js               
 │
-│   ├── apply/                   # Application form
-│   │   └── page.js              # /apply (Xhyndy)
+├── public/                     
+│   ├── images/                 
+│   └── icons/                 
 │
-│   ├── login/
-│   │   └── page.js              # Login page (SHARED — OWNER: IKAW)
-│
-│   ├── register/
-│   │   └── page.js              # Register page (SHARED — OWNER: IKAW)
-│
-│   ├── dashboard/               # Landlord side
-│   │   ├── page.js              # /dashboard main (IKAW)
-│   │   │
-│   │   ├── rooms/
-│   │   │   └── page.js          # Manage rooms (IKAW)
-│   │   │
-│   │   ├── applications/
-│   │   │   └── page.js          # Applications management (Xhyndy)
-│   │   │
-│   │   ├── payments/
-│   │   │   └── page.js          # Payments (Maymay)
-│   │   │
-│   │   └── maintenance/
-│   │       └── page.js          # Maintenance (Xhyndy)
-│
-│   ├── tenant/                  # Tenant side
-│   │   ├── dashboard/
-│   │   │   └── page.js          # Tenant dashboard (IKAW)
-│   │   │
-│   │   ├── payments/
-│   │   │   └── page.js          # Tenant payments (Maymay)
-│   │   │
-│   │   ├── maintenance/
-│   │   │   └── page.js          # Tenant maintenance (Xhyndy)
-│   │   │
-│   │   └── announcements/
-│   │       └── page.js          # Tenant announcements (SHARED — OWNER: IKAW)
-│
-│   └── api/                     # Backend (later, can be shared)
-│       ├── rooms/
-│       │   └── route.js          # (IKAW)
-│       │
-│       ├── applications/
-│       │   └── route.js          # (Xhyndy)
-│       │
-│       ├── auth/
-│       │   └── route.js          # (IKAW)
-│       │
-│       ├── payments/
-│       │   └── route.js          # (Maymay)
-│       │
-│       └── maintenance/
-│           └── route.js          # (Xhyndy)
-│
-├── components/                  # Reusable UI components
-│   ├── Navbar.js                 # SHARED — OWNER: IKAW
-│   ├── Sidebar.js                # SHARED — OWNER: IKAW
-│   ├── Button.js                 # SHARED — Owner: whoever creates new usage
-│   ├── Card.js                   # SHARED — reusable, safe to copy for feature
-│   ├── RoomCard.js               # IKAW
-│   ├── PaymentCard.js            # Maymay (new component)
-│   ├── MaintenanceCard.js        # Xhyndy (new component)
-│   └── ApplicationCard.js        # Xhyndy (new component)
-│
-├── lib/                         # Core logic (later)
-│   ├── db.js                    # (SHARED — OWNER: IKAW)
-│   └── auth.js                  # (SHARED — OWNER: IKAW)
-│
-├── utils/                       # Helper functions
-│   └── helpers.js               # SHARED
-│
-├── public/                      # Static files
-│   ├── images/                  # SHARED
-│   └── icons/                   # SHARED
-│
-├── styles/                      # Optional extra styles
-│   └── custom.css               # SHARED
+├── styles/                     
+│   └── custom.css            
 │
 ├── .gitignore
+├── AGENTS.md
+├── CLAUDE.md
+├── eslint.config.mjs
+├── next-env.d.ts
+├── package-lock.json
 ├── package.json
+├── postcss.config.js
 ├── next.config.js
 ├── README.md
-└── jsconfig.json               # Optional (path aliases)
+└── tsconfig.json              

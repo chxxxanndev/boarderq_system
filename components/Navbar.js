@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation'; // Added useRouter
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { 
   LayoutDashboard, 
@@ -13,7 +13,8 @@ import {
   User,
   LogOut,
   Sun,
-  Moon
+  Moon,
+  Info // Added Info icon for the About page
 } from 'lucide-react';
 
 export default function Navbar() {
@@ -22,14 +23,13 @@ export default function Navbar() {
   const [role, setRole] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(true);
 
-  // FIX: Listen to 'pathname' changes
   useEffect(() => {
     const storedRole = localStorage.getItem('role');
     setRole(storedRole); 
     
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'light') setIsDarkMode(false);
-  }, [pathname]); // Whenever the route changes, re-read the role from localStorage
+  }, [pathname]);
 
   const toggleTheme = () => {
     const newMode = !isDarkMode;
@@ -40,12 +40,12 @@ export default function Navbar() {
   const handleLogout = () => {
     localStorage.removeItem('role');
     localStorage.removeItem('userEmail');
-    setRole(null); // Clear local state immediately
-    window.location.href = '/public/login'; // Hard redirect to clear any cached states
+    setRole(null);
+    window.location.href = '/public/login';
   };
 
   const getIcon = (name) => {
-    const iconClass = "w-4 h-4 text-cyan-500"; // Changed to cyan to match your theme
+    const iconClass = "w-4 h-4 text-cyan-500";
     switch (name) {
       case 'Dashboard': return <LayoutDashboard className={iconClass} />;
       case 'Rooms': return <BedDouble className={iconClass} />;
@@ -53,6 +53,7 @@ export default function Navbar() {
       case 'Payments': return <CreditCard className={iconClass} />;
       case 'Maintenance': return <Wrench className={iconClass} />;
       case 'Announcements': return <Megaphone className={iconClass} />;
+      case 'About': return <Info className={iconClass} />; // Added Icon mapping
       default: return <LayoutDashboard className={iconClass} />;
     }
   };
@@ -63,10 +64,11 @@ export default function Navbar() {
     navLinks = [
       { name: 'Home', href: '/' },
       { name: 'Rooms', href: '/public/rooms' },
+      { name: 'About', href: '/public/about' }, // Added About Link
     ];
   } else if (role === 'landlord') {
     navLinks = [
-      { name: 'Dashboard', href: '/admin' }, // Ensure these match your folder structure
+      { name: 'Dashboard', href: '/admin/dashboard' },
       { name: 'Rooms', href: '/admin/rooms' },
       { name: 'Applications', href: '/admin/applications' },
       { name: 'Payments', href: '/admin/payments' },
@@ -95,7 +97,6 @@ export default function Navbar() {
       </div>
 
       <div className="flex items-center gap-8">
-        {/* Navigation Links */}
         <div className="hidden lg:flex items-center gap-8">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
@@ -141,7 +142,6 @@ export default function Navbar() {
             </Link>
           ) : (
             <div className="flex items-center gap-4">
-               {/* Show Role Badge */}
                <span className="text-[9px] bg-cyan-500/10 text-cyan-500 px-2 py-1 rounded font-black uppercase tracking-tighter">
                 {role}
               </span>
