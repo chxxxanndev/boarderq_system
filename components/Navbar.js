@@ -1,10 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation'; // Added useRouter
 import { useEffect, useState } from 'react';
 import { 
-  ClipboardCheck, 
   LayoutDashboard, 
   BedDouble, 
   FileText, 
@@ -19,31 +18,34 @@ import {
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [role, setRole] = useState(null);
-  const [isDarkMode, setIsDarkMode] = useState(true); // Defaulting to your dark screenshot look
+  const [isDarkMode, setIsDarkMode] = useState(true);
 
+  // FIX: Listen to 'pathname' changes
   useEffect(() => {
     const storedRole = localStorage.getItem('role');
     setRole(storedRole); 
     
-    // Check for saved theme preference
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'light') setIsDarkMode(false);
-  }, []);
+  }, [pathname]); // Whenever the route changes, re-read the role from localStorage
 
   const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-    localStorage.setItem('theme', !isDarkMode ? 'dark' : 'light');
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    localStorage.setItem('theme', newMode ? 'dark' : 'light');
   };
 
   const handleLogout = () => {
     localStorage.removeItem('role');
-    window.location.href = '/';
+    localStorage.removeItem('userEmail');
+    setRole(null); // Clear local state immediately
+    window.location.href = '/public/login'; // Hard redirect to clear any cached states
   };
 
-  // Icon mapping for modern look
   const getIcon = (name) => {
-    const iconClass = "w-4 h-4 text-yellow-500";
+    const iconClass = "w-4 h-4 text-cyan-500"; // Changed to cyan to match your theme
     switch (name) {
       case 'Dashboard': return <LayoutDashboard className={iconClass} />;
       case 'Rooms': return <BedDouble className={iconClass} />;
@@ -55,6 +57,7 @@ export default function Navbar() {
     }
   };
 
+  // Define links based on role
   let navLinks = [];
   if (!role) {
     navLinks = [
@@ -63,10 +66,10 @@ export default function Navbar() {
     ];
   } else if (role === 'landlord') {
     navLinks = [
-      { name: 'Dashboard', href: '/dashboard' },
-      { name: 'Rooms', href: '/dashboard/rooms' },
-      { name: 'Applications', href: '/dashboard/applications' },
-      { name: 'Payments', href: '/dashboard/payments' },
+      { name: 'Dashboard', href: '/admin' }, // Ensure these match your folder structure
+      { name: 'Rooms', href: '/admin/rooms' },
+      { name: 'Applications', href: '/admin/applications' },
+      { name: 'Payments', href: '/admin/payments' },
     ];
   } else if (role === 'tenant') {
     navLinks = [
@@ -79,8 +82,8 @@ export default function Navbar() {
   return (
     <nav className={`sticky top-0 z-50 w-full px-8 py-4 flex items-center justify-between transition-all duration-300 border-b ${
       isDarkMode 
-        ? 'bg-[#0B1120] border-white/5' 
-        : 'bg-white border-slate-200 shadow-sm'
+        ? 'bg-[#0B1120] border-white/5 text-white' 
+        : 'bg-white border-slate-200 shadow-sm text-slate-900'
     }`}>
       
       <div className="flex items-center gap-6">
@@ -91,9 +94,7 @@ export default function Navbar() {
         </Link>
       </div>
 
-      {/* RIGHT: DYNAMIC NAVIGATION & THEME TOGGLE */}
       <div className="flex items-center gap-8">
-        
         {/* Navigation Links */}
         <div className="hidden lg:flex items-center gap-8">
           {navLinks.map((link) => {
@@ -119,10 +120,7 @@ export default function Navbar() {
           })}
         </div>
 
-        {/* UTILITIES (Theme + Auth) */}
         <div className={`flex items-center gap-4 pl-6 border-l ${isDarkMode ? 'border-white/10' : 'border-slate-200'}`}>
-          
-          {/* THEME TOGGLE BUTTON */}
           <button 
             onClick={toggleTheme}
             className={`p-2 rounded-lg transition-colors ${
@@ -142,17 +140,24 @@ export default function Navbar() {
               <User size={18} />
             </Link>
           ) : (
-            <button 
-              onClick={handleLogout}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded border transition-all text-[10px] font-bold uppercase ${
-                isDarkMode 
-                  ? 'bg-white/5 border-white/10 text-white/60 hover:text-red-400 hover:bg-red-500/10' 
-                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-red-600 hover:bg-red-50'
-              }`}
-            >
-              <LogOut size={14} />
-              Logout
-            </button>
+            <div className="flex items-center gap-4">
+               {/* Show Role Badge */}
+               <span className="text-[9px] bg-cyan-500/10 text-cyan-500 px-2 py-1 rounded font-black uppercase tracking-tighter">
+                {role}
+              </span>
+              
+              <button 
+                onClick={handleLogout}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded border transition-all text-[10px] font-bold uppercase ${
+                  isDarkMode 
+                    ? 'bg-white/5 border-white/10 text-white/60 hover:text-red-400 hover:bg-red-500/10' 
+                    : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-red-600 hover:bg-red-50'
+                }`}
+              >
+                <LogOut size={14} />
+                Logout
+              </button>
+            </div>
           )}
         </div>
       </div>

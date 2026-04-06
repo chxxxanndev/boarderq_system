@@ -1,28 +1,51 @@
 'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Button from '@/components/Button';
 import { Mail, Lock, ShieldCheck, Fingerprint } from 'lucide-react';
 
 export default function LoginPage() {
+  const router = useRouter();
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
 
-  const handleLogin = async (e) => {
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleLogin = (e) => {
     e.preventDefault();
+    const { email, password } = formData;
 
-    const email = document.querySelector('input[type="email"]').value;
-    const password = document.querySelector('input[type="password"]').value;
-
-    // 🔐 TEMP MOCK AUTH (replace with real backend later)
-
-    // 👉 LANDLORD (fixed account)
+    // 1. ADMIN CHECK
     if (email === 'admin@boarderq.com' && password === 'admin123') {
-      window.location.href = '/dashboard';
+      localStorage.setItem('role', 'landlord');
+      localStorage.setItem('userEmail', email);
+      router.push('/admin');
       return;
     }
 
-    // 👉 TENANT (example account)
-    if (email === 'tenant@boarderq.com' && password === 'tenant123') {
-      window.location.href = '/tenant/dashboard';
+    // 2. TENANT CHECK
+    const localData = localStorage.getItem('tenants');
+    const tenants = localData ? JSON.parse(localData) : [];
+
+    const foundTenant = tenants.find(
+      (t) => t.email.toLowerCase() === email.toLowerCase() && t.password === password
+    );
+
+    if (foundTenant) {
+      if (foundTenant.status !== 'approved') {
+        alert('Access Restricted: Your account is pending approval.');
+        return;
+      }
+
+      localStorage.setItem('role', 'tenant');
+      localStorage.setItem('userEmail', foundTenant.email);
+      router.push('/tenant/dashboard');
       return;
     }
 
@@ -50,9 +73,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <form className="space-y-6 relative z-10">
-          
-          {/* EMAIL */}
+        <form onSubmit={handleLogin} className="space-y-6 relative z-10">
           <div className="space-y-2">
             <label className="text-[10px] font-mono uppercase tracking-[0.3em] text-slate-500 block font-bold">
               User Identification
@@ -61,13 +82,16 @@ export default function LoginPage() {
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-cyan-600 w-4 h-4 transition-colors" />
               <input 
                 type="email" 
+                name="email"
+                required
+                value={formData.email}
+                onChange={handleChange}
                 placeholder="USER@BOARDERQ.COM" 
                 className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-300 focus:outline-none focus:border-cyan-600 focus:bg-white focus:ring-4 focus:ring-cyan-600/5 transition-all font-mono text-sm uppercase"
               />
             </div>
           </div>
 
-          {/* PASSWORD */}
           <div className="space-y-2">
             <label className="text-[10px] font-mono uppercase tracking-[0.3em] text-slate-500 block font-bold">
               Security Protocol
@@ -76,39 +100,26 @@ export default function LoginPage() {
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-cyan-600 w-4 h-4 transition-colors" />
               <input 
                 type="password" 
+                name="password"
+                required
+                value={formData.password}
+                onChange={handleChange}
                 placeholder="••••••••" 
                 className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-300 focus:outline-none focus:border-cyan-600 focus:bg-white focus:ring-4 focus:ring-cyan-600/5 transition-all font-mono text-sm"
               />
             </div>
           </div>
 
-          {/* OPTIONS */}
-          <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2 cursor-pointer group">
-              <input type="checkbox" className="w-3.5 h-3.5 border-slate-300 rounded-sm text-cyan-600 focus:ring-cyan-600/20" />
-              <span className="text-[10px] text-slate-500 font-mono uppercase tracking-widest group-hover:text-slate-800 transition-colors">
-                Stay Synced
-              </span>
-            </label>
-            <Link href="#" className="text-slate-400 text-[10px] font-mono uppercase tracking-widest hover:text-cyan-600 transition-colors">
-              Recovery
-            </Link>
-          </div>
-
-          {/* SIGN IN BUTTON */}
           <div className="pt-4 space-y-4">
             <Button 
-              className="w-full py-4 text-[11px] shadow-lg shadow-cyan-600/20" 
-              variant="primary"
-              onClick={handleLogin}
+              type="submit"
+              className="w-full py-4 text-[11px] shadow-lg shadow-cyan-600/20 bg-cyan-600 hover:bg-cyan-700 text-white" 
             >
               Sign In <ShieldCheck className="w-4 h-4 ml-2" />
             </Button>
           </div>
-
         </form>
 
-        {/* REGISTER LINK */}
         <div className="mt-10 pt-6 border-t border-slate-100 text-center">
           <p className="text-slate-400 text-[10px] font-mono uppercase tracking-widest">
             New Entity?{' '}
@@ -117,7 +128,6 @@ export default function LoginPage() {
             </Link>
           </p>
         </div>
-
       </div>
     </div>
   );
