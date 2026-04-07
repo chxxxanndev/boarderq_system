@@ -21,7 +21,6 @@ export default function LoginPage() {
     e.preventDefault();
     const { email, password } = formData;
 
-    // 1. ADMIN CHECK
     if (email === 'admin@boarderq.com' && password === 'admin123') {
       localStorage.setItem('role', 'landlord');
       localStorage.setItem('userEmail', email);
@@ -29,7 +28,6 @@ export default function LoginPage() {
       return;
     }
 
-    // 2. TENANT CHECK
     const localData = localStorage.getItem('tenants');
     const tenants = localData ? JSON.parse(localData) : [];
 
@@ -61,11 +59,11 @@ export default function LoginPage() {
 
         <div className="text-center mb-10 relative z-10">
           <div className="bg-purple-50 border border-purple-100 px-4 py-1 inline-block mb-4 rounded-sm">
-            <span className="text-purple-700 text-[9px] tracking-[0.4em] uppercase font-black italic">
+            <span className="text-purple-700 text-[9px] tracking-[0.4em] uppercase font-black">
               Identity Verification
             </span>
           </div>
-          <h1 className="text-5xl font-black text-slate-900 italic tracking-tighter uppercase leading-none">
+          <h1 className="text-5xl font-black text-slate-900 tracking-tighter uppercase leading-none">
             Log In
           </h1>
           <p className="text-slate-400 text-[10px] font-mono tracking-widest mt-3 uppercase">
@@ -87,7 +85,7 @@ export default function LoginPage() {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="USER@BOARDERQ.COM" 
-                className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-300 focus:outline-none focus:border-cyan-600 focus:bg-white focus:ring-4 focus:ring-cyan-600/5 transition-all font-mono text-sm uppercase"
+                className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-300 focus:outline-none focus:border-cyan-600 focus:bg-white focus:ring-4 focus:ring-cyan-600/5 transition-all font-mono text-sm"
               />
             </div>
           </div>

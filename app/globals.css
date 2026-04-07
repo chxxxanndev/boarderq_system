@@ -11,6 +11,8 @@ body {
   color: rgb(var(--foreground-rgb));
   background-color: var(--background-hex);
   min-height: 100vh;
+  width: 100%; 
+  overflow-x: hidden; 
   
   background-image: 
     linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),

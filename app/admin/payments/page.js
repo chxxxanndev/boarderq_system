@@ -12,11 +12,11 @@ export default function LandlordPayments() {
         
         <div className="w-full flex items-center gap-6 mb-12">
           <div className="bg-purple-500/10 border border-purple-500/20 px-6 py-2 rounded-sm shrink-0 shadow-sm">
-            <span className="text-purple-700 font-black text-[11px] tracking-[0.3em] uppercase italic">
+            <span className="text-purple-700 font-black text-[11px] tracking-[0.3em] uppercase">
               FINANCIAL RECORDS
             </span>
           </div>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">
+          <h1 className="text-4xl font-black text-slate-900 tracking-tighter uppercase leading-none">
             Payments
           </h1>
           <div className="flex-1 h-[1px] bg-slate-200"></div>

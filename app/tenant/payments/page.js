@@ -25,14 +25,13 @@ export default function TenantPayments() {
     <div className="flex min-h-screen bg-slate-50 font-sans text-slate-900">
       <main className="flex-1 p-8 lg:p-12">
         
-        {/* Standardized Header Section (EXACT MATCH TO ADMIN) */}
         <div className="w-full flex items-center gap-6 mb-12">
           <div className="bg-cyan-500/10 border border-cyan-500/20 px-6 py-2 rounded-sm shrink-0 shadow-sm">
-            <span className="text-cyan-700 font-black text-[11px] tracking-[0.3em] uppercase italic">
+            <span className="text-cyan-700 font-black text-[11px] tracking-[0.3em] uppercase">
               FINANCIAL TERMINAL
             </span>
           </div>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">
+          <h1 className="text-4xl font-black text-slate-900 tracking-tighter uppercase leading-none">
             Billing & History
           </h1>
           <div className="flex-1 h-[1px] bg-slate-200"></div>
@@ -43,7 +42,6 @@ export default function TenantPayments() {
           </div>
         </div>
 
-        {/* Stats Summary (Matched to Admin Dashboard Stats) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
           <div className="glass-panel bg-white p-6 border-l-2 border-slate-200 hover:border-l-cyan-500 transition-all shadow-sm">
             <div className="flex justify-between items-start mb-4">
@@ -55,7 +53,7 @@ export default function TenantPayments() {
               </div>
             </div>
             <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1 font-semibold">Outstanding Balance</p>
-            <p className="text-3xl font-black text-slate-900 italic uppercase tracking-tighter">₱5,500.00</p>
+            <p className="text-3xl font-black text-slate-900 uppercase tracking-tighter">₱5,500.00</p>
           </div>
 
           <div className="glass-panel bg-white p-6 border-l-2 border-slate-200 shadow-sm">
@@ -68,7 +66,7 @@ export default function TenantPayments() {
               </div>
             </div>
             <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1 font-semibold">Total Paid to Date</p>
-            <p className="text-3xl font-black text-slate-900 italic uppercase tracking-tighter">₱16,500.00</p>
+            <p className="text-3xl font-black text-slate-900 uppercase tracking-tighter">₱16,500.00</p>
           </div>
 
           <div className="glass-panel bg-white p-6 border-l-2 border-slate-200 shadow-sm">
@@ -78,16 +76,15 @@ export default function TenantPayments() {
               </div>
             </div>
             <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1 font-semibold">Last Transaction</p>
-            <p className="text-3xl font-black text-slate-900 italic uppercase tracking-tighter">MAR 05</p>
+            <p className="text-3xl font-black text-slate-900 uppercase tracking-tighter">MAR 05</p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
-          {/* Transaction History - (Matched to Admin's "Recent Applications" List) */}
           <div className="lg:col-span-2 glass-panel bg-white border border-slate-200 overflow-hidden shadow-sm">
             <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-              <h2 className="text-[11px] font-black text-slate-900 uppercase italic tracking-[0.2em] flex items-center gap-2">
+              <h2 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] flex items-center gap-2">
                 <div className="w-2 h-2 bg-cyan-500"></div>
                 Transaction Logs
               </h2>
@@ -98,7 +95,7 @@ export default function TenantPayments() {
               {paymentHistory.map((item, i) => (
                 <div key={i} className="flex items-center justify-between p-6 hover:bg-slate-50/50 transition-colors group cursor-pointer">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-slate-100 group-hover:bg-slate-900 group-hover:text-white transition-colors flex items-center justify-center font-black italic text-xs border border-slate-200 uppercase">
+                    <div className="w-10 h-10 bg-slate-100 group-hover:bg-slate-900 group-hover:text-white transition-colors flex items-center justify-center font-black text-xs border border-slate-200 uppercase">
                       {item.initial}
                     </div>
                     <div>
@@ -108,7 +105,7 @@ export default function TenantPayments() {
                       </p>
                     </div>
                   </div>
-                  <button className="flex items-center gap-1 text-[10px] font-black uppercase italic text-cyan-600 group-hover:translate-x-1 transition-transform tracking-widest">
+                  <button className="flex items-center gap-1 text-[10px] font-black uppercase text-cyan-600 group-hover:translate-x-1 transition-transform tracking-widest">
                     Receipt <Download className="w-3 h-3" />
                   </button>
                 </div>
@@ -121,10 +118,9 @@ export default function TenantPayments() {
             </div>
           </div>
 
-          {/* Action Sidebar - (Matched to Admin's Quick Actions Sidebar) */}
           <div className="space-y-6">
             <div className="bg-slate-900 p-8 text-white border-b-4 border-cyan-500 shadow-xl">
-              <h3 className="text-xl font-black italic uppercase tracking-tighter mb-6">Payment Portal</h3>
+              <h3 className="text-xl font-black uppercase tracking-tighter mb-6">Payment Portal</h3>
               <div className="space-y-3">
                 <Button className="w-full justify-start rounded-none bg-cyan-600 hover:bg-cyan-500 text-[10px] tracking-[0.2em] font-bold h-12">
                    SETTLE CURRENT BILL
@@ -140,7 +136,7 @@ export default function TenantPayments() {
                 <Clock className="w-4 h-4 text-amber-500" />
                 <h4 className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">System Notice</h4>
               </div>
-              <p className="text-xs text-slate-600 italic leading-relaxed uppercase tracking-tighter">
+              <p className="text-xs text-slate-600 leading-relaxed uppercase tracking-tighter">
                 GCash Gateway maintenance on <span className="text-cyan-600 font-bold">March 25</span>. 
                 Expect minor delays in receipt generation.
               </p>
@@ -148,7 +144,6 @@ export default function TenantPayments() {
           </div>
         </div>
 
-        {/* Standard Footer - EXACT MATCH TO ADMIN */}
         <footer className="mt-20 py-8 text-slate-400 text-[8px] tracking-[0.5em] font-mono uppercase border-t border-slate-200 w-full text-center">
           Console <span className="mx-2 text-cyan-500 opacity-50">/</span> Secure <span className="mx-2 text-cyan-500 opacity-50">/</span> Boarder-Q 2026
         </footer>

@@ -25,21 +25,18 @@ export default function RegisterPage() {
     const newTenant = {
       ...formData,
       role: 'tenant',
-      status: 'approved' // Set to 'pending' if you want landlords to approve them first
+      status: 'approved'
     };
 
-    // GET existing tenants
     const localData = localStorage.getItem('tenants');
     const existingTenants = localData ? JSON.parse(localData) : [];
 
-    // Validation
     const emailExists = existingTenants.find(user => user.email.toLowerCase() === formData.email.toLowerCase());
     if (emailExists || formData.email === 'admin@boarderq.com') {
       alert('This email is already registered.');
       return;
     }
 
-    // SAVE
     existingTenants.push(newTenant);
     localStorage.setItem('tenants', JSON.stringify(existingTenants));
 

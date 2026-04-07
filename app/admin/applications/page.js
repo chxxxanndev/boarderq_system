@@ -25,11 +25,11 @@ export default function LandlordApplications() {
         
         <div className="w-full flex items-center gap-6 mb-12">
           <div className="bg-purple-500/10 border border-purple-500/20 px-6 py-2 rounded-sm shrink-0 shadow-sm">
-            <span className="text-purple-700 font-black text-[11px] tracking-[0.3em] uppercase italic">
+            <span className="text-purple-700 font-black text-[11px] tracking-[0.3em] uppercase">
               TENANT RECORDS
             </span>
           </div>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">
+          <h1 className="text-4xl font-black text-slate-900 tracking-tighter uppercase leading-none">
             Applications
           </h1>
           <div className="flex-1 h-[1px] bg-slate-200"></div>
@@ -60,7 +60,7 @@ export default function LandlordApplications() {
               <div className="bg-slate-100 p-6 rounded-full border border-slate-200 mb-6">
                 <ClipboardList className="w-12 h-12 text-slate-300 animate-pulse" />
               </div>
-              <h3 className="text-lg font-bold text-slate-800 tracking-tight uppercase italic">No pending applications</h3>
+              <h3 className="text-lg font-bold text-slate-800 tracking-tight uppercase">No pending applications</h3>
               <p className="text-slate-500 text-xs font-mono tracking-widest mt-2 uppercase">
                 Database synchronization complete. All clear.
               </p>

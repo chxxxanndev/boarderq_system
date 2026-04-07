@@ -6,14 +6,12 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen flex flex-col items-center pt-20 pb-10 transition-colors duration-300 bg-slate-50">
       
-      {/* Top Badge */}
       <div className="border border-cyan-500/20 px-6 py-1.5 mb-10 animate-pulse bg-cyan-500/10">
         <span className="text-cyan-700 text-[10px] tracking-[0.4em] uppercase font-bold">
           Technical Specifications & Project Scope
         </span>
       </div>
 
-      {/* Header Section */}
       <header className="text-center mb-12 px-4">
         <h1 className="text-5xl md:text-6xl font-black text-cyan-600 tracking-tighter uppercase italic leading-none transition-colors">
           THE BOARDER-Q PROJECT
@@ -27,10 +25,8 @@ export default function AboutPage() {
         </div>
       </header>
 
-      {/* Main Content Wrapper */}
       <div className="w-full max-w-5xl px-6 space-y-8">
         
-        {/* Abstract Section */}
         <div className="bg-white border border-slate-200 p-8 shadow-sm hover:border-cyan-500/40 transition-all duration-500 relative overflow-hidden">
           <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
              <Database className="w-32 h-32 text-cyan-600" />
@@ -61,10 +57,8 @@ export default function AboutPage() {
           </div>
         </div>
 
-        {/* Grid Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           
-          {/* Functional Pillars */}
           <div className="bg-white border border-slate-200 p-8 shadow-sm hover:border-cyan-500/40 transition-all duration-500">
             <div className="flex items-center gap-3 mb-6">
               <div className="bg-cyan-500/10 p-2 border border-cyan-500/20">
@@ -91,7 +85,6 @@ export default function AboutPage() {
             </ul>
           </div>
 
-          {/* Development Team */}
           <div className="bg-white border border-slate-200 p-8 shadow-sm hover:border-purple-500/40 transition-all duration-500">
             <div className="flex items-center gap-3 mb-6">
               <div className="bg-purple-500/10 p-2 border border-purple-500/20">
@@ -123,7 +116,6 @@ export default function AboutPage() {
 
         </div>
 
-        {/* Vision Statement */}
         <div className="w-full text-center py-10">
           <p className="text-[10px] text-slate-400 font-mono uppercase tracking-[0.5em] mb-4">The Future of Boarding Management</p>
           <h3 className="text-2xl font-black text-slate-800 tracking-tighter uppercase italic">

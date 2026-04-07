@@ -9,11 +9,11 @@ export default function TenantAnnouncements() {
         
         <div className="w-full flex items-center gap-6 mb-12">
           <div className="bg-purple-500/10 border border-purple-500/20 px-6 py-2 rounded-sm shrink-0 shadow-sm">
-            <span className="text-purple-700 font-black text-[11px] tracking-[0.3em] uppercase italic">
+            <span className="text-purple-700 font-black text-[11px] tracking-[0.3em] uppercase">
               BROADCAST LOGS
             </span>
           </div>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">
+          <h1 className="text-4xl font-black text-slate-900 tracking-tighter uppercase leading-none">
             Announcements
           </h1>
           <div className="flex-1 h-[1px] bg-slate-200"></div>
@@ -41,7 +41,7 @@ export default function TenantAnnouncements() {
 
                   <div className="flex-1">
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-2">
-                      <h3 className="text-xl font-black text-slate-900 uppercase italic tracking-tight group-hover:text-cyan-700 transition-colors">
+                      <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight group-hover:text-cyan-700 transition-colors">
                         {ann.title}
                       </h3>
                       <span className="text-[10px] text-slate-600 font-mono flex items-center gap-1 uppercase tracking-widest bg-slate-100 px-2 py-1 border border-slate-200">
@@ -49,7 +49,7 @@ export default function TenantAnnouncements() {
                       </span>
                     </div>
 
-                    <p className="text-slate-600 text-sm leading-relaxed font-light mb-6 border-l border-slate-200 pl-4 italic">
+                    <p className="text-slate-600 text-sm leading-relaxed font-light mb-6 border-l border-slate-200 pl-4">
                       {ann.content}
                     </p>
 

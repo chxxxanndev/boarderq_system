@@ -1,55 +1,171 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { 
   LayoutDashboard, 
-  Home, 
-  Users, 
+  FileText, 
   CreditCard, 
   Wrench, 
-  Settings,
-  ChevronRight
+  Megaphone,
+  ChevronDown,
+  ChevronRight,
+  Menu,
+  Users,
+  Home,
+  LogOut
 } from 'lucide-react';
 
-export default function Sidebar({ active = 'dashboard' }) {
-  const menuItems = [
-    { id: 'dashboard', label: 'Overview', icon: LayoutDashboard, href: '/dashboard' },
-    { id: 'rooms', label: 'Manage Rooms', icon: Home, href: '/dashboard/rooms' },
-    { id: 'applications', label: 'Applications', icon: Users, href: '/dashboard/applications' },
-    { id: 'payments', label: 'Payments', icon: CreditCard, href: '/dashboard/payments' },
-    { id: 'maintenance', label: 'Maintenance', icon: Wrench, href: '/dashboard/maintenance' },
-  ];
+export default function Sidebar() {
+  const pathname = usePathname();
+  const [role, setRole] = useState(null);
+  const [userName, setUserName] = useState("SYSTEM USER");
+  
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isTenantsOpen, setIsTenantsOpen] = useState(true);
+
+  useEffect(() => {
+    const storedRole = localStorage.getItem('role');
+    setRole(storedRole); 
+    if (storedRole === 'landlord') setUserName("Admin User");
+    if (storedRole === 'tenant') setUserName("Tenant User");
+  }, [pathname]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('role');
+    localStorage.removeItem('userEmail');
+    window.location.href = '/public/login'; 
+  };
+
+  const getMenuItems = () => {
+    if (role === 'landlord') {
+      return [
+        { id: 'dashboard', label: 'OVERVIEW', icon: LayoutDashboard, href: '/admin/dashboard' },
+        { id: 'rooms', label: 'PROPERTIES', icon: Home, href: '/admin/rooms' },
+        { 
+          id: 'tenants_group', 
+          label: 'FIND TENANTS', 
+          icon: Users, 
+          isDropdown: true,
+          isOpen: isTenantsOpen,
+          toggle: () => setIsTenantsOpen(!isTenantsOpen),
+          subItems: [
+            { label: 'APPLICATIONS', href: '/admin/applications' },
+            { label: 'LEADS', href: '#' }, 
+          ]
+        },
+        { id: 'payments', label: 'REPORTS', icon: FileText, href: '/admin/payments' },
+        { id: 'maintenance', label: 'MAINTENANCE', icon: Wrench, href: '/admin/maintenance' },
+      ];
+    }
+    return [
+      { id: 'dashboard', label: 'OVERVIEW', icon: LayoutDashboard, href: '/tenant/dashboard' },
+      { id: 'payments', label: 'PAYMENTS', icon: CreditCard, href: '/tenant/payments' },
+      { id: 'announcements', label: 'ANNOUNCEMENTS', icon: Megaphone, href: '/tenant/announcements' },
+    ];
+  };
+
+  const menuItems = getMenuItems();
 
   return (
-    <aside className="w-64 bg-slate-950/20 border-r border-slate-800/60 h-[calc(100vh-140px)] sticky top-[140px] hidden md:block">
-      <div className="p-4 flex flex-col gap-1">
+    <aside className={`${isCollapsed ? 'w-20' : 'w-64'} bg-black h-screen sticky top-0 hidden md:flex flex-col text-white transition-all duration-300 ease-in-out border-r border-[#333] shadow-2xl`}>
+      
+      {/* Branding Section */}
+      <div className="h-20 flex items-center px-6 justify-between border-b border-[#333]">
+        {!isCollapsed && (
+          <div className="flex items-center gap-1">
+             <span className="font-black text-xl tracking-tighter">BOARDER</span>
+             <span className="font-black text-xl text-[#00A3CC] italic">Q</span>
+          </div>
+        )}
+        <button onClick={() => setIsCollapsed(!isCollapsed)} className="hover:bg-[#1A1A1A] p-2 rounded-lg transition-colors text-[#00A3CC]">
+          <Menu size={22} />
+        </button>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-grow py-6 overflow-y-auto overflow-x-hidden">
         {menuItems.map((item) => {
-          const isActive = active === item.id;
+          if (item.isDropdown) {
+            return (
+              <div key={item.id} className="mb-2">
+                <button 
+                  onClick={item.toggle}
+                  className={`w-full flex items-center gap-4 px-6 py-3 text-white/60 hover:text-white hover:bg-[#1A1A1A] transition-all ${item.isOpen ? 'text-white' : ''}`}
+                >
+                  <item.icon size={20} className="min-w-[20px]" />
+                  {!isCollapsed && (
+                    <>
+                      <span className="text-[12px] font-black tracking-widest flex-1 text-left">{item.label}</span>
+                      {item.isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                    </>
+                  )}
+                </button>
+                {!isCollapsed && item.isOpen && (
+                  <div className="bg-[#0A0A0A]">
+                    {item.subItems.map((sub, idx) => {
+                      const isSubActive = pathname === sub.href;
+                      return (
+                        <Link 
+                          key={idx} 
+                          href={sub.href}
+                          className={`flex items-center gap-4 px-6 py-3 transition-all relative ${
+                            isSubActive ? 'bg-[#1A1A1A] text-white' : 'text-white/40 hover:text-white hover:bg-[#1A1A1A]'
+                          }`}
+                        >
+                          {isSubActive && <div className="absolute left-0 w-1 h-full bg-[#00A3CC]"></div>}
+                          <span className="ml-9 text-[11px] font-bold tracking-wider">{sub.label}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          }
+
+          const isActive = pathname === item.href;
           return (
             <Link 
               key={item.id} 
               href={item.href}
-              className={`flex items-center justify-between p-3 transition-all duration-300 group ${
-                isActive 
-                  ? 'bg-cyan-500/10 border-l-2 border-cyan-400 text-cyan-400' 
-                  : 'text-slate-500 hover:text-slate-200 hover:bg-slate-900/40 border-l-2 border-transparent'
+              className={`flex items-center gap-4 px-6 py-3 transition-all relative group ${
+                isActive ? 'bg-[#1A1A1A] text-white' : 'text-white/50 hover:text-white hover:bg-[#1A1A1A]'
               }`}
             >
-              <div className="flex items-center gap-3">
-                <item.icon className={`w-4 h-4 ${isActive ? 'text-cyan-400' : 'text-slate-600 group-hover:text-cyan-500'}`} />
-                <span className="font-bold text-[11px] uppercase tracking-[0.2em] font-mono">
-                  {item.label}
-                </span>
-              </div>
-              {isActive && <div className="w-1 h-1 bg-cyan-400 rounded-full shadow-[0_0_8px_#22d3ee]"></div>}
+              {/* Cyan Active Indicator Bar */}
+              {isActive && (
+                <div className="absolute left-0 w-1.5 h-full bg-[#00A3CC] shadow-[0_0_15px_#00A3CC]"></div>
+              )}
+              
+              <item.icon size={20} className={`min-w-[20px] ${isActive ? 'text-[#00A3CC]' : 'text-white/50 group-hover:text-white'}`} />
+              {!isCollapsed && <span className="text-[12px] font-black tracking-widest">{item.label}</span>}
             </Link>
           );
         })}
-      </div>
+      </nav>
 
-      <div className="absolute bottom-6 w-full px-4">
-        <Link href="/settings" className="flex items-center gap-3 p-3 text-slate-600 hover:text-cyan-400 transition-colors border-t border-slate-900 pt-6">
-          <Settings className="w-4 h-4" />
-          <span className="font-bold text-[10px] uppercase tracking-widest font-mono">System Settings</span>
-        </Link>
+      {/* User & Sign Out Section */}
+      <div className="mt-auto border-t border-[#333] bg-[#0A0A0A]">
+         {!isCollapsed && (
+            <div className="px-6 py-5 flex items-center gap-3">
+               <div className="w-9 h-9 rounded-sm bg-[#333] border border-white/10 flex items-center justify-center font-black text-sm text-[#00A3CC]">
+                  {userName.charAt(0)}
+               </div>
+               <div className="overflow-hidden">
+                  <p className="text-[11px] font-black uppercase truncate tracking-tight">{userName}</p>
+                  <p className="text-[9px] text-[#00A3CC] font-bold uppercase tracking-widest">{role}</p>
+               </div>
+            </div>
+         )}
+        <button 
+          onClick={handleLogout}
+          className="w-full flex items-center gap-4 px-6 py-5 text-white/40 hover:text-red-500 hover:bg-red-500/5 transition-all border-t border-[#333]"
+        >
+          <LogOut size={20} className="min-w-[20px]" />
+          {!isCollapsed && <span className="text-[11px] font-black tracking-[0.2em] uppercase">Sign Out</span>}
+        </button>
       </div>
     </aside>
   );
