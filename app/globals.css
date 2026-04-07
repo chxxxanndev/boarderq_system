@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --foreground-rgb: 255, 255, 255;
-  --background-hex: #020617; /* Deepest Navy (Slate-950) */
-  --accent-cyan: #22d3ee;
-  --accent-purple: #a855f7;
+  --foreground-rgb: 15, 23, 42; 
+  --background-hex: #f8fafc; 
+  --accent-cyan: #0891b2; 
+  --accent-purple: #9333ea;
 }
 
 body {
@@ -12,52 +12,46 @@ body {
   background-color: var(--background-hex);
   min-height: 100vh;
   
-  /* 1. THE GRID BACKGROUND: Subtle lines every 40px */
   background-image: 
-    linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+    linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
   background-size: 45px 45px;
   background-attachment: fixed;
 }
 
-/* 2. THE GLOWING LOGO: Matches the "BOARDER-Q" light blue glow */
 .glow-text {
-  text-shadow: 0 0 15px rgba(34, 211, 238, 0.4), 0 0 30px rgba(34, 211, 238, 0.2);
+  text-shadow: 0 0 10px rgba(8, 145, 178, 0.2);
 }
 
-/* 3. THE GRADIENT LINE: The thin glowing line under the logo */
 .glow-line {
   height: 1px;
   width: 180px;
   margin: 1.5rem auto;
   background: linear-gradient(90deg, transparent, var(--accent-cyan), var(--accent-purple), transparent);
-  box-shadow: 0 0 10px rgba(34, 211, 238, 0.3);
+  box-shadow: 0 0 8px rgba(8, 145, 178, 0.1);
 }
 
-/* 4. GLASSMORPHISM PANELS: For the "Tenant Records" boxes */
 .glass-panel {
-  background: rgba(15, 23, 42, 0.7);
+  background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 4px;
 }
 
-/* 5. SIDEBAR/BUTTON GLOW: Subtle hover effect */
 .btn-cyan {
-  @apply transition-all duration-300 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500 hover:text-slate-950 uppercase tracking-widest font-bold;
+  @apply transition-all duration-300 border border-cyan-600/30 text-cyan-700 hover:bg-cyan-600 hover:text-white uppercase tracking-widest font-bold;
 }
 
-/* 6. CUSTOM SCROLLBAR: Modern dark style */
 ::-webkit-scrollbar {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #020617;
+  background: #f1f5f9; 
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: #cbd5e1; 
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #22d3ee;
+  background: #0891b2;
 }

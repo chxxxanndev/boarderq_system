@@ -3,7 +3,6 @@ import { User, Calendar, FileText, Check, X, Tag } from 'lucide-react';
 export default function ApplicationCard({ application, onAccept, onReject }) {
   return (
     <div className="glass-panel p-6 border-l-2 border-l-purple-500/50 hover:border-l-cyan-400 transition-all duration-500 group">
-      {/* HEADER SECTION */}
       <div className="flex items-start justify-between mb-8">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 bg-slate-900 border border-slate-700 rounded-sm flex items-center justify-center text-cyan-400 font-black text-xl italic group-hover:border-cyan-400/50 transition-colors">
@@ -25,7 +24,6 @@ export default function ApplicationCard({ application, onAccept, onReject }) {
         </div>
       </div>
 
-      {/* INFO SECTION */}
       <div className="space-y-4 mb-8 bg-slate-950/40 p-4 rounded-sm border border-slate-800/40">
         <div className="flex items-center gap-3 text-xs">
           <User className="w-3 h-3 text-slate-600" />
@@ -39,7 +37,6 @@ export default function ApplicationCard({ application, onAccept, onReject }) {
         </div>
       </div>
 
-      {/* ACTION BUTTONS */}
       <div className="grid grid-cols-2 gap-3">
         <button 
           onClick={() => onReject(application.id)}

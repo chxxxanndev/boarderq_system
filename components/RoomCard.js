@@ -7,7 +7,6 @@ export default function RoomCard({ room }) {
   return (
     <div className="glass-panel overflow-hidden group hover:border-cyan-500/40 transition-all duration-500 flex flex-col h-full border-l-2 border-l-slate-800 hover:border-l-cyan-400">
       
-      {/* 1. IMAGE SECTION */}
       <div className="h-52 bg-slate-900 relative overflow-hidden">
         <img 
           src={room.image || `https://picsum.photos/seed/${room.id}/400/300`} 
@@ -16,7 +15,6 @@ export default function RoomCard({ room }) {
           referrerPolicy="no-referrer"
         />
         
-        {/* Status Badge - High Contrast */}
         <div className={`absolute top-4 right-4 px-4 py-1 border text-[10px] font-black uppercase tracking-widest italic flex items-center gap-2 ${
           isAvailable 
             ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-400 shadow-[0_0_15px_rgba(52,211,153,0.2)]' 
@@ -26,7 +24,6 @@ export default function RoomCard({ room }) {
           {room.status}
         </div>
 
-        {/* Room ID Tag */}
         <div className="absolute bottom-0 left-0 bg-slate-950/80 px-3 py-1 border-t border-r border-slate-800/50 backdrop-blur-sm">
           <span className="text-[9px] font-mono text-cyan-500 uppercase tracking-widest font-bold">
             UNIT-ID: {room.id.toString().padStart(3, '0')}
@@ -34,7 +31,6 @@ export default function RoomCard({ room }) {
         </div>
       </div>
 
-      {/* 2. CONTENT SECTION */}
       <div className="p-6 flex flex-col flex-1">
         <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter mb-4 group-hover:text-cyan-400 transition-colors">
           {room.name}
@@ -50,7 +46,6 @@ export default function RoomCard({ room }) {
             <span className="text-slate-300">{room.capacity} Person Max</span>
           </div>
           
-          {/* Price Readout */}
           <div className="flex items-center gap-3 pt-2 border-t border-slate-800/60 mt-2">
             <div className="text-[10px] font-mono text-slate-600 uppercase">Monthly Rate:</div>
             <div className="text-xl font-black text-cyan-400 glow-text flex items-center gap-1">
@@ -59,7 +54,6 @@ export default function RoomCard({ room }) {
           </div>
         </div>
 
-        {/* 3. ACTION BUTTON */}
         <div className="mt-auto">
           {isAvailable ? (
             <Link 

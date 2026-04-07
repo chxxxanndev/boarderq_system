@@ -193,201 +193,75 @@ IMPORTANT:
 
 * Ayaw mo edit same files
 * Always create your own branch
-* Pull before starting
+* Pull before starting             
 
-
-FULL FOLDER STRUCTURE
-boarderqueue_system/
+--------------------------------------------------------
+Final Full Folder Structure (Working Frontend only)
+--------------------------------------------------------
+app/
+├── layout.js               
+├── page.js                
+├── globals.css
 │
-├── app/                         # Main App Router (pages + API)
-│   ├── layout.js                # Global layout - CHE
-│   ├── page.js                  # Landing page (/) - CHE
-│   ├── globals.css
+├── admin/                   # Admin / Landlord dashboard
+│   ├── layout.js            
+│   ├── dashboard/
+│   ├── rooms/
+│   ├── applications/
+│   ├── payments/
+│   └── maintenance/
 │
-│   ├── rooms/                   # Public rooms browsing
-│   │   └── page.js              # /rooms - CHE
-│
-│   ├── apply/                   # Application form
-│   │   └── page.js              # /apply - XHYNDY
-│
+├── public/                  # Public / unauthenticated pages
+│   ├── rooms/
+│   ├── apply/
 │   ├── login/
-│   │   └── page.js              - CHE
-│
 │   ├── register/
-│   │   └── page.js              - CHE
+│   └── about/              
 │
-│   ├── dashboard/               # Landlord side
-│   │   ├── page.js              # /dashboard - CHE
-│   │   │
-│   │   ├── rooms/
-│   │   │   └── page.js          # Manage rooms - CHE 
-│   │   │
-│   │   ├── applications/
-│   │   │   └── page.js          - XHYNDY
-│   │   │
-│   │   ├── payments/
-│   │   │   └── page.js          - MAYMAY
-│   │   │
-│   │   └── maintenance/
-│   │       └── page.js          - XHYNDY
+├── tenant/                  # Tenant dashboard
+│   ├── dashboard/
+│   ├── payments/
+│   ├── maintenance/
+│   └── announcements/
 │
-│   ├── tenant/                  # Tenant side
-│   │   ├── dashboard/
-│   │   │   └── page.js          - CHE
-│   │   │
-│   │   ├── payments/
-│   │   │   └── page.js          - MAYMAY
-│   │   │
-│   │   ├── maintenance/
-│   │   │   └── page.js          - MAYMAY
-│   │   │
-│   │   └── announcements/
-│   │       └── page.js          - AKO
+├── api/                     # API routes
+│   ├── rooms/
+│   ├── applications/
+│   ├── auth/
+│   ├── payments/
+│   └── maintenance/
 │
-│   └── api/                     # Backend (later)
-│       ├── rooms/
-│       │   └── route.js
-│       │
-│       ├── applications/
-│       │   └── route.js
-│       │
-│       ├── auth/
-│       │   └── route.js
-│       │
-│       ├── payments/
-│       │   └── route.js
-│       │
-│       └── maintenance/
-│           └── route.js
+├── components/                  
+│   ├── Navbar.js                 
+│   ├── Sidebar.js                
+│   ├── Button.js                 
+│   ├── Card.js                   
+│   ├── RoomCard.js              
+│   ├── PaymentCard.js            
+│   ├── MaintenanceCard.js        
+│   └── ApplicationCard.js       
 │
-├── components/                  # Reusable UI components
-│   ├── Navbar.js
-│   ├── RoomCard.js
-│   ├── Button.js
-│   ├── Sidebar.js
-│   └── Card.js
+├── lib/                        
+│   ├── db.js                    
+│   └── auth.js                 
+├── utils/                       
+│   └── helpers.js               
 │
-├── lib/                         # Core logic (later)
-│   ├── db.js                    # MySQL connection
-│   └── auth.js                  # Authentication helpers
+├── public/                     
+│   ├── images/                 
+│   └── icons/                 
 │
-├── utils/                       # Helper functions
-│   └── helpers.js
-│
-├── public/                      # Static files
-│   ├── images/
-│   └── icons/
-│
-├── styles/                      # Optional extra styles
-│   └── custom.css
+├── styles/                     
+│   └── custom.css            
 │
 ├── .gitignore
+├── AGENTS.md
+├── CLAUDE.md
+├── eslint.config.mjs
+├── next-env.d.ts
+├── package-lock.json
 ├── package.json
+├── postcss.config.js
 ├── next.config.js
 ├── README.md
-└── jsconfig.json               # Optional (path aliases)
-
-
-
-
-
-
-
-
-
-
-
-NEW:
-
-boarderqueue_system/
-│
-├── app/                         # Main App Router (pages + API)
-│   ├── layout.js                # Global layout (SHARED — OWNER: IKAW)
-│   ├── page.js                  # Landing page (SHARED — OWNER: IKAW)
-│   ├── globals.css
-│
-│   ├── rooms/                   # Public rooms browsing
-│   │   └── page.js              # /rooms (IKAW)
-│
-│   ├── apply/                   # Application form
-│   │   └── page.js              # /apply (Xhyndy)
-│
-│   ├── login/
-│   │   └── page.js              # Login page (SHARED — OWNER: IKAW)
-│
-│   ├── register/
-│   │   └── page.js              # Register page (SHARED — OWNER: IKAW)
-│
-│   ├── dashboard/               # Landlord side
-│   │   ├── page.js              # /dashboard main (IKAW)
-│   │   │
-│   │   ├── rooms/
-│   │   │   └── page.js          # Manage rooms (IKAW)
-│   │   │
-│   │   ├── applications/
-│   │   │   └── page.js          # Applications management (Xhyndy)
-│   │   │
-│   │   ├── payments/
-│   │   │   └── page.js          # Payments (Maymay)
-│   │   │
-│   │   └── maintenance/
-│   │       └── page.js          # Maintenance (Xhyndy)
-│
-│   ├── tenant/                  # Tenant side
-│   │   ├── dashboard/
-│   │   │   └── page.js          # Tenant dashboard (IKAW)
-│   │   │
-│   │   ├── payments/
-│   │   │   └── page.js          # Tenant payments (Maymay)
-│   │   │
-│   │   ├── maintenance/
-│   │   │   └── page.js          # Tenant maintenance (Xhyndy)
-│   │   │
-│   │   └── announcements/
-│   │       └── page.js          # Tenant announcements (SHARED — OWNER: IKAW)
-│
-│   └── api/                     # Backend (later, can be shared)
-│       ├── rooms/
-│       │   └── route.js          # (IKAW)
-│       │
-│       ├── applications/
-│       │   └── route.js          # (Xhyndy)
-│       │
-│       ├── auth/
-│       │   └── route.js          # (IKAW)
-│       │
-│       ├── payments/
-│       │   └── route.js          # (Maymay)
-│       │
-│       └── maintenance/
-│           └── route.js          # (Xhyndy)
-│
-├── components/                  # Reusable UI components
-│   ├── Navbar.js                 # SHARED — OWNER: IKAW
-│   ├── Sidebar.js                # SHARED — OWNER: IKAW
-│   ├── Button.js                 # SHARED — Owner: whoever creates new usage
-│   ├── Card.js                   # SHARED — reusable, safe to copy for feature
-│   ├── RoomCard.js               # IKAW
-│   ├── PaymentCard.js            # Maymay (new component)
-│   ├── MaintenanceCard.js        # Xhyndy (new component)
-│   └── ApplicationCard.js        # Xhyndy (new component)
-│
-├── lib/                         # Core logic (later)
-│   ├── db.js                    # (SHARED — OWNER: IKAW)
-│   └── auth.js                  # (SHARED — OWNER: IKAW)
-│
-├── utils/                       # Helper functions
-│   └── helpers.js               # SHARED
-│
-├── public/                      # Static files
-│   ├── images/                  # SHARED
-│   └── icons/                   # SHARED
-│
-├── styles/                      # Optional extra styles
-│   └── custom.css               # SHARED
-│
-├── .gitignore
-├── package.json
-├── next.config.js
-├── README.md
-└── jsconfig.json               # Optional (path aliases)
+└── tsconfig.json              

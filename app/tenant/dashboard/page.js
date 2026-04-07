@@ -1,137 +1,160 @@
 'use client';
-import Navbar from '@/components/Navbar';
-import Card from '@/components/Card';
-import PaymentCard from '@/components/PaymentCard';
-import { mockPayments, mockAnnouncements } from '@/lib/db';
-import { Home, CreditCard, Wrench, Bell, ArrowRight } from 'lucide-react';
-import Link from 'next/link';
+import React, { useEffect, useState } from 'react';
+import { 
+  Home, 
+  CreditCard, 
+  Wrench, 
+  Bell, 
+  ChevronRight,
+  Zap,
+  Clock,
+  ArrowUpRight,
+  ShieldCheck,
+  User,
+  ArrowDownRight
+} from 'lucide-react';
+import Button from '@/components/Button';
 
 export default function TenantDashboard() {
+  const [userName, setUserName] = useState('Resident');
+
+  useEffect(() => {
+    const name = localStorage.getItem('userName');
+    if (name) setUserName(name.split(' ')[0]); 
+  }, []);
+
   const currentRoom = {
     name: 'Premium Solo Room',
     number: '204',
-    rent: 5500,
-    dueDate: 'April 5, 2026',
+    rent: '5,500',
+    dueDate: 'APRIL 05, 2026',
   };
 
+  const stats = [
+    { label: 'Room Assignment', value: `#${currentRoom.number}`, icon: Home, color: 'text-cyan-600', bg: 'bg-cyan-500/10', border: 'border-cyan-500/20', trend: 'Floor 2', trendUp: true },
+    { label: 'Monthly Rent', value: `₱${currentRoom.rent}`, icon: CreditCard, color: 'text-emerald-600', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', trend: 'Paid on time', trendUp: true },
+    { label: 'Utility Balance', value: '₱420.0', icon: Zap, color: 'text-purple-600', bg: 'bg-purple-500/10', border: 'border-purple-500/20', trend: '+₱50 vs last', trendUp: false },
+    { label: 'Account Status', value: 'Active', icon: ShieldCheck, color: 'text-amber-600', bg: 'bg-amber-500/10', border: 'border-amber-500/20', trend: 'Verified', trendUp: true },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 md:pb-0">
-      <Navbar role="tenant" />
-      
-      <main className="max-w-4xl mx-auto px-6 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Hello, John!</h1>
-          <p className="text-gray-500">Welcome to your Boarder-Q dashboard.</p>
+    <div className="flex min-h-screen bg-slate-50 font-sans text-slate-900">
+      <main className="flex-1 p-8 lg:p-12">
+        
+        {/* Standardized Header Section - EXACT MATCH TO ADMIN */}
+        <div className="w-full flex items-center gap-6 mb-12">
+          <div className="bg-cyan-500/10 border border-cyan-500/20 px-6 py-2 rounded-sm shrink-0 shadow-sm">
+            <span className="text-cyan-700 font-black text-[11px] tracking-[0.3em] uppercase italic">
+              RESIDENT NODE
+            </span>
+          </div>
+          <h1 className="text-4xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">
+            Hello, <span className="text-cyan-600">{userName}!</span>
+          </h1>
+          <div className="flex-1 h-[1px] bg-slate-200"></div>
+          <div className="hidden md:block">
+             <p className="text-slate-400 text-[10px] font-mono tracking-widest uppercase">
+               Terminal v1.0
+             </p>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-blue-600 rounded-3xl p-8 text-white shadow-lg shadow-blue-100 relative overflow-hidden">
-            <div className="relative z-10">
-              <p className="text-blue-100 text-sm font-medium mb-1">Current Room</p>
-              <h2 className="text-3xl font-bold mb-6">{currentRoom.name}</h2>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-blue-100 text-xs uppercase font-bold tracking-wider">Room No.</p>
-                  <p className="text-xl font-bold">{currentRoom.number}</p>
+        {/* Stats Grid - EXACT MATCH TO ADMIN GAPS AND MARGINS */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+          {stats.map((stat, i) => (
+            <div key={i} className="glass-panel bg-white p-6 border-l-2 border-slate-200 hover:border-l-cyan-500 transition-all shadow-sm">
+              <div className="flex justify-between items-start mb-4">
+                <div className={`p-2 border ${stat.border} ${stat.bg}`}>
+                  <stat.icon className={`w-4 h-4 ${stat.color}`} />
                 </div>
-                <div className="text-right">
-                  <p className="text-blue-100 text-xs uppercase font-bold tracking-wider">Monthly Rent</p>
-                  <p className="text-xl font-bold">₱{currentRoom.rent}</p>
+                <div className={`flex items-center gap-1 font-mono text-[9px] font-bold ${stat.trendUp ? 'text-emerald-600' : 'text-rose-600'}`}>
+                  {stat.trendUp ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+                  {stat.trend}
                 </div>
               </div>
+              <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1 font-semibold">{stat.label}</p>
+              <p className="text-3xl font-black text-slate-900 italic uppercase tracking-tighter">{stat.value}</p>
             </div>
-            <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-blue-500 rounded-full opacity-20"></div>
-          </div>
-
-          <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm flex flex-col justify-between">
-            <div>
-              <p className="text-gray-500 text-sm font-medium mb-1">Next Payment Due</p>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">{currentRoom.dueDate}</h3>
-              <p className="text-orange-500 text-sm font-bold flex items-center gap-1">
-                <CreditCard className="w-4 h-4" /> ₱{currentRoom.rent} Pending
-              </p>
-            </div>
-            <Link href="/tenant/payments" className="w-full bg-gray-900 text-white py-3 rounded-xl font-bold text-center hover:bg-gray-800 transition-colors mt-4">
-              Pay Now
-            </Link>
-          </div>
+          ))}
         </div>
 
-        <div className="space-y-8">
-          <section>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-gray-900">Recent Announcements</h2>
-              <Link href="/tenant/announcements" className="text-blue-600 text-sm font-bold hover:underline flex items-center gap-1">
-                View All <ArrowRight className="w-4 h-4" />
-              </Link>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          {/* Announcements List - EXACT MATCH TO ADMIN LIST PROPORTIONS */}
+          <div className="lg:col-span-2 glass-panel bg-white border border-slate-200 overflow-hidden shadow-sm">
+            <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+              <h2 className="text-[11px] font-black text-slate-900 uppercase italic tracking-[0.2em] flex items-center gap-2">
+                <div className="w-2 h-2 bg-cyan-500"></div>
+                System Announcements
+              </h2>
+              <span className="px-2 py-0.5 bg-slate-900 text-white text-[9px] font-mono">02 BROADCASTS</span>
             </div>
-            <div className="space-y-4">
-              {mockAnnouncements.slice(0, 2).map((ann) => (
-                <div key={ann.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex gap-4">
-                  <div className="bg-blue-50 p-3 rounded-xl text-blue-600 h-fit">
-                    <Bell className="w-6 h-6" />
+            
+            <div className="divide-y divide-slate-100">
+              {[
+                { title: 'Water Maintenance', date: 'MAR 28, 2026', type: 'TECH', initial: 'WM' },
+                { title: 'New Visitor Policy', date: 'MAR 25, 2026', type: 'RULES', initial: 'VP' },
+                { title: 'Quarterly Fire Drill', date: 'MAR 20, 2026', type: 'SAFETY', initial: 'FD' },
+              ].map((ann, i) => (
+                <div key={i} className="flex items-center justify-between p-6 hover:bg-slate-50/50 transition-colors group cursor-pointer">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-slate-100 group-hover:bg-slate-900 group-hover:text-white transition-colors flex items-center justify-center font-black italic text-xs border border-slate-200">
+                      {ann.initial}
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-slate-900 uppercase text-sm tracking-tight">{ann.title}</h4>
+                      <p className="text-[10px] font-mono text-slate-500 uppercase tracking-tight">
+                        {ann.type} <span className="mx-2 opacity-30">|</span> {ann.date}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="font-bold text-gray-900 mb-1">{ann.title}</h4>
-                    <p className="text-sm text-gray-600 line-clamp-2">{ann.content}</p>
-                    <p className="text-xs text-gray-400 mt-2">{ann.date}</p>
-                  </div>
+                  <button className="flex items-center gap-1 text-[10px] font-black uppercase italic text-cyan-600 group-hover:translate-x-1 transition-transform tracking-widest">
+                    Review <ChevronRight className="w-3 h-3" />
+                  </button>
                 </div>
               ))}
             </div>
-          </section>
-
-          <section>
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Link href="/tenant/payments" className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center gap-3 hover:bg-gray-50 transition-colors">
-                <div className="bg-green-50 p-3 rounded-xl text-green-600">
-                  <CreditCard className="w-6 h-6" />
-                </div>
-                <span className="text-sm font-bold text-gray-700">Payments</span>
-              </Link>
-              <Link href="/tenant/maintenance" className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center gap-3 hover:bg-gray-50 transition-colors">
-                <div className="bg-orange-50 p-3 rounded-xl text-orange-600">
-                  <Wrench className="w-6 h-6" />
-                </div>
-                <span className="text-sm font-bold text-gray-700">Repairs</span>
-              </Link>
-              <Link href="/tenant/announcements" className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center gap-3 hover:bg-gray-50 transition-colors">
-                <div className="bg-blue-50 p-3 rounded-xl text-blue-600">
-                  <Bell className="w-6 h-6" />
-                </div>
-                <span className="text-sm font-bold text-gray-700">Notices</span>
-              </Link>
-              <Link href="/rooms" className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col items-center gap-3 hover:bg-gray-50 transition-colors">
-                <div className="bg-purple-50 p-3 rounded-xl text-purple-600">
-                  <Home className="w-6 h-6" />
-                </div>
-                <span className="text-sm font-bold text-gray-700">Browse</span>
-              </Link>
+            <div className="p-4 bg-slate-50/80 border-t border-slate-100 text-center">
+              <button className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] hover:text-cyan-600 transition-colors">
+                View All Records
+              </button>
             </div>
-          </section>
-        </div>
-      </main>
+          </div>
 
-      {/* Mobile Bottom Nav */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-6 py-3 flex items-center justify-between md:hidden z-50">
-        <Link href="/tenant/dashboard" className="flex flex-col items-center gap-1 text-blue-600">
-          <Home className="w-6 h-6" />
-          <span className="text-[10px] font-bold">Home</span>
-        </Link>
-        <Link href="/tenant/payments" className="flex flex-col items-center gap-1 text-gray-400">
-          <CreditCard className="w-6 h-6" />
-          <span className="text-[10px] font-bold">Pay</span>
-        </Link>
-        <Link href="/tenant/maintenance" className="flex flex-col items-center gap-1 text-gray-400">
-          <Wrench className="w-6 h-6" />
-          <span className="text-[10px] font-bold">Fix</span>
-        </Link>
-        <Link href="/tenant/announcements" className="flex flex-col items-center gap-1 text-gray-400">
-          <Bell className="w-6 h-6" />
-          <span className="text-[10px] font-bold">Alerts</span>
-        </Link>
-      </div>
+          {/* Actions Sidebar - EXACT MATCH TO ADMIN SIDEBAR BOXES */}
+          <div className="space-y-6">
+            <div className="bg-slate-900 p-8 text-white border-b-4 border-cyan-500 shadow-xl">
+              <h3 className="text-xl font-black italic uppercase tracking-tighter mb-6">Quick Actions</h3>
+              <div className="space-y-3">
+                <Button className="w-full justify-start rounded-none bg-cyan-600 hover:bg-cyan-500 text-[10px] tracking-[0.2em] font-bold h-12">
+                  <CreditCard className="mr-3 w-4 h-4" /> INITIALIZE PAYMENT
+                </Button>
+                <Button variant="outline" className="w-full justify-start rounded-none border-slate-700 text-slate-300 hover:bg-white hover:text-slate-900 text-[10px] tracking-[0.2em] font-bold h-12">
+                  <Wrench className="mr-3 w-4 h-4" /> REPAIR REQUEST
+                </Button>
+                <Button variant="outline" className="w-full justify-start rounded-none border-slate-700 text-slate-300 hover:bg-white hover:text-slate-900 text-[10px] tracking-[0.2em] font-bold h-12">
+                  <User className="mr-3 w-4 h-4" /> UPDATE PROFILE
+                </Button>
+              </div>
+            </div>
+
+            <div className="glass-panel border border-slate-200 p-6 bg-white shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <Clock className="w-4 h-4 text-amber-500" />
+                <h4 className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">System Notice</h4>
+              </div>
+              <p className="text-xs text-slate-600 italic leading-relaxed uppercase tracking-tighter">
+                Next rent due on: <span className="text-slate-900 font-bold">{currentRoom.dueDate}</span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Global Footer - EXACT MATCH TO ADMIN */}
+        <footer className="mt-20 py-8 text-slate-400 text-[8px] tracking-[0.5em] font-mono uppercase border-t border-slate-200 w-full text-center">
+          Console <span className="mx-2 text-cyan-500 opacity-50">/</span> Secure <span className="mx-2 text-cyan-500 opacity-50">/</span> Boarder-Q 2026
+        </footer>
+      </main>
     </div>
   );
 }

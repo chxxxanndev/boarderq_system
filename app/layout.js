@@ -7,15 +7,38 @@ const inter = Inter({ subsets: ['latin'] });
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} antialiased bg-slate-950`}>
         <Navbar />
-        {/* Removed max-w-7xl so sidebars can touch the edge */}
         <main className="min-h-screen">
           {children}
         </main>
-        {/* Footer omitted for brevity */}
       </body>
     </html>
   );
 }
+
+
+
+// // app/layout.js
+// import './globals.css';
+// import { Inter } from 'next/font/google';
+// import Navbar from '@/components/Navbar';
+// import { ThemeProvider } from '@/context/ThemeContext';
+
+// const inter = Inter({ subsets: ['latin'] });
+
+// export default function RootLayout({ children }) {
+//   return (
+//     <html lang="en" suppressHydrationWarning>
+//       <body className={`${inter.className} antialiased`}>
+//         <ThemeProvider>
+//           <Navbar />
+//           <main className="min-h-screen">
+//             {children}
+//           </main>
+//         </ThemeProvider>
+//       </body>
+//     </html>
+//   );
+// }
