@@ -1,6 +1,10 @@
-import { CreditCard, Calendar, CheckCircle, Clock, Banknote } from 'lucide-react';
+'use client';
+
+import { useState } from 'react';
+import { CreditCard, Calendar, CheckCircle, Clock, Banknote, ChevronDown, X, Receipt, Phone, User, Hash } from 'lucide-react';
 
 export default function PaymentCard({ payment }) {
+  const [isOpen, setIsOpen] = useState(false);
   const isPaid = payment.status === 'Paid';
 
   return (
@@ -14,13 +18,30 @@ export default function PaymentCard({ payment }) {
           {isPaid ? <CheckCircle className="w-6 h-6" /> : <Clock className="w-6 h-6" />}
         </div>
 
-        <div>
-          <h4 className="font-black text-white italic uppercase tracking-tighter text-lg leading-none mb-1 group-hover:text-cyan-400 transition-colors">
-            {payment.month} Rent
-          </h4>
-          <p className="text-[10px] text-slate-500 flex items-center gap-1 font-mono uppercase tracking-widest">
-            <Calendar className="w-3 h-3 text-slate-600" /> Deadline: <span className="text-slate-300">{payment.dueDate}</span>
-          </p>
+        {/* RIGHT SECTION: Amount, Status, Chevron */}
+        <div className="flex flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto border-t border-slate-800/50 md:border-0 pt-4 md:pt-0">
+          <div className="flex items-center gap-2">
+            <span className="text-slate-500 font-mono text-xs">PHP</span>
+            <p className="text-2xl font-black text-white tracking-tighter">
+              {payment.amount.toLocaleString()}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 mt-1">
+            <div className={`px-3 py-0.5 border text-[10px] font-black uppercase tracking-[0.2em] italic flex items-center gap-1.5 ${
+              isPaid
+                ? 'bg-emerald-500/5 border-emerald-500/20 text-emerald-400'
+                : 'bg-amber-500/5 border-amber-500/20 text-amber-400 animate-pulse'
+            }`}>
+              <div className={`w-1 h-1 rounded-full ${isPaid ? 'bg-emerald-400' : 'bg-amber-400'}`}></div>
+              {payment.status}
+            </div>
+
+            {/* Chevron toggle indicator */}
+            <ChevronDown
+              className={`w-4 h-4 text-slate-500 transition-transform duration-300 ${isOpen ? 'rotate-180 text-cyan-400' : ''}`}
+            />
+          </div>
         </div>
       </div>
 
@@ -39,8 +60,12 @@ export default function PaymentCard({ payment }) {
         }`}>
           <div className={`w-1 h-1 rounded-full ${isPaid ? 'bg-emerald-400' : 'bg-amber-400'}`}></div>
           {payment.status}
+
         </div>
       </div>
+
+      {/* Divider */}
+      <div className="h-px bg-slate-800/60 w-full" />
     </div>
   );
 }
