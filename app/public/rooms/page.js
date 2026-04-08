@@ -11,16 +11,6 @@ export default function RoomsPage() {
     <div className="min-h-screen flex flex-col items-center pt-20 pb-20 bg-gradient-to-b from-black via-[#1a1a1a] to-[#7a7a7a] text-white font-sans">
       
       <main className="w-full max-w-7xl px-6">
-        
-        {/* Top Badge: Matching Landing Style */}
-        <div className="mb-10 flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-2 text-[11px] tracking-[0.4em] uppercase font-black opacity-60 hover:opacity-100 transition-opacity">
-            <ArrowLeft size={14} /> Back to Home
-          </Link>
-          <span className="text-white text-[11px] tracking-[0.4em] uppercase font-black opacity-80">
-            SECURE ACCESS / DIRECTORY
-          </span>
-        </div>
 
         {/* Header Section */}
         <header className="mb-12">

@@ -72,14 +72,30 @@ export default function Sidebar() {
     <aside className={`${isCollapsed ? 'w-20' : 'w-64'} bg-black h-screen sticky top-0 hidden md:flex flex-col text-white transition-all duration-300 ease-in-out border-r border-[#333] shadow-2xl`}>
       
       {/* Branding Section */}
-      <div className="h-20 flex items-center px-6 justify-between border-b border-[#333]">
+      <div className={`h-20 flex items-center border-b border-[#333] transition-all duration-300 ${
+        isCollapsed ? 'justify-center px-0' : 'justify-between px-4'
+      }`}>
         {!isCollapsed && (
-          <div className="flex items-center gap-1">
-             <span className="font-black text-xl tracking-tighter">BOARDER</span>
-             <span className="font-black text-xl text-[#00A3CC] italic">Q</span>
+          <div className="flex items-center gap-2 min-w-0 mr-2">
+            {/* Logo Image */}
+            <img 
+              src="/images/logo.png" 
+              alt="Logo" 
+              className="h-8 w-auto object-contain flex-shrink-0" 
+            />
+            
+            {/* System Name - Adjusted font size to text-lg to prevent overlap */}
+            <div className="flex items-center gap-0.5 whitespace-nowrap overflow-hidden">
+              <span className="font-black text-lg tracking-tight">BOARDER</span>
+              <span className="font-black text-lg text-[#00A3CC] italic">Q</span>
+            </div>
           </div>
         )}
-        <button onClick={() => setIsCollapsed(!isCollapsed)} className="hover:bg-[#1A1A1A] p-2 rounded-lg transition-colors text-[#00A3CC]">
+
+        <button 
+          onClick={() => setIsCollapsed(!isCollapsed)} 
+          className="hover:bg-[#1A1A1A] rounded-lg transition-colors text-[#00A3CC] flex-shrink-0"
+        >
           <Menu size={22} />
         </button>
       </div>

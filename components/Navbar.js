@@ -48,11 +48,20 @@ export default function Navbar() {
     }`}>
       
       <div className="flex items-center gap-6">
-        <Link href="/" className="flex items-center gap-2 group">
-          <span className={`text-xl font-bold tracking-tight uppercase ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
-            Boarder<span className="text-cyan-500 italic">Q</span>
-          </span>
-        </Link>
+          <div className="flex items-center gap-2 min-w-0 mr-2">
+            {/* Logo Image */}
+            <img 
+              src="/images/logo.png" 
+              alt="Logo" 
+              className="h-8 w-auto object-contain flex-shrink-0" 
+            />
+            
+            {/* System Name - Adjusted font size to text-lg to prevent overlap */}
+            <div className="flex items-center gap-0.5 whitespace-nowrap overflow-hidden">
+              <span className="font-black text-lg tracking-tight">BOARDER</span>
+              <span className="font-black text-lg text-[#00A3CC] italic">Q</span>
+            </div>
+          </div>
       </div>
 
       <div className="hidden lg:flex items-center gap-10">
