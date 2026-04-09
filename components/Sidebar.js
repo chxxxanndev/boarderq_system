@@ -63,6 +63,7 @@ export default function Sidebar() {
       { id: 'dashboard', label: 'OVERVIEW', icon: LayoutDashboard, href: '/tenant/dashboard' },
       { id: 'payments', label: 'PAYMENTS', icon: CreditCard, href: '/tenant/payments' },
       { id: 'announcements', label: 'ANNOUNCEMENTS', icon: Megaphone, href: '/tenant/announcements' },
+      { id: 'maintenance', label: 'MAINTENANCE', icon: Megaphone, href: '/tenant/maintenance' },
     ];
   };
 

@@ -4,7 +4,7 @@ import {
   ClipboardList, CheckCircle2, XCircle, Search, 
   ChevronRight, HelpCircle, Inbox, Clock
 } from 'lucide-react';
-import { mockApplications } from '@/lib/db';
+import { mockApplications } from '@/lib/constants';
 import Button from '@/components/Button';
 
 export default function LandlordApplications() {

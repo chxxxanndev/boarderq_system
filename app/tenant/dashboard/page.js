@@ -4,150 +4,160 @@ import {
   Home, 
   CreditCard, 
   Wrench, 
-  Bell, 
   ChevronRight,
   Zap,
-  Clock,
-  ArrowUpRight,
   ShieldCheck,
   User,
+  ArrowUpRight,
   ArrowDownRight
 } from 'lucide-react';
 import Button from '@/components/Button';
 
 export default function TenantDashboard() {
-  const [userName, setUserName] = useState('Resident');
+  const [userName, setUserName] = useState('CHE');
 
   useEffect(() => {
     const name = localStorage.getItem('userName');
-    if (name) setUserName(name.split(' ')[0]); 
+    if (name) setUserName(name.split(' ')[0].toUpperCase()); 
   }, []);
 
   const currentRoom = {
-    name: 'Premium Solo Room',
     number: '204',
     rent: '5,500',
     dueDate: 'APRIL 05, 2026',
   };
 
   const stats = [
-    { label: 'Room Assignment', value: `#${currentRoom.number}`, icon: Home, color: 'text-cyan-600', bg: 'bg-cyan-500/10', border: 'border-cyan-500/20', trend: 'Floor 2', trendUp: true },
-    { label: 'Monthly Rent', value: `₱${currentRoom.rent}`, icon: CreditCard, color: 'text-emerald-600', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', trend: 'Paid on time', trendUp: true },
-    { label: 'Utility Balance', value: '₱420.0', icon: Zap, color: 'text-purple-600', bg: 'bg-purple-500/10', border: 'border-purple-500/20', trend: '+₱50 vs last', trendUp: false },
-    { label: 'Account Status', value: 'Active', icon: ShieldCheck, color: 'text-amber-600', bg: 'bg-amber-500/10', border: 'border-amber-500/20', trend: 'Verified', trendUp: true },
+    { label: 'Room Assignment', value: `#${currentRoom.number}`, icon: Home, bgColor: 'bg-[#C5C7C7]', trend: 'Floor 2', trendUp: true },
+    { label: 'Monthly Rent', value: `₱${currentRoom.rent}`, icon: CreditCard, bgColor: 'bg-[#B0B2B2]', trend: 'Paid on time', trendUp: true },
+    { label: 'Utility Balance', value: '₱420.0', icon: Zap, bgColor: 'bg-[#A1A3A3]', trend: '+₱50 vs last', trendUp: false },
+    { label: 'Account Status', value: 'ACTIVE', icon: ShieldCheck, bgColor: 'bg-[#919393]', trend: 'Verified', trendUp: true },
   ];
 
   return (
-    <div className="flex min-h-screen bg-slate-50 font-sans text-slate-900">
+    <div className="flex min-h-screen bg-gradient-to-r from-black via-[#2a2a2a] via-20% to-[#efefef] font-sans text-white">     
       <main className="flex-1 p-8 lg:p-12">
         
-        <div className="w-full flex items-center gap-6 mb-12">
-          <div className="bg-cyan-500/10 border border-cyan-500/20 px-6 py-2 rounded-sm shrink-0 shadow-sm">
-            <span className="text-cyan-700 font-black text-[11px] tracking-[0.3em] uppercase">
+        {/* Header Section - Matching Admin Style */}
+        <div className="flex items-baseline gap-4 mb-12">
+          <h1 className="text-4xl font-[1000] tracking-tighter uppercase leading-none">
+            <span className="text-white">HELLO, </span>
+            <span className="text-[#00A3CC]">{userName}!</span>
+          </h1>
+          <div className="bg-[#00A3CC]/10 border border-[#00A3CC]/20 px-4 py-1 rounded-sm">
+            <span className="text-[#00A3CC] text-[9px] font-black tracking-[0.4em] uppercase">
               RESIDENT NODE
             </span>
           </div>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tighter uppercase leading-none">
-            Hello, <span className="text-cyan-600">{userName}!</span>
-          </h1>
-          <div className="flex-1 h-[1px] bg-slate-200"></div>
-          <div className="hidden md:block">
-             <p className="text-slate-400 text-[10px] font-mono tracking-widest uppercase">
-               Terminal v1.0
-             </p>
-          </div>
+          <div className="flex-1 h-[1px] bg-white/10 ml-4 hidden md:block"></div>
+          <p className="text-white/40 text-[10px] font-mono tracking-widest uppercase hidden md:block">
+            TERMINAL V1.0
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+        {/* Stats Grid - Matching Admin Block Style */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
           {stats.map((stat, i) => (
-            <div key={i} className="glass-panel bg-white p-6 border-l-2 border-slate-200 hover:border-l-cyan-500 transition-all shadow-sm">
-              <div className="flex justify-between items-start mb-4">
-                <div className={`p-2 border ${stat.border} ${stat.bg}`}>
-                  <stat.icon className={`w-4 h-4 ${stat.color}`} />
-                </div>
-                <div className={`flex items-center gap-1 font-mono text-[9px] font-bold ${stat.trendUp ? 'text-emerald-600' : 'text-rose-600'}`}>
-                  {stat.trendUp ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-                  {stat.trend}
-                </div>
+            <div 
+              key={i} 
+              className={`${stat.bgColor} p-6 rounded-2xl flex flex-col items-center justify-center h-40 shadow-2xl text-center relative overflow-hidden group hover:scale-[1.02] transition-transform`}
+            >
+              {/* Trend Indicator */}
+              <div className={`absolute top-3 right-4 flex items-center gap-1 font-bold text-[9px] tracking-tighter ${stat.trendUp ? 'text-emerald-700' : 'text-rose-700'}`}>
+                {stat.trendUp ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+                {stat.trend.toUpperCase()}
               </div>
-              <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1 font-semibold">{stat.label}</p>
-              <p className="text-3xl font-black text-slate-900 uppercase tracking-tighter">{stat.value}</p>
+
+              {/* Label */}
+              <h2 className="text-sm font-[1000] text-black leading-tight uppercase mb-1">
+                {stat.label}
+              </h2>
+
+              {/* Value */}
+              <p className="text-4xl font-[1000] text-white leading-none tracking-tighter my-1">
+                {stat.value}
+              </p>
+
+              {/* Icon Overlay (Subtle) */}
+              <stat.icon className="absolute -left-2 -bottom-2 w-12 h-12 text-black/5 -rotate-12" />
             </div>
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
           
-          <div className="lg:col-span-2 glass-panel bg-white border border-slate-200 overflow-hidden shadow-sm">
-            <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-              <h2 className="text-[11px] font-black text-slate-900 uppercase tracking-[0.2em] flex items-center gap-2">
-                <div className="w-2 h-2 bg-cyan-500"></div>
-                System Announcements
+          {/* Announcements Section - White/10 Backdrop style */}
+          <div className="xl:col-span-2 bg-white/10 backdrop-blur-md border border-white/10 rounded-xl p-8 flex flex-col shadow-2xl">
+            <div className="flex justify-between items-end mb-8 border-b-2 border-black pb-3">
+              <h2 className="text-sm font-black text-white uppercase tracking-[0.3em] flex items-center gap-2">
+                <span className="w-2 h-2 bg-[#00A3CC]"></span>
+                SYSTEM ANNOUNCEMENTS
               </h2>
-              <span className="px-2 py-0.5 bg-slate-900 text-white text-[9px] font-mono">02 BROADCASTS</span>
+              <div className="bg-black px-3 py-1 text-[9px] font-black tracking-widest text-white">
+                02 BROADCASTS
+              </div>
             </div>
             
-            <div className="divide-y divide-slate-100">
+            <div className="space-y-3">
               {[
-                { title: 'Water Maintenance', date: 'MAR 28, 2026', type: 'TECH', initial: 'WM' },
-                { title: 'New Visitor Policy', date: 'MAR 25, 2026', type: 'RULES', initial: 'VP' },
-                { title: 'Quarterly Fire Drill', date: 'MAR 20, 2026', type: 'SAFETY', initial: 'FD' },
+                { title: 'Water Maintenance', date: 'MAR 28, 2026', type: 'TECH', id: 'WM' },
+                { title: 'New Visitor Policy', date: 'MAR 25, 2026', type: 'RULES', id: 'VP' },
+                { title: 'Quarterly Fire Drill', date: 'MAR 20, 2026', type: 'SAFETY', id: 'FD' },
               ].map((ann, i) => (
-                <div key={i} className="flex items-center justify-between p-6 hover:bg-slate-50/50 transition-colors group cursor-pointer">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-slate-100 group-hover:bg-slate-900 group-hover:text-white transition-colors flex items-center justify-center font-black text-xs border border-slate-200">
-                      {ann.initial}
+                <div key={i} className="bg-[#6F7171] hover:bg-[#5a5c5c] transition-all p-5 rounded-lg flex items-center justify-between group cursor-pointer shadow-md border-l-4 border-transparent hover:border-[#00A3CC]">
+                  <div className="flex items-center gap-4 w-1/2">
+                    <div className="w-10 h-10 bg-black/20 flex items-center justify-center font-[1000] text-xs text-white border border-white/10">
+                      {ann.id}
                     </div>
                     <div>
-                      <h4 className="font-bold text-slate-900 uppercase text-sm tracking-tight">{ann.title}</h4>
-                      <p className="text-[10px] font-mono text-slate-500 uppercase tracking-tight">
-                        {ann.type} <span className="mx-2 opacity-30">|</span> {ann.date}
-                      </p>
+                      <h4 className="font-black text-white uppercase text-lg tracking-tight">{ann.title}</h4>
+                      <p className="text-[10px] font-bold text-white/50 tracking-widest">{ann.type} | {ann.date}</p>
                     </div>
                   </div>
-                  <button className="flex items-center gap-1 text-[10px] font-black uppercase text-cyan-600 group-hover:translate-x-1 transition-transform tracking-widest">
-                    Review <ChevronRight className="w-3 h-3" />
+                  <button className="text-[10px] font-black text-white group-hover:text-[#00A3CC] flex items-center gap-2 tracking-[0.2em] transition-colors">
+                    REVIEW <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
               ))}
             </div>
-            <div className="p-4 bg-slate-50/80 border-t border-slate-100 text-center">
-              <button className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] hover:text-cyan-600 transition-colors">
-                View All Records
-              </button>
-            </div>
           </div>
 
+          {/* Quick Actions Sidebar Section */}
           <div className="space-y-6">
-            <div className="bg-slate-900 p-8 text-white border-b-4 border-cyan-500 shadow-xl">
-              <h3 className="text-xl font-black uppercase tracking-tighter mb-6">Quick Actions</h3>
+            <div className="bg-black/40 backdrop-blur-xl p-8 border-l-4 border-[#00A3CC] shadow-2xl rounded-r-lg">
+              <h3 className="text-lg font-black uppercase tracking-widest mb-6 text-white">
+                 Quick Actions
+              </h3>
               <div className="space-y-3">
-                <Button className="w-full justify-start rounded-none bg-cyan-600 hover:bg-cyan-500 text-[10px] tracking-[0.2em] font-bold h-12">
+                <Button className="w-full justify-start rounded-xl bg-[#00A3CC] hover:bg-[#008BB3] text-[10px] tracking-[0.2em] font-[1000] h-12 border-none">
                   <CreditCard className="mr-3 w-4 h-4" /> INITIALIZE PAYMENT
                 </Button>
-                <Button variant="outline" className="w-full justify-start rounded-none border-slate-700 text-slate-300 hover:bg-white hover:text-slate-900 text-[10px] tracking-[0.2em] font-bold h-12">
+                <Button variant="outline" className="w-full justify-start rounded-xl border-white/20 text-white hover:bg-white hover:text-black text-[10px] tracking-[0.2em] font-[1000] h-12 transition-all">
                   <Wrench className="mr-3 w-4 h-4" /> REPAIR REQUEST
                 </Button>
-                <Button variant="outline" className="w-full justify-start rounded-none border-slate-700 text-slate-300 hover:bg-white hover:text-slate-900 text-[10px] tracking-[0.2em] font-bold h-12">
+                <Button variant="outline" className="w-full justify-start rounded-xl border-white/20 text-white hover:bg-white hover:text-black text-[10px] tracking-[0.2em] font-[1000] h-12 transition-all">
                   <User className="mr-3 w-4 h-4" /> UPDATE PROFILE
                 </Button>
               </div>
             </div>
 
-            <div className="glass-panel border border-slate-200 p-6 bg-white shadow-sm">
-              <div className="flex items-center gap-2 mb-4">
-                <Clock className="w-4 h-4 text-amber-500" />
-                <h4 className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">System Notice</h4>
+            {/* System Status / Notice */}
+            <div className="bg-white/5 border border-white/10 p-6 rounded-xl backdrop-blur-sm">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-2 h-2 rounded-full bg-[#00A3CC] animate-pulse"></div>
+                <span className="text-[10px] font-black uppercase tracking-widest text-[#00A3CC]">Status: Current</span>
               </div>
-              <p className="text-xs text-slate-600 leading-relaxed uppercase tracking-tighter">
-                Next rent due on: <span className="text-slate-900 font-bold">{currentRoom.dueDate}</span>
+              <p className="text-[11px] font-bold text-white/60 uppercase leading-relaxed tracking-tighter">
+                Next rent due on: <span className="text-white font-black underline decoration-[#00A3CC]">{currentRoom.dueDate}</span>
               </p>
             </div>
           </div>
         </div>
 
-        <footer className="mt-20 py-8 text-slate-400 text-[8px] tracking-[0.5em] font-mono uppercase border-t border-slate-200 w-full text-center">
-          Console <span className="mx-2 text-cyan-500 opacity-50">/</span> Secure <span className="mx-2 text-cyan-500 opacity-50">/</span> Boarder-Q 2026
+        {/* Footer Section */}
+        <footer className="mt-20 py-8 text-white/30 text-[8px] tracking-[0.5em] font-mono uppercase border-t border-white/5 w-full text-center">
+          Console <span className="mx-2 text-[#00A3CC]">/</span> Secure <span className="mx-2 text-[#00A3CC]">/</span> Boarder-Q Resident v1.0
         </footer>
       </main>
     </div>

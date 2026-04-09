@@ -4,7 +4,7 @@ import {
   Wrench, CheckCircle2, Clock, AlertTriangle, Hammer,
   Search, ChevronRight, HelpCircle, Plus, Filter
 } from 'lucide-react';
-import { mockMaintenance } from '@/lib/db';
+import { mockMaintenance } from '@/lib/constants';
 import Button from '@/components/Button';
 
 export default function LandlordMaintenance() {

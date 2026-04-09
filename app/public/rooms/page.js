@@ -1,7 +1,7 @@
 'use client';
 
 import RoomCard from '@/components/RoomCard';
-import { mockRooms } from '@/lib/db';
+import { mockRooms } from '@/lib/constants';
 import { Search, Filter, Compass, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 

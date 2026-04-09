@@ -49,14 +49,12 @@ export default function Navbar() {
       
       <div className="flex items-center gap-6">
           <div className="flex items-center gap-2 min-w-0 mr-2">
-            {/* Logo Image */}
             <img 
               src="/images/logo.png" 
               alt="Logo" 
               className="h-8 w-auto object-contain flex-shrink-0" 
             />
             
-            {/* System Name - Adjusted font size to text-lg to prevent overlap */}
             <div className="flex items-center gap-0.5 whitespace-nowrap overflow-hidden">
               <span className="font-black text-lg tracking-tight">BOARDER</span>
               <span className="font-black text-lg text-[#00A3CC] italic">Q</span>
@@ -115,7 +113,7 @@ export default function Navbar() {
             className="flex items-center gap-2 bg-cyan-600 hover:bg-cyan-500 text-white px-5 py-2 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all shadow-lg shadow-cyan-900/20"
           >
             <User size={14} />
-            Login
+            Get Started
           </Link>
         ) : (
           <div className="flex items-center gap-4 pl-4 border-l border-white/10">

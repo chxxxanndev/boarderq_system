@@ -4,7 +4,7 @@ import {
   Download, Filter, ReceiptText, ShieldCheck, 
   Search, ChevronRight, HelpCircle, TrendingUp, DollarSign
 } from 'lucide-react';
-import { mockPayments } from '@/lib/db';
+import { mockPayments } from '@/lib/constants';
 import Button from '@/components/Button';
 
 export default function LandlordPayments() {
