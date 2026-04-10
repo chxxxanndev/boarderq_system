@@ -146,57 +146,9 @@ TENANT PAGES:
 12. Announcements (/tenant/announcements)
    - List of announcements
 
-----------------------------------
-
-DESIGN REQUIREMENTS:
-
-- Use Tailwind CSS
-- Clean, modern, minimal UI
-- Use cards, grids, and spacing
-- Responsive design
-- Use reusable components (Navbar, Card, Button)
-- Add icons if possible (Heroicons or similar)
-
-----------------------------------
-
-IMPORTANT:
-
-- Use mock data (hardcoded arrays)
-- No backend or API calls yet
-- Use proper folder structure (App Router)
-- Use ONLY JavaScript (.js files), NOT TypeScript
-- Do NOT use TypeScript types or interfaces
-- Code must be clean and organized
-
-----------------------------------
-
-OUTPUT FORMAT:
-
-- Provide full folder structure
-- Provide code per page/component
-- Make sure everything is ready to run in Next.js
-
-----------------------------------
-
-Goal:
-A complete working frontend prototype of the BoarderQueue system using JavaScript.
-
-
-
-I-divide nato atong tasks para dili mag conflict:
-
-1. Dashboard + Rooms + Announcements   - CHE
-2. Payments (landlord + tenant)        - MAYMAY
-3. Maintenance + Applications          - XHYNDY
-
-IMPORTANT:
-
-* Ayaw mo edit same files
-* Always create your own branch
-* Pull before starting             
 
 --------------------------------------------------------
-Final Full Folder Structure (Working Frontend only)
+Final Full Folder Structure (Working Frontend and Backend)
 --------------------------------------------------------
 app/
 ├── layout.js               
@@ -226,6 +178,8 @@ app/
 │   └── announcements/
 │
 ├── api/                     # API routes
+│   ├── admins/dashboard
+│   ├── announcements/
 │   ├── rooms/
 │   ├── applications/
 │   ├── auth/
@@ -243,9 +197,14 @@ app/
 │   ├── MaintenanceCard.js        
 │   └── ApplicationCard.js       
 │
+├── context/                        
+│   └── ThemeContext.js   
+│
 ├── lib/                        
+│   ├── constants.js 
 │   ├── db.js                    
-│   └── auth.js                 
+│   └── auth.js      
+│           
 ├── utils/                       
 │   └── helpers.js               
 │
@@ -256,6 +215,7 @@ app/
 ├── styles/                     
 │   └── custom.css            
 │
+├── .env
 ├── .gitignore
 ├── AGENTS.md
 ├── CLAUDE.md
@@ -281,6 +241,8 @@ CREATE TABLE rooms (
   amenities     TEXT,
   house_rules   TEXT,
   image_url     VARCHAR(500) DEFAULT NULL,
+  location      VARCHAR(255) DEFAULT NULL,
+  capacity      VARCHAR(100) DEFAULT NULL,
   status        ENUM('available', 'occupied', 'maintenance') NOT NULL DEFAULT 'available',
   updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -294,6 +256,7 @@ CREATE TABLE users (
   password      VARCHAR(255) NOT NULL,
   role          ENUM('admin', 'tenant') NOT NULL DEFAULT 'tenant',
   push_token    VARCHAR(255) DEFAULT NULL,
+  status        ENUM('pending', 'active', 'suspended') NOT NULL DEFAULT 'pending',
   updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
