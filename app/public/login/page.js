@@ -64,10 +64,14 @@ export default function LoginPage() {
           <div className="absolute top-0 right-[-120px] h-full w-[240px] bg-white rounded-[100%] z-0 shadow-[-20px_0_40px_rgba(0,0,0,0.05)]" />
           
           <div className="relative z-10 flex flex-col items-center">
-            <div className="mb-8 p-8 bg-slate-50 rounded-full shadow-inner animate-bounce [animation-duration:3s]">
-              <Building2 size={80} className="text-[#00A3CC]" />
-            </div>
-            <h2 className="text-5xl font-[1000] text-black tracking-tighter uppercase leading-none italic">
+          <div className="mb-8 p-8 bg-slate-50 rounded-full shadow-inner animate-bounce [animation-duration:3s] flex items-center justify-center">
+            <img
+              src="/images/logo.png"
+              alt="Logo"
+              className="w-25 h-25 object-contain"
+            />
+          </div>            
+          <h2 className="text-5xl font-[1000] text-black tracking-tighter uppercase leading-none italic">
               BOARDER<span className="text-[#00A3CC]">Q</span>
             </h2>
             <div className="h-1 w-12 bg-[#00A3CC] my-4 rounded-full" />

@@ -1,3 +1,4 @@
+// app/api/announcements/route.js
 import pool from '@/lib/db';
 import { NextResponse } from 'next/server';
 

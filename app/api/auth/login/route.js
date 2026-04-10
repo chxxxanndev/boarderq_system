@@ -42,13 +42,17 @@ export async function POST(request) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
-    // 3. JWT
+    // Inside your Login API POST function
     const token = jwt.sign(
-      { userId: user.id, role: user.role },
-      process.env.JWT_SECRET || 'boarderq_secret_key',
-      { expiresIn: '7d' }
+      { 
+        id: user.id,      // <--- THIS IS THE KEY PART
+        email: user.email, 
+        role: user.role 
+      }, 
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
     );
-
+    
     console.log("Result: LOGIN SUCCESS!");
     return NextResponse.json({
       token,

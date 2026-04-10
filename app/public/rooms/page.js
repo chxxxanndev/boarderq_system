@@ -1,13 +1,38 @@
 'use client';
 
+import React, { useEffect, useState } from 'react';
 import RoomCard from '@/components/RoomCard';
-import { mockRooms } from '@/lib/constants';
-import { Search, Filter, Compass, ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
+import { Search, Filter, Compass } from 'lucide-react';
 
 export default function RoomsPage() {
+  const [rooms, setRooms] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    const fetchRooms = async () => {
+      try {
+        const res = await fetch('/api/rooms');
+        const data = await res.json();
+        // Filter only 'available' rooms for the public page
+        const availableRooms = data.filter(room => room.status === 'available');
+        setRooms(availableRooms);
+      } catch (error) {
+        console.error("Failed to fetch rooms:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRooms();
+  }, []);
+
+  // Filter rooms based on search input
+  const filteredRooms = rooms.filter(room => 
+    room.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    // BACKGROUND: Matching the Industrial Gradient of the Landing Page
     <div className="min-h-screen flex flex-col items-center pt-20 pb-20 bg-gradient-to-b from-black via-[#1a1a1a] to-[#7a7a7a] text-white font-sans">
       
       <main className="w-full max-w-7xl px-6">
@@ -30,13 +55,15 @@ export default function RoomsPage() {
               </p>
             </div>
 
-            {/* Search & Filter: Industrial Style */}
+            {/* Search & Filter: Functional search term */}
             <div className="flex items-center gap-3 w-full md:w-auto">
               <div className="relative flex-1 md:w-80 group">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#00A3CC] w-4 h-4" />
                 <input 
                   type="text" 
                   placeholder="SEARCH UNIT NO..." 
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-12 pr-4 py-4 bg-black/40 border-2 border-[#444] text-white rounded-none focus:outline-none focus:border-[#00A3CC] transition-all text-xs font-black tracking-widest placeholder:text-white/30"
                 />
               </div>
@@ -49,11 +76,14 @@ export default function RoomsPage() {
 
         {/* Room Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {mockRooms.length > 0 ? (
-            mockRooms.map((room) => (
+          {loading ? (
+            // Industrial Loading State
+            <div className="col-span-full py-20 text-center animate-pulse">
+              <p className="text-[#00A3CC] font-mono tracking-[0.5em] text-xs">SYNCHRONIZING DATABASE...</p>
+            </div>
+          ) : filteredRooms.length > 0 ? (
+            filteredRooms.map((room) => (
               <div key={room.id} className="border-t-4 border-[#00A3CC]">
-                {/* Note: I'm assuming RoomCard handles its own internal styling, 
-                    but adding a wrapper here to ensure industrial alignment */}
                 <RoomCard room={room} />
               </div>
             ))
@@ -61,27 +91,32 @@ export default function RoomsPage() {
             <div className="col-span-full py-32 flex flex-col items-center justify-center border-2 border-dashed border-white/10 bg-white/5">
               <Compass className="w-16 h-16 text-[#00A3CC] mb-6 animate-pulse" />
               <p className="text-white font-black text-xs uppercase tracking-[0.5em]">
-                No active listings found in database
+                {searchTerm ? "No matching units found" : "No active listings found in database"}
               </p>
             </div>
           )}
         </div>
 
-        {/* Features Row (Matching Landing Page style) */}
+        {/* Features Row */}
         <div className="mt-24 space-y-3">
             <div className="flex justify-between items-end mb-6 border-b-2 border-black pb-3">
                <h3 className="text-lg font-black text-white tracking-[0.3em] uppercase">DIRECTORY STATUS</h3>
-               <span className="text-[10px] font-black text-[#00A3CC] tracking-widest">LIVE UPDATES</span>
+               <span className="text-[10px] font-black text-[#00A3CC] tracking-widest uppercase">
+                 {loading ? "FETCHING..." : "LIVE UPDATES"}
+               </span>
             </div>
             <div className="bg-[#A6A6A6] p-5 flex items-center justify-between shadow-lg">
                <span className="text-xl font-black text-black tracking-tight uppercase">Database Sync</span>
-               <span className="text-[11px] font-bold text-black/60 tracking-widest hidden md:block">ALL UNITS VERIFIED BY SYSTEM ADMIN</span>
-               <span className="text-[11px] font-black text-white bg-black px-3 py-1">STABLE</span>
+               <span className="text-[11px] font-bold text-black/60 tracking-widest hidden md:block uppercase">
+                 {rooms.length} Units Currently Online
+               </span>
+               <span className="text-[11px] font-black text-white bg-black px-3 py-1 uppercase">
+                 {loading ? "BUSY" : "STABLE"}
+               </span>
             </div>
         </div>
       </main>
 
-      {/* Footer matching the landing page */}
       <footer className="mt-24 py-12 text-white/30 text-[9px] tracking-[0.6em] font-mono uppercase border-t border-white/10 w-full text-center">
         CONSOLE <span className="mx-2 text-[#00A3CC]">/</span> DIRECTORY <span className="mx-2 text-[#00A3CC]">/</span> BOARDER-Q DEVELOPMENT 2026
       </footer>

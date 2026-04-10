@@ -56,14 +56,15 @@ export default function Sidebar() {
         { id: 'rooms', label: 'PROPERTIES', icon: Home, href: '/admin/rooms' },
         { 
           id: 'tenants_group', 
-          label: 'FIND TENANTS', 
+          label: 'TENANT MODULES', // Renamed for clarity
           icon: Users, 
           isDropdown: true,
           isOpen: isTenantsOpen,
           toggle: () => setIsTenantsOpen(!isTenantsOpen),
           subItems: [
-            { label: 'APPLICATIONS', href: '/admin/applications' },
-            { label: 'LEADS', href: '#' }, 
+            { label: 'NEW APPLICATIONS', href: '/admin/applications' },
+            { label: 'ACCESS CONTROL', href: '/admin/tenants' }, // ADDED THIS: Leads to your new page
+            { label: 'ACTIVE LIST', href: '#' }, 
           ]
         },
         { id: 'payments', label: 'REPORTS', icon: FileText, href: '/admin/payments' },
@@ -90,6 +91,11 @@ export default function Sidebar() {
       }`}>
         {!isCollapsed && (
           <div className="flex items-center gap-2 min-w-0 mr-2">
+              <img 
+                src="/images/logo.png" 
+                alt="Boarder-Q Logo" 
+                className="w-15 h-10 object-contain rounded-lg shadow-[0_0_15px_rgba(0,163,204,0.3)]"
+              />
             <div className="flex items-center gap-0.5 whitespace-nowrap overflow-hidden">
               <span className="font-black text-lg tracking-tight">BOARDER</span>
               <span className="font-black text-lg text-[#00A3CC] italic">Q</span>

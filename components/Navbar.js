@@ -56,7 +56,7 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     // 1. Optional: Call backend logout if you use cookies/sessions
-    // await fetch('/api/auth/logout', { method: 'POST' });
+    await fetch('/api/auth/logout', { method: 'POST' });
 
     // 2. Clear local data
     localStorage.removeItem('role');

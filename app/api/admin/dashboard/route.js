@@ -1,4 +1,3 @@
-// app/api/admin/dashboard/route.js
 import pool from '@/lib/db';
 import { NextResponse } from 'next/server';
 
@@ -10,29 +9,25 @@ export async function GET() {
     const [maintenance] = await pool.query("SELECT COUNT(*) as count FROM maintenance_requests WHERE status = 'pending'");
     const [revenue] = await pool.query("SELECT SUM(amount) as total FROM payments WHERE status = 'confirmed'");
 
-    // 2. Get Recent Applications (Module 1)
+    // 2. Get Recent Applications 
     const [apps] = await pool.query(`
-      SELECT a.*, r.name as room_name 
+      SELECT a.applicant_name as name, r.name as room_name, a.applied_at 
       FROM applications a 
       JOIN rooms r ON a.room_id = r.id 
       WHERE a.status = 'pending' 
       ORDER BY a.applied_at DESC LIMIT 3
     `);
 
-    // 3. Get System Logs (Creative Feature)
-    const [logs] = await pool.query("SELECT title, created_at FROM announcements ORDER BY created_at DESC LIMIT 4");
-
+    // Return a flat structure to match the frontend state
     return NextResponse.json({
-      stats: {
-        tenants: tenants[0].count,
-        available: available[0].count,
-        maintenance: maintenance[0].count,
-        revenue: revenue[0].total || 0
-      },
-      recentApplications: apps,
-      systemLogs: logs
+      tenants: tenants[0].count,
+      available: available[0].count,
+      maintenance: maintenance[0].count,
+      revenue: revenue[0].total || 0,
+      applications: apps // Matches data?.applications in your frontend
     });
   } catch (error) {
+    console.error("Dashboard API Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
