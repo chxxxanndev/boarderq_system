@@ -7,8 +7,7 @@ export async function GET() {
     const [tenants] = await pool.query("SELECT COUNT(*) as count FROM users WHERE role = 'tenant' AND status = 'active'");
     const [available] = await pool.query("SELECT COUNT(*) as count FROM rooms WHERE status = 'available'");
     const [maintenance] = await pool.query("SELECT COUNT(*) as count FROM maintenance_requests WHERE status = 'pending'");
-    const [revenue] = await pool.query("SELECT SUM(amount) as total FROM payments WHERE status = 'confirmed'");
-
+    const [revenue] = await pool.query("SELECT COALESCE(SUM(amount), 0) as total FROM payments WHERE status = 'confirmed'");
     // 2. Get Recent Applications 
     const [apps] = await pool.query(`
       SELECT a.applicant_name as name, r.name as room_name, a.applied_at 

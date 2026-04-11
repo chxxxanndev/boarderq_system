@@ -1,3 +1,4 @@
+// app/admin/layout.js
 'use client';
 import { usePathname } from 'next/navigation';
 import Sidebar from '@/components/Sidebar'; 
@@ -6,7 +7,7 @@ export default function DashboardLayout({ children }) {
   const pathname = usePathname();
   
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-white relative">
+    <div className="flex h-screen w-full overflow-hidden bg-transparent relative">
       
       <Sidebar />
 

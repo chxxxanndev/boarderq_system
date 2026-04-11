@@ -6,17 +6,27 @@ export default function AdminPayments() {
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchPayments = async () => {
-    try {
-      const res = await fetch('/api/admin/payments');
-      const data = await res.json();
-      setPayments(data);
-    } catch (err) {
-      console.error("Fetch error");
-    } finally {
-      setLoading(false);
+const fetchPayments = async () => {
+  try {
+    const res = await fetch('/api/admin/payments');
+    
+    // Check if the response is actually okay
+    if (!res.ok) {
+      const errorText = await res.text(); // Get the raw error (might be HTML or JSON)
+      console.error("SERVER ERROR STATUS:", res.status);
+      console.error("SERVER ERROR BODY:", errorText);
+      return;
     }
-  };
+
+    const data = await res.json();
+    setPayments(data);
+  } catch (err) {
+    // This will now tell us if it's a network error or a JSON parsing error
+    console.error("DETAILED FETCH ERROR:", err);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => { fetchPayments(); }, []);
 

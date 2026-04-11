@@ -1,69 +1,49 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { 
-  LayoutDashboard, FileText, CreditCard, Wrench, Megaphone,
-  ChevronDown, ChevronRight, Menu, Users, Home, LogOut
+  LayoutDashboard, CreditCard, Wrench, Megaphone,
+  ChevronDown, ChevronRight, Users, Home, FileText
 } from 'lucide-react';
+import { useSidebar } from '@/context/SidebarContext';
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const router = useRouter();
-  const [user, setUser] = useState({ name: "LOADING...", role: null });
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const { isCollapsed, toggleSidebar } = useSidebar(); 
+  const [role, setRole] = useState(null);
   const [isTenantsOpen, setIsTenantsOpen] = useState(true);
 
-  // BACKEND: Fetch real user data on load
   useEffect(() => {
-    const fetchUser = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        router.push('/public/login');
-        return;
-      }
+    setRole(localStorage.getItem('role'));
+  }, []);
 
-      try {
-        const res = await fetch('/api/auth/me', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await res.json();
-        
-        if (res.ok) {
-          setUser(data);
-        } else {
-          handleLogout();
-        }
-      } catch (err) {
-        handleLogout();
-      }
-    };
-
-    fetchUser();
-  }, [pathname]);
-
-  const handleLogout = () => {
-    localStorage.clear();
-    window.location.href = '/public/login'; 
+  // FIXED LOGIC: If collapsed, expand the sidebar first before showing the menu
+  const handleTenantToggle = () => {
+    if (isCollapsed) {
+      toggleSidebar(); // This expands the bar
+      setIsTenantsOpen(true); // Ensure menu is open after expansion
+    } else {
+      setIsTenantsOpen(!isTenantsOpen);
+    }
   };
 
   const getMenuItems = () => {
-    // Standardized to 'admin' to match your DB Schema
-    if (user.role === 'admin') {
+    if (role === 'admin') {
       return [
         { id: 'dashboard', label: 'OVERVIEW', icon: LayoutDashboard, href: '/admin/dashboard' },
         { id: 'rooms', label: 'PROPERTIES', icon: Home, href: '/admin/rooms' },
         { 
           id: 'tenants_group', 
-          label: 'TENANT MODULES', // Renamed for clarity
+          label: 'TENANT MODULES', 
           icon: Users, 
           isDropdown: true,
           isOpen: isTenantsOpen,
-          toggle: () => setIsTenantsOpen(!isTenantsOpen),
+          toggle: handleTenantToggle, 
           subItems: [
             { label: 'NEW APPLICATIONS', href: '/admin/applications' },
-            { label: 'ACCESS CONTROL', href: '/admin/tenants' }, // ADDED THIS: Leads to your new page
+            { label: 'ACCESS CONTROL', href: '/admin/tenants' }, 
             { label: 'ACTIVE LIST', href: '#' }, 
           ]
         },
@@ -71,7 +51,6 @@ export default function Sidebar() {
         { id: 'maintenance', label: 'MAINTENANCE', icon: Wrench, href: '/admin/maintenance' },
       ];
     }
-    // Tenant Menu
     return [
       { id: 'dashboard', label: 'OVERVIEW', icon: LayoutDashboard, href: '/tenant/dashboard' },
       { id: 'payments', label: 'PAYMENTS', icon: CreditCard, href: '/tenant/payments' },
@@ -80,41 +59,29 @@ export default function Sidebar() {
     ];
   };
 
-  const menuItems = getMenuItems();
-
   return (
-    <aside className={`${isCollapsed ? 'w-20' : 'w-64'} bg-black h-screen sticky top-0 hidden md:flex flex-col text-white transition-all duration-300 ease-in-out border-r border-[#333] shadow-2xl z-50`}>
-      
-      {/* Branding Section */}
-      <div className={`h-20 flex items-center border-b border-[#333] transition-all duration-300 ${
-        isCollapsed ? 'justify-center px-0' : 'justify-between px-4'
-      }`}>
-        {!isCollapsed && (
-          <div className="flex items-center gap-2 min-w-0 mr-2">
-              <img 
-                src="/images/logo.png" 
-                alt="Boarder-Q Logo" 
-                className="w-15 h-10 object-contain rounded-lg shadow-[0_0_15px_rgba(0,163,204,0.3)]"
-              />
-            <div className="flex items-center gap-0.5 whitespace-nowrap overflow-hidden">
-              <span className="font-black text-lg tracking-tight">BOARDER</span>
-              <span className="font-black text-lg text-[#00A3CC] italic">Q</span>
-            </div>
-          </div>
-        )}
-        <button onClick={() => setIsCollapsed(!isCollapsed)} className="hover:bg-[#1A1A1A] rounded-lg transition-colors text-[#00A3CC]">
-          <Menu size={22} />
-        </button>
-      </div>
-
-      {/* Navigation */}
-      <nav className="flex-grow py-6 overflow-y-auto overflow-x-hidden">
-        {menuItems.map((item) => {
+    <aside 
+      className={`
+        ${isCollapsed ? 'w-20' : 'w-64'} 
+        bg-black z-50 h-full sticky top-0 
+        hidden md:flex flex-col text-white 
+        transition-all duration-300 border-r border-white/10 shadow-2xl
+      `}
+    >
+      <nav className="flex-grow py-4 overflow-y-auto scrollbar-hide">
+        {getMenuItems().map((item) => {
           if (item.isDropdown) {
+            const isChildActive = item.subItems.some(sub => pathname === sub.href);
+            
             return (
               <div key={item.id} className="mb-2">
-                <button onClick={item.toggle} className={`w-full flex items-center gap-4 px-6 py-3 text-white/60 hover:text-white hover:bg-[#1A1A1A] transition-all ${item.isOpen ? 'text-white' : ''}`}>
-                  <item.icon size={20} className="min-w-[20px]" />
+                <button 
+                  onClick={item.toggle} 
+                  className={`w-full flex items-center gap-4 px-6 py-3.5 transition-all ${
+                    isChildActive || item.isOpen ? 'text-white' : 'text-white/50 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <item.icon size={20} className={`min-w-[20px] ${isChildActive ? 'text-[#00A3CC]' : ''}`} />
                   {!isCollapsed && (
                     <>
                       <span className="text-[11px] font-black tracking-widest flex-1 text-left uppercase">{item.label}</span>
@@ -122,12 +89,20 @@ export default function Sidebar() {
                     </>
                   )}
                 </button>
+                
+                {/* FIXED: Only show sub-menu if sidebar is NOT collapsed */}
                 {!isCollapsed && item.isOpen && (
-                  <div className="bg-[#0A0A0A]">
+                  <div className="bg-[#050505] border-y border-white/5">
                     {item.subItems.map((sub, idx) => (
-                      <Link key={idx} href={sub.href} className={`flex items-center gap-4 px-6 py-3 transition-all relative ${pathname === sub.href ? 'bg-[#1A1A1A] text-white' : 'text-white/40 hover:text-white hover:bg-[#1A1A1A]'}`}>
-                        {pathname === sub.href && <div className="absolute left-0 w-1 h-full bg-[#00A3CC]"></div>}
-                        <span className="ml-9 text-[10px] font-bold tracking-wider uppercase">{sub.label}</span>
+                      <Link 
+                        key={idx} 
+                        href={sub.href} 
+                        className={`flex items-center gap-4 px-6 py-3 relative transition-all ${
+                          pathname === sub.href ? 'bg-white/5 text-white' : 'text-white/30 hover:text-white'
+                        }`}
+                      >
+                        {pathname === sub.href && <div className="absolute left-0 w-1.5 h-full bg-[#00A3CC]"></div>}
+                        <span className="ml-9 text-[10px] font-bold tracking-wider uppercase truncate">{sub.label}</span>
                       </Link>
                     ))}
                   </div>
@@ -138,33 +113,20 @@ export default function Sidebar() {
 
           const isActive = pathname === item.href;
           return (
-            <Link key={item.id} href={item.href} className={`flex items-center gap-4 px-6 py-3 transition-all relative group ${isActive ? 'bg-[#1A1A1A] text-white' : 'text-white/50 hover:text-white hover:bg-[#1A1A1A]'}`}>
+            <Link 
+              key={item.id} 
+              href={item.href} 
+              className={`flex items-center gap-4 px-6 py-3.5 relative transition-all ${
+                isActive ? 'bg-white/5 text-white' : 'text-white/40 hover:text-white hover:bg-white/5'
+              }`}
+            >
               {isActive && <div className="absolute left-0 w-1.5 h-full bg-[#00A3CC] shadow-[0_0_15px_#00A3CC]"></div>}
-              <item.icon size={20} className={`min-w-[20px] ${isActive ? 'text-[#00A3CC]' : 'text-white/50 group-hover:text-white'}`} />
+              <item.icon size={20} className={`min-w-[20px] ${isActive ? 'text-[#00A3CC]' : 'text-white/40'}`} />
               {!isCollapsed && <span className="text-[11px] font-black tracking-widest uppercase">{item.label}</span>}
             </Link>
           );
         })}
       </nav>
-
-      {/* User Section */}
-      <div className="mt-auto border-t border-[#333] bg-[#0A0A0A]">
-         {!isCollapsed && (
-            <div className="px-6 py-5 flex items-center gap-3">
-               <div className="w-9 h-9 rounded-sm bg-[#333] border border-white/10 flex items-center justify-center font-black text-sm text-[#00A3CC]">
-                  {user.name.charAt(0)}
-               </div>
-               <div className="overflow-hidden">
-                  <p className="text-[10px] font-black uppercase truncate tracking-tight">{user.name}</p>
-                  <p className="text-[8px] text-[#00A3CC] font-bold uppercase tracking-widest">{user.role}</p>
-               </div>
-            </div>
-         )}
-        <button onClick={handleLogout} className="w-full flex items-center gap-4 px-6 py-5 text-white/40 hover:text-red-500 hover:bg-red-500/5 transition-all border-t border-[#333]">
-          <LogOut size={20} className="min-w-[20px]" />
-          {!isCollapsed && <span className="text-[10px] font-black tracking-[0.2em] uppercase">Sign Out</span>}
-        </button>
-      </div>
     </aside>
   );
 }
