@@ -3,138 +3,236 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Button from '@/components/Button';
-import { Mail, Lock, Building2, ChevronRight, Loader2 } from 'lucide-react';
+import { 
+  ChevronRight, Loader2, ShieldCheck, Mail, 
+  Lock, Eye, EyeOff, AlertCircle 
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function LoginPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(""); 
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ email: '', password: '' });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (error) setError(""); 
   };
 
   const handleLogin = async (e) => {
-  e.preventDefault();
-  setLoading(true);
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
-  try {
-    const response = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
-    });
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (!response.ok) {
-      throw new Error(data.error || 'Login failed');
+      if (!response.ok) {
+        throw new Error(data.error || 'Identity verification failed');
+      }
+
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('role', data.user.role);
+      localStorage.setItem('userEmail', data.user.email);
+      localStorage.setItem('user', JSON.stringify(data.user));
+
+      if (data.user.role === 'admin') {
+        router.push('/admin/dashboard');
+      } else {
+        router.push('/tenant/dashboard');
+      }
+    } catch (err) {
+      setError(err.message); 
+    } finally {
+      setLoading(false);
     }
+  };
 
-    // Login Success
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('role', data.user.role);
-    localStorage.setItem('userEmail', data.user.email);
-
-    // Redirect based on role from Database
-    if (data.user.role === 'admin') {
-      router.push('/admin/dashboard');
-    } else {
-      router.push('/tenant/dashboard');
+  // 🔥 Animation Variants
+  const containerVariants = {
+    hidden: {},
+    show: {
+      transition: {
+        staggerChildren: 0.12
+      }
     }
+  };
 
-  } catch (err) {
-    alert(err.message);
-  } finally {
-    setLoading(false);
-  }
-};
+  const itemVariants = {
+    hidden: { opacity: 0, y: 25 },
+    show: { opacity: 1, y: 0 }
+  };
 
   return (
-    <div className="h-screen w-full flex items-center justify-center bg-[#0a0a0a] overflow-hidden p-4 md:p-8">
-      {/* Background Glow */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#00A3CC]/10 blur-[120px] rounded-full animate-pulse" />
+    <div className="h-[calc(100vh-72px)] w-full flex flex-col lg:flex-row bg-white overflow-hidden font-sans">
       
-      <div className="w-full max-w-5xl h-full max-h-[700px] flex rounded-[40px] overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/5 bg-[#111] animate-in fade-in zoom-in duration-700">
+      {/* LEFT SECTION */}
+      <div className="hidden lg:flex flex-1 relative bg-[#F8FAFC] items-center justify-center border-r border-[#E5E7EB]">
         
-        {/* Left Section: Branding */}
-        <div className="hidden lg:flex flex-1 bg-white relative items-center justify-center overflow-hidden">
-          {/* Decorative Curve */}
-          <div className="absolute top-0 right-[-120px] h-full w-[240px] bg-white rounded-[100%] z-0 shadow-[-20px_0_40px_rgba(0,0,0,0.05)]" />
-          
-          <div className="relative z-10 flex flex-col items-center">
-          <div className="mb-8 p-8 bg-slate-50 rounded-full shadow-inner animate-bounce [animation-duration:3s] flex items-center justify-center">
-            <img
-              src="/images/logo.png"
-              alt="Logo"
-              className="w-25 h-25 object-contain"
-            />
+        {/* Floating animation */}
+        <motion.div 
+          animate={{ y: [0, -12, 0] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          className="flex flex-col items-center text-center"
+        >
+          <div className="mb-10 p-12 bg-white rounded-full shadow-xl shadow-blue-500/5 border border-[#E5E7EB]">
+            <img src="/images/logo.png" alt="Logo" className="w-32 h-32 object-contain" />
           </div>            
-          <h2 className="text-5xl font-[1000] text-black tracking-tighter uppercase leading-none italic">
-              BOARDER<span className="text-[#00A3CC]">Q</span>
-            </h2>
-            <div className="h-1 w-12 bg-[#00A3CC] my-4 rounded-full" />
-            <p className="text-slate-400 text-[10px] font-bold tracking-[0.5em] uppercase">
-              Management Interface
-            </p>
-          </div>
+          <h2 className="text-6xl font-black text-[#0B1F3B] tracking-tighter uppercase leading-none">
+            BOARDER<span className="text-[#1E5EFF] italic">Q</span>
+          </h2>
+          <div className="h-1.5 w-16 bg-[#1E5EFF] my-6 rounded-full" />
+          <p className="text-[#6B7280] text-xs font-black tracking-[0.5em] uppercase">
+            Boarding House Management System
+          </p>
+        </motion.div>
+      </div>
 
-          <div className="absolute bottom-10 left-12 text-[9px] text-slate-300 font-mono tracking-widest uppercase">
-            System Node: <span className="text-slate-900 font-bold">BQ-MAIN-01</span>
-          </div>
-        </div>
+      {/* RIGHT SECTION */}
+      <div className="flex-1 flex flex-col justify-center items-center p-8 md:p-16 relative bg-white">
 
-        {/* Right Section: Form */}
-        <div className="w-full lg:w-[450px] bg-[#161616] p-10 md:p-14 flex flex-col justify-center relative">
-          <div className="mb-10 transform transition-all duration-500 hover:translate-x-2">
-            <h1 className="text-4xl font-[1000] text-white tracking-tighter uppercase leading-none">
-              LOGIN
+        {/* 🔥 Animated background */}
+        <motion.div
+          className="absolute inset-0 pointer-events-none"
+          animate={{
+            background: [
+              "radial-gradient(circle at 20% 20%, rgba(30,94,255,0.05), transparent)",
+              "radial-gradient(circle at 80% 80%, rgba(30,94,255,0.05), transparent)",
+              "radial-gradient(circle at 20% 20%, rgba(30,94,255,0.05), transparent)"
+            ]
+          }}
+          transition={{ duration: 10, repeat: Infinity }}
+        />
+
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+          className="w-full max-w-md relative z-10"
+        >
+          
+          {/* HEADER */}
+          <motion.div variants={itemVariants} className="mb-6">
+            <h1 className="text-5xl font-black text-[#0B1F3B] tracking-tight uppercase leading-none">
+              Sign In
             </h1>
-            <p className="text-[#00A3CC] text-[10px] font-black tracking-[0.3em] uppercase mt-2">
-              Authentication Required
+            <p className="text-[#6B7280] text-[10px] font-bold tracking-[0.2em] uppercase mt-4 flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-[#1E5EFF]" /> Secure Credential Entry
             </p>
-          </div>
+          </motion.div>
 
-          <form onSubmit={handleLogin} className="space-y-5">
-            <div className="group space-y-2">
-              <label className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 group-focus-within:text-[#00A3CC] transition-colors">Credential Email</label>
-              <input 
-                type="email" name="email" required value={formData.email} onChange={handleChange}
-                placeholder="identity@boarderq.com" 
-                className="w-full px-6 py-4 bg-[#222] border border-white/5 rounded-2xl text-white placeholder:text-white/10 focus:outline-none focus:border-[#00A3CC] focus:ring-4 focus:ring-[#00A3CC]/10 transition-all text-sm"
-              />
-            </div>
+          <motion.form variants={itemVariants} onSubmit={handleLogin} className="space-y-6">
+            
+            {/* ERROR */}
+            <AnimatePresence>
+              {error && (
+                <motion.div 
+                  initial={{ opacity: 0, y: -10, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  className="p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-start gap-3 text-rose-600 shadow-sm"
+                >
+                  <AlertCircle className="shrink-0 mt-0.5" size={18} />
+                  <div>
+                    <p className="text-[11px] font-black uppercase tracking-wider">{error}</p>
+                    <p className="text-[9px] font-bold opacity-70 mt-1 uppercase">
+                      Authentication Terminal Refused Access
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-            <div className="group space-y-2">
-              <div className="flex justify-between items-center">
-                <label className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 group-focus-within:text-[#00A3CC] transition-colors">Access Key</label>
-                <button type="button" className="text-[8px] font-bold text-white/20 hover:text-[#00A3CC] uppercase tracking-widest transition-colors">Reset Key</button>
+            {/* EMAIL */}
+            <motion.div variants={itemVariants} className="space-y-1">
+              <label className="text-[10px] font-black uppercase text-[#6B7280] ml-1 tracking-widest">Email Identity</label>
+              <motion.div
+                animate={error ? { x: [0, -4, 4, -4, 0] } : {}}
+                transition={{ duration: 0.3 }}
+                className="relative group"
+              >
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] group-focus-within:text-[#1E5EFF]" />
+                <input 
+                  type="email" name="email" required value={formData.email} onChange={handleChange}
+                  className="w-full pl-12 pr-6 py-4 bg-[#F8FAFC] border border-[#E5E7EB] rounded-2xl font-bold focus:border-[#1E5EFF] focus:ring-4 focus:ring-[#1E5EFF]/5"
+                />
+              </motion.div>
+            </motion.div>
+
+            {/* PASSWORD */}
+            <motion.div variants={itemVariants} className="space-y-1">
+              <div className="flex justify-between">
+                <label className="text-[10px] font-black uppercase text-[#6B7280] ml-1 tracking-widest">Access Key</label>
+                <button type="button" className="text-[9px] font-black text-[#1E5EFF] uppercase hover:underline">Forgot Key?</button>
               </div>
-              <input 
-                type="password" name="password" required value={formData.password} onChange={handleChange}
-                placeholder="••••••••" 
-                className="w-full px-6 py-4 bg-[#222] border border-white/5 rounded-2xl text-white placeholder:text-white/10 focus:outline-none focus:border-[#00A3CC] focus:ring-4 focus:ring-[#00A3CC]/10 transition-all text-sm"
-              />
-            </div>
 
-            <Button 
-              type="submit" 
+              <motion.div
+                animate={error ? { x: [0, -4, 4, -4, 0] } : {}}
+                transition={{ duration: 0.3 }}
+                className="relative group"
+              >
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] group-focus-within:text-[#1E5EFF]" />
+                <input 
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  required
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full pl-12 pr-14 py-4 bg-[#F8FAFC] border border-[#E5E7EB] rounded-2xl font-bold focus:border-[#1E5EFF] focus:ring-4 focus:ring-[#1E5EFF]/5"
+                />
+
+                <motion.button
+                  whileTap={{ scale: 0.8, rotate: 10 }}
+                  whileHover={{ scale: 1.1 }}
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#6B7280]"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </motion.button>
+              </motion.div>
+            </motion.div>
+
+            {/* BUTTON */}
+            <motion.button 
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.96 }}
+              type="submit"
               disabled={loading}
-className="w-full py-4 rounded-2xl bg-[#00A3CC] hover:bg-[#008BB3] text-white hover:text-slate-900 font-[1000] tracking-[0.2em] text-xs transition-all active:scale-95 shadow-lg shadow-[#00A3CC]/20 flex justify-center items-center"            >
-              {loading ? <Loader2 className="animate-spin" /> : <>AUTHORIZE ACCESS <ChevronRight className="ml-2 w-4 h-4" /></>}
-            </Button>
-          </form>
+              className="w-full py-5 rounded-2xl bg-[#0B1F3B] text-white font-black tracking-[0.2em] text-xs shadow-xl flex justify-center items-center gap-3 relative overflow-hidden"
+            >
+              <motion.div
+                className="absolute inset-0 bg-[#1E5EFF] opacity-0"
+                whileHover={{ opacity: 0.15 }}
+              />
 
-          <div className="mt-8 text-center">
-            <p className="text-white/30 text-[10px] font-bold uppercase tracking-widest">
-              New entity?{' '}
-              <Link href="/public/register" className="text-[#00A3CC] hover:text-white transition-colors underline-offset-4 hover:underline ml-1">
-                Register Profile
+              {loading 
+                ? <Loader2 className="animate-spin" size={18} /> 
+                : <>VERIFY & AUTHORIZE <ChevronRight size={16} /></>
+              }
+            </motion.button>
+          </motion.form>
+
+          {/* FOOTER */}
+          <motion.div variants={itemVariants} className="mt-12 text-center pt-8 border-t border-[#F8FAFC]">
+            <p className="text-[#6B7280] text-[10px] font-bold uppercase tracking-widest">
+              Need to initialize a profile?{' '}
+              <Link href="/public/register" className="text-[#1E5EFF] font-black ml-1 hover:underline">
+                Register Node
               </Link>
             </p>
-          </div>
-        </div>
+          </motion.div>
+
+        </motion.div>
       </div>
     </div>
   );

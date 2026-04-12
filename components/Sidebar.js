@@ -19,11 +19,10 @@ export default function Sidebar() {
     setRole(localStorage.getItem('role'));
   }, []);
 
-  // FIXED LOGIC: If collapsed, expand the sidebar first before showing the menu
   const handleTenantToggle = () => {
     if (isCollapsed) {
-      toggleSidebar(); // This expands the bar
-      setIsTenantsOpen(true); // Ensure menu is open after expansion
+      toggleSidebar(); 
+      setIsTenantsOpen(true); 
     } else {
       setIsTenantsOpen(!isTenantsOpen);
     }
@@ -63,12 +62,26 @@ export default function Sidebar() {
     <aside 
       className={`
         ${isCollapsed ? 'w-20' : 'w-64'} 
-        bg-black z-50 h-full sticky top-0 
+        bg-gradient-to-b from-[#0B1F3B] to-[#1E5EFF] 
+        z-50 h-screen sticky top-0 
         hidden md:flex flex-col text-white 
-        transition-all duration-300 border-r border-white/10 shadow-2xl
+        transition-all duration-300 border-r border-white/10 shadow-xl
       `}
     >
-      <nav className="flex-grow py-4 overflow-y-auto scrollbar-hide">
+      {/* BRANDING SECTION: MOVED FROM NAVBAR */}
+      <div className={`h-[72px] flex items-center border-b border-white/10 ${isCollapsed ? 'justify-center' : 'px-6'}`}>
+        <div className="flex items-center gap-2">
+          <img src="/images/logo.png" alt="Logo" className="h-8 w-auto object-contain" />
+          {!isCollapsed && (
+            <div className="flex items-center gap-0.5">
+              <span className="font-black text-lg tracking-tight">BOARDER</span>
+              <span className="font-black text-lg text-[#22D3EE] italic">Q</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <nav className="flex-grow py-6 overflow-y-auto scrollbar-hide">
         {getMenuItems().map((item) => {
           if (item.isDropdown) {
             const isChildActive = item.subItems.some(sub => pathname === sub.href);
@@ -77,11 +90,11 @@ export default function Sidebar() {
               <div key={item.id} className="mb-2">
                 <button 
                   onClick={item.toggle} 
-                  className={`w-full flex items-center gap-4 px-6 py-3.5 transition-all ${
-                    isChildActive || item.isOpen ? 'text-white' : 'text-white/50 hover:text-white hover:bg-white/5'
+                  className={`w-full flex items-center gap-4 px-6 py-4 transition-all ${
+                    isChildActive || item.isOpen ? 'text-white' : 'text-white/60 hover:text-white hover:bg-white/10'
                   }`}
                 >
-                  <item.icon size={20} className={`min-w-[20px] ${isChildActive ? 'text-[#00A3CC]' : ''}`} />
+                  <item.icon size={20} className={`min-w-[20px] ${isChildActive ? 'text-[#22D3EE]' : ''}`} />
                   {!isCollapsed && (
                     <>
                       <span className="text-[11px] font-black tracking-widest flex-1 text-left uppercase">{item.label}</span>
@@ -90,19 +103,22 @@ export default function Sidebar() {
                   )}
                 </button>
                 
-                {/* FIXED: Only show sub-menu if sidebar is NOT collapsed */}
                 {!isCollapsed && item.isOpen && (
-                  <div className="bg-[#050505] border-y border-white/5">
+                  <div className="bg-black/20 border-y border-white/5">
                     {item.subItems.map((sub, idx) => (
                       <Link 
                         key={idx} 
                         href={sub.href} 
-                        className={`flex items-center gap-4 px-6 py-3 relative transition-all ${
-                          pathname === sub.href ? 'bg-white/5 text-white' : 'text-white/30 hover:text-white'
+                        className={`flex items-center gap-4 px-6 py-3.5 relative transition-all ${
+                          pathname === sub.href ? 'bg-white/10 text-white' : 'text-white/40 hover:text-white'
                         }`}
                       >
-                        {pathname === sub.href && <div className="absolute left-0 w-1.5 h-full bg-[#00A3CC]"></div>}
-                        <span className="ml-9 text-[10px] font-bold tracking-wider uppercase truncate">{sub.label}</span>
+                        {pathname === sub.href && (
+                          <div className="absolute left-0 w-1.5 h-full bg-[#22D3EE]"></div>
+                        )}
+                        <span className={`ml-9 text-[10px] font-bold tracking-wider uppercase truncate ${pathname === sub.href ? 'text-[#22D3EE]' : ''}`}>
+                          {sub.label}
+                        </span>
                       </Link>
                     ))}
                   </div>
@@ -116,13 +132,19 @@ export default function Sidebar() {
             <Link 
               key={item.id} 
               href={item.href} 
-              className={`flex items-center gap-4 px-6 py-3.5 relative transition-all ${
-                isActive ? 'bg-white/5 text-white' : 'text-white/40 hover:text-white hover:bg-white/5'
+              className={`flex items-center gap-4 px-6 py-4 relative transition-all ${
+                isActive ? 'bg-white/20 text-white' : 'text-white/50 hover:text-white hover:bg-white/10'
               }`}
             >
-              {isActive && <div className="absolute left-0 w-1.5 h-full bg-[#00A3CC] shadow-[0_0_15px_#00A3CC]"></div>}
-              <item.icon size={20} className={`min-w-[20px] ${isActive ? 'text-[#00A3CC]' : 'text-white/40'}`} />
-              {!isCollapsed && <span className="text-[11px] font-black tracking-widest uppercase">{item.label}</span>}
+              {isActive && (
+                <div className="absolute left-0 w-1.5 h-full bg-[#22D3EE] shadow-[0_0_15px_rgba(34,211,238,0.5)]"></div>
+              )}
+              <item.icon size={20} className={`min-w-[20px] transition-colors ${isActive ? 'text-[#22D3EE]' : 'text-white/50'}`} />
+              {!isCollapsed && (
+                <span className="text-[11px] font-black tracking-widest uppercase transition-colors">
+                  {item.label}
+                </span>
+              )}
             </Link>
           );
         })}

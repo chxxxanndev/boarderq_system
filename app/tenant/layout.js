@@ -1,11 +1,11 @@
 'use client';
-import Sidebar from '@/components/Sidebar'; 
+// import Sidebar from '@/components/Sidebar'; 
 
 export default function DashboardLayout({ children }) {
   return (
     // CHANGE 1: height calc and background black
     <div className="flex h-[calc(100vh-64px)] w-full overflow-hidden bg-black relative">
-      <Sidebar />
+      {/* <Sidebar /> */}
 
       <main className="flex-1 flex flex-col min-w-0 h-full overflow-y-auto bg-transparent relative z-10">
         <div className="w-full min-h-full">

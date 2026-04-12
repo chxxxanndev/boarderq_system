@@ -4,8 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
 import { 
-  BedDouble, User, LogOut, Home, Menu, 
-  Bell, HelpCircle, Settings, ChevronDown, LayoutDashboard, Loader2, Clock 
+  Menu, Bell, HelpCircle, Settings, ChevronDown, LogOut, Loader2 
 } from 'lucide-react';
 import ProfileSettingsModal from './ProfileSettingsModal';
 import { useSidebar } from '@/context/SidebarContext';
@@ -16,7 +15,6 @@ export default function Navbar() {
   const { isCollapsed, toggleSidebar } = useSidebar();
   const { toggleHelp } = useHelp();
   
-  // Initialize state immediately to prevent flicker
   const [user, setUser] = useState(() => {
     if (typeof window !== 'undefined') {
       const storedUser = localStorage.getItem('user');
@@ -38,22 +36,17 @@ export default function Navbar() {
   useEffect(() => {
     setMounted(true);
     const token = localStorage.getItem('token');
-
     if (token) {
-      // Sync fresh user data
       fetch('/api/auth/me', { headers: { 'Authorization': `Bearer ${token}` } })
         .then(res => res.ok ? res.json() : Promise.reject(res))
         .then(data => {
           setUser(data);
           localStorage.setItem('user', JSON.stringify(data));
         })
-        .catch(err => {
-           if (err.status === 401 || err.status === 403) handleLogout();
-        });
+        .catch(err => { if (err.status === 401) handleLogout(); });
 
-      // Sync Notifications
       fetch('/api/notifications', { headers: { 'Authorization': `Bearer ${token}` } })
-        .then(res => res.ok ? res.json() : []) // Fallback to empty array if error
+        .then(res => res.ok ? res.json() : []) 
         .then(data => setNotifications(data))
         .catch(() => setNotifications([]));
     }
@@ -75,32 +68,36 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="sticky top-0 z-[100] w-full h-[72px] px-8 flex items-center justify-between bg-[#0B1120] border-b border-white/5 text-white shadow-2xl transition-all duration-300">
+      <nav className="sticky top-0 z-[40] w-full h-[72px] px-8 flex items-center justify-between bg-white border-b border-[#E5E7EB] text-[#0B1F3B] shadow-sm transition-all duration-300">
         
         {/* LEFT SECTION */}
         <div className="flex items-center gap-6">
-          <Link href={user.role === 'admin' ? '/admin/dashboard' : user.role === 'tenant' ? '/tenant/dashboard' : '/'} className="flex items-center gap-2 group">
-            <img src="/images/logo.png" alt="Logo" className="h-8 w-auto object-contain" />
-            <div className={`flex items-center gap-0.5 overflow-hidden transition-all duration-500 ease-in-out ${isDashboardPage && isCollapsed ? 'max-w-0 opacity-0' : 'max-w-[200px] opacity-100'}`}>
-              <span className="font-black text-lg tracking-tight">BOARDER</span>
-              <span className="font-black text-lg text-[#00A3CC] italic">Q</span>
-            </div>
-          </Link>
+          {/* Logo returns to Navbar ONLY on public pages */}
+          {!isDashboardPage && (
+            <Link href="/" className="flex items-center gap-2 group">
+              <img src="/images/logo.png" alt="Logo" className="h-8 w-auto object-contain" />
+              <div className="flex items-center gap-0.5">
+                <span className="font-black text-lg tracking-tight text-[#0B1F3B]">BOARDER</span>
+                <span className="font-black text-lg text-[#1E5EFF] italic">Q</span>
+              </div>
+            </Link>
+          )}
 
+          {/* Toggle Menu button ONLY on dashboard pages */}
           {isDashboardPage && (
-            <button onClick={toggleSidebar} className="p-2 hover:bg-white/5 rounded-lg text-[#00A3CC] border border-white/10">
+            <button onClick={toggleSidebar} className="p-2 hover:bg-[#F8FAFC] rounded-lg text-[#0B1F3B] border border-[#E5E7EB] transition-colors">
               <Menu size={22} />
             </button>
           )}
         </div>
 
-        {/* CENTER: Navigation Links (Shows on Public Pages OR if Logged Out) */}
-        {(!isDashboardPage || !user.role) && (
+        {/* CENTER: Public Navigation Links (RESTORED) */}
+        {!isDashboardPage && (
           <div className="hidden lg:flex items-center gap-10">
-            <Link href="/" className={`text-[11px] font-black uppercase tracking-widest transition-colors ${pathname === '/' ? 'text-cyan-500' : 'text-white/60 hover:text-white'}`}>
+            <Link href="/" className={`text-[11px] font-black uppercase tracking-[0.2em] transition-colors ${pathname === '/' ? 'text-[#1E5EFF]' : 'text-[#6B7280] hover:text-[#0B1F3B]'}`}>
               Overview
             </Link>
-            <Link href="/public/rooms" className={`text-[11px] font-black uppercase tracking-widest transition-colors ${pathname === '/public/rooms' ? 'text-cyan-500' : 'text-white/60 hover:text-white'}`}>
+            <Link href="/public/rooms" className={`text-[11px] font-black uppercase tracking-[0.2em] transition-colors ${pathname === '/public/rooms' ? 'text-[#1E5EFF]' : 'text-[#6B7280] hover:text-[#0B1F3B]'}`}>
               Browse Rooms
             </Link>
           </div>
@@ -108,73 +105,71 @@ export default function Navbar() {
 
         {/* RIGHT SECTION */}
         <div className="flex items-center gap-4">
+          
+          {/* Dashboard Icons (Notifs/Help) */}
           {user.role && isDashboardPage && (
-            <div className="flex items-center gap-2 mr-2 border-r border-white/10 pr-4">
-              {/* NOTIFICATION BELL */}
+            <div className="flex items-center gap-2 mr-2 border-r border-[#E5E7EB] pr-4">
               <div className="relative" ref={notifRef}>
                 <button 
                   onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                  className={`p-2 transition-colors relative rounded-lg ${isNotificationsOpen ? 'text-[#00A3CC] bg-white/5' : 'text-white/40 hover:text-white'}`}
+                  className={`p-2 transition-colors relative rounded-lg ${isNotificationsOpen ? 'text-[#1E5EFF] bg-[#F8FAFC]' : 'text-[#6B7280] hover:text-[#0B1F3B]'}`}
                 >
                   <Bell size={20} />
-                  {notifications.length > 0 && <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-[#0B1120]"></span>}
+                  {notifications.length > 0 && <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>}
                 </button>
                 {isNotificationsOpen && (
-                  <div className="absolute right-0 mt-3 w-80 bg-[#0B1120] border border-white/10 rounded-sm shadow-2xl py-2 z-[110] animate-in fade-in slide-in-from-top-2">
-                    <div className="px-4 py-2 border-b border-white/5 flex justify-between bg-black/20">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-[#00A3CC]">Alerts</span>
-                      <span className="text-[9px] text-white/40">{notifications.length} New</span>
+                  <div className="absolute right-0 mt-3 w-80 bg-white border border-[#E5E7EB] rounded-2xl shadow-xl py-2 z-[110] animate-in fade-in zoom-in-95 overflow-hidden">
+                    <div className="px-4 py-3 border-b border-[#E5E7EB] flex justify-between bg-[#F8FAFC]">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-[#0B1F3B]">Notifications</span>
+                      <span className="text-[9px] text-[#1E5EFF] font-bold">{notifications.length} NEW</span>
                     </div>
                     <div className="max-h-80 overflow-y-auto">
-                      {notifications.map((n) => (
-                        <div key={n.id} className="px-4 py-3 hover:bg-white/5 border-b border-white/5 transition-all">
-                          <p className="text-[9px] font-black uppercase text-white/30">{n.type}</p>
-                          <p className="text-[11px] font-bold text-white/90 leading-tight">{n.title}</p>
+                      {notifications.length > 0 ? notifications.map((n) => (
+                        <div key={n.id} className="px-4 py-4 hover:bg-[#F8FAFC] border-b border-[#E5E7EB] transition-all">
+                          <p className="text-[9px] font-black uppercase text-[#1E5EFF] mb-1">{n.type}</p>
+                          <p className="text-[11px] font-bold text-[#0B1F3B] leading-snug">{n.title}</p>
                         </div>
-                      ))}
+                      )) : (
+                        <div className="px-4 py-8 text-center text-[#6B7280] text-[10px] font-bold uppercase">No Alerts</div>
+                      )}
                     </div>
                   </div>
                 )}
               </div>
-              <button onClick={toggleHelp} className="p-2 text-white/40 hover:text-[#00A3CC] transition-colors"><HelpCircle size={20} /></button>
+              <button onClick={toggleHelp} className="p-2 text-[#6B7280] hover:text-[#1E5EFF] transition-colors"><HelpCircle size={20} /></button>
             </div>
           )}
 
-          {/* USER PROFILE OR LOGIN */}
+          {/* Profile Dropdown or Sign In Button */}
           {user.role ? (
             <div className="relative" ref={dropdownRef}>
-              <button onClick={() => setIsProfileOpen(!isProfileOpen)} className="flex items-center gap-3 pl-2 py-1 rounded-lg group">
+              <button onClick={() => setIsProfileOpen(!isProfileOpen)} className="flex items-center gap-3 pl-3 py-1.5 rounded-xl transition-all hover:bg-[#F8FAFC] group">
                 <div className="text-right hidden sm:block">
-                  <p className="text-[10px] font-black uppercase leading-none tracking-tight">{user.name}</p>
-                  <p className="text-[8px] text-[#00A3CC] font-bold uppercase tracking-widest">{user.role}</p>
+                  <p className="text-[11px] font-black uppercase leading-none tracking-tight text-[#0B1F3B]">{user.name}</p>
+                  <p className="text-[9px] text-[#1E5EFF] font-black uppercase tracking-widest mt-1 opacity-80">{user.role}</p>
                 </div>
-                <div className="w-9 h-9 rounded-sm bg-[#1A1A1A] border border-white/10 flex items-center justify-center font-black text-[#00A3CC]">
+                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF] flex items-center justify-center font-black text-white text-sm shadow-sm">
                   {user.name?.charAt(0) || 'U'}
                 </div>
-                <ChevronDown size={14} className={`text-white/40 transition-transform duration-300 ${isProfileOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown size={14} className={`text-[#6B7280] transition-transform duration-300 ${isProfileOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {isProfileOpen && (
-                <div className="absolute right-0 mt-3 w-56 bg-[#0B1120] border border-white/10 rounded-md shadow-2xl py-2 z-[110] animate-in fade-in slide-in-from-top-2">
-                  <button onClick={() => { setIsSettingsOpen(true); setIsProfileOpen(false); }} className="w-full flex items-center gap-3 px-4 py-2.5 text-[11px] font-black uppercase text-white/70 hover:bg-white/5 transition-all">
-                    <Settings size={16} className="text-[#00A3CC]" /> Account Settings
+                <div className="absolute right-0 mt-3 w-60 bg-white border border-[#E5E7EB] rounded-xl shadow-2xl py-2 z-[110] animate-in fade-in zoom-in-95">
+                  <button onClick={() => { setIsSettingsOpen(true); setIsProfileOpen(false); }} className="w-full flex items-center gap-4 px-5 py-3.5 text-[11px] font-black uppercase text-[#0B1F3B] hover:bg-[#F8FAFC] transition-all">
+                    <Settings size={18} className="text-[#1E5EFF]" /> Account Settings
                   </button>
-                  <div className="h-px bg-white/5 my-1 mx-2"></div>
-                  <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-2.5 text-[11px] font-black uppercase text-red-400 hover:bg-red-500/5 transition-all">
-                    <LogOut size={16} /> Sign Out
+                  <div className="h-px bg-[#E5E7EB] my-1 mx-3"></div>
+                  <button onClick={handleLogout} className="w-full flex items-center gap-4 px-5 py-3.5 text-[11px] font-black uppercase text-rose-500 hover:bg-rose-50 transition-all">
+                    <LogOut size={18} /> Sign Out
                   </button>
                 </div>
               )}
             </div>
           ) : (
-            /* FIX: Logic to prevent showing "Get Started" on Dashboard while syncing */
-            isDashboardPage ? (
-              <div className="flex items-center gap-2 px-4 opacity-20"><Loader2 size={14} className="animate-spin" /></div>
-            ) : (
-              <Link href="/public/login" className="bg-[#00A3CC] hover:bg-white hover:text-black text-white px-6 py-2.5 rounded-sm text-[11px] font-black uppercase tracking-widest transition-all shadow-lg">
-                Get Started
-              </Link>
-            )
+             <Link href="/public/login" className="bg-[#1E5EFF] hover:bg-[#0B1F3B] text-white px-8 py-3 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-500/10 active:scale-95">
+                Sign In
+             </Link>
           )}
         </div>
       </nav>
