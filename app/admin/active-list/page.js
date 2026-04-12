@@ -1,18 +1,37 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Users, Mail, Home, Trash2, Calendar, ShieldCheck } from 'lucide-react';
+import { Users, Mail, Home, Trash2, Calendar, ShieldCheck, LogOut } from 'lucide-react';
 
 export default function ActiveList() {
   const [tenants, setTenants] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchData = async () => {
+const fetchData = async () => {
     try {
-      const res = await fetch('/api/admin/active-list');
+      const token = localStorage.getItem('token'); // Get the token
+      
+      const res = await fetch('/api/admin/active-list', {
+        headers: { 
+          'Authorization': `Bearer ${token}`, // Send the token here
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!res.ok) {
+        // If it's 401 or 403, we know it's an auth issue
+        if (res.status === 401 || res.status === 403) {
+          console.error("Auth Error: You are not authorized to view this.");
+          return;
+        }
+        const errorData = await res.json().catch(() => ({ error: "Server Error" }));
+        console.error("Fetch failed:", errorData.error);
+        return;
+      }
+
       const data = await res.json();
-      setTenants(data || []);
+      setTenants(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error(err);
+      console.error("Connection Error:", err);
     } finally {
       setLoading(false);
     }
@@ -20,25 +39,35 @@ export default function ActiveList() {
 
   useEffect(() => { fetchData(); }, []);
 
-  const handleMoveOut = async (id) => {
-    if (!confirm("Confirm move-out? This will free up the room for new applicants.")) return;
-    try {
-      const res = await fetch(`/api/admin/active-list?id=${id}`, { method: 'DELETE' });
-      if (res.ok) fetchData();
-    } catch (err) { console.error(err); }
-  };
+const handleMoveOut = async (id) => {
+    if (!confirm("Confirm immediate move-out?")) return;
+    
+    const token = localStorage.getItem('token'); // Get token
 
-  if (loading) return (
-    <div className="h-screen w-full flex items-center justify-center bg-black text-[#00A3CC] font-black uppercase tracking-[0.3em]">
-      Loading Active Directory...
-    </div>
-  );
+    try {
+      const res = await fetch(`/api/admin/active-list`, { 
+        method: 'PATCH',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` // ADD THIS
+        },
+        body: JSON.stringify({ id }) 
+      });
+      
+      if (res.ok) {
+        fetchData();
+      } else {
+        const err = await res.json();
+        alert(err.error || "Failed to process move-out");
+      }
+    } catch (err) { 
+      console.error(err); 
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-[#1a1a1a] to-[#555] p-8 lg:p-12">
       <main className="max-w-7xl mx-auto">
-        
-        {/* Header Section */}
         <div className="flex items-baseline gap-4 mb-12">
           <h1 className="text-4xl font-black tracking-tighter uppercase leading-none text-white">
             ACTIVE <span className="text-[#00A3CC]">RESIDENTS</span>
@@ -48,7 +77,6 @@ export default function ActiveList() {
           </span>
         </div>
 
-        {/* Occupancy Card */}
         <div className="bg-[#A6A6A6] w-full max-w-sm p-8 mb-10 shadow-2xl border-l-8 border-[#00A3CC] flex justify-between items-center">
             <div>
                 <p className="text-[10px] font-black uppercase text-black/60 mb-2">Total Active Tenants</p>
@@ -59,14 +87,13 @@ export default function ActiveList() {
             <Users size={48} className="text-white opacity-40" />
         </div>
 
-        {/* Resident Table */}
         <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-sm overflow-hidden shadow-2xl">
           <table className="w-full text-left">
             <thead>
               <tr className="bg-black/60 border-b-2 border-white/5">
                 <th className="px-8 py-5 text-[10px] font-black uppercase text-[#00A3CC] tracking-widest">Resident Details</th>
                 <th className="px-8 py-5 text-[10px] font-black uppercase text-[#00A3CC] tracking-widest">Unit Allocation</th>
-                <th className="px-8 py-5 text-[10px] font-black uppercase text-[#00A3CC] tracking-widest">Acquisition Date</th>
+                <th className="px-8 py-5 text-[10px] font-black uppercase text-[#00A3CC] tracking-widest">Lease Timeline</th>
                 <th className="px-8 py-5 text-right text-[10px] font-black uppercase text-[#00A3CC] tracking-widest">System Action</th>
               </tr>
             </thead>
@@ -89,9 +116,15 @@ export default function ActiveList() {
                     </div>
                   </td>
                   <td className="px-8 py-6">
-                    <div className="flex items-center gap-2 text-[10px] font-black text-white/60 uppercase">
-                        <Calendar size={12} />
-                        {new Date(t.move_in_date).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })}
+                    <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2 text-[10px] font-black text-white/60 uppercase">
+                            <Calendar size={12} className="text-[#00A3CC]" /> IN: {new Date(t.move_in_date).toLocaleDateString()}
+                        </div>
+                        {t.move_out_date && (
+                        <div className="flex items-center gap-2 text-[10px] font-black text-amber-500 uppercase">
+                            <LogOut size={12} /> OUT: {new Date(t.move_out_date).toLocaleDateString()}
+                        </div>
+                        )}
                     </div>
                   </td>
                   <td className="px-8 py-6 text-right">
@@ -106,13 +139,6 @@ export default function ActiveList() {
               ))}
             </tbody>
           </table>
-          
-          {tenants.length === 0 && (
-            <div className="py-32 text-center flex flex-col items-center">
-              <ShieldCheck size={64} className="text-white/5 mb-4" />
-              <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white/20">System Empty: No Active Leases Found</p>
-            </div>
-          )}
         </div>
       </main>
     </div>

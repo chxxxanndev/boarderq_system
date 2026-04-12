@@ -40,21 +40,22 @@ export default function Navbar() {
     const token = localStorage.getItem('token');
 
     if (token) {
-      // Sync fresh data
+      // Sync fresh user data
       fetch('/api/auth/me', { headers: { 'Authorization': `Bearer ${token}` } })
-        .then(res => res.json())
+        .then(res => res.ok ? res.json() : Promise.reject(res))
         .then(data => {
-          if (data.role) {
-            setUser(data);
-            localStorage.setItem('user', JSON.stringify(data));
-          }
-        }).catch(() => {});
+          setUser(data);
+          localStorage.setItem('user', JSON.stringify(data));
+        })
+        .catch(err => {
+           if (err.status === 401 || err.status === 403) handleLogout();
+        });
 
-      // Fetch alerts
+      // Sync Notifications
       fetch('/api/notifications', { headers: { 'Authorization': `Bearer ${token}` } })
-        .then(res => res.json())
+        .then(res => res.ok ? res.json() : []) // Fallback to empty array if error
         .then(data => setNotifications(data))
-        .catch(() => {});
+        .catch(() => setNotifications([]));
     }
 
     const handleClickOutside = (e) => {

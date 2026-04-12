@@ -1,3 +1,4 @@
+// app/api/rooms/route.js
 import pool from '@/lib/db';
 import { NextResponse } from 'next/server';
 
@@ -12,17 +13,17 @@ export async function GET() {
 
 export async function POST(request) {
   try {
-    const { name, monthly_rate, amenities } = await request.json();
+    const { name, monthly_rate, location, capacity, image_url, amenities } = await request.json();
 
     if (!name || !monthly_rate) {
       return NextResponse.json({ error: "Missing required unit parameters" }, { status: 400 });
     }
 
-    // Fixed to include amenities and default values for location/capacity/image_url
+    // Include ALL fields in the INSERT statement
     const [result] = await pool.query(
-      `INSERT INTO rooms (name, monthly_rate, amenities, status) 
-       VALUES (?, ?, ?, 'available')`,
-      [name, monthly_rate, amenities]
+      `INSERT INTO rooms (name, monthly_rate, location, capacity, image_url, amenities, status) 
+       VALUES (?, ?, ?, ?, ?, ?, 'available')`,
+      [name, monthly_rate, location, capacity, image_url, amenities || '']
     );
 
     return NextResponse.json({ 
