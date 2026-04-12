@@ -10,14 +10,14 @@ export function ThemeProvider({ children }) {
     const saved = localStorage.getItem('theme');
     const dark = saved ? saved === 'dark' : true;
     setIsDarkMode(dark);
-    document.body.className = dark ? 'bg-[#0B1120]' : 'bg-slate-100'; // 👈 sync body
+    document.body.className = dark ? 'bg-[#0B1120]' : 'bg-slate-100'; 
   }, []);
 
   const toggleTheme = () => {
     const newMode = !isDarkMode;
     setIsDarkMode(newMode);
     localStorage.setItem('theme', newMode ? 'dark' : 'light');
-    document.body.className = newMode ? 'bg-[#0B1120]' : 'bg-slate-100'; // 👈 sync body on toggle
+    document.body.className = newMode ? 'bg-[#0B1120]' : 'bg-slate-100'; 
   };
 
   return (

@@ -4,129 +4,136 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Button from '@/components/Button';
-import { Mail, Lock, ShieldCheck, Fingerprint } from 'lucide-react';
+import { Mail, Lock, Building2, ChevronRight, Loader2 } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    email: '',
-    password: ''
-  });
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({ email: '', password: '' });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    const { email, password } = formData;
+  const handleLogin = async (e) => {
+  e.preventDefault();
+  setLoading(true);
 
-    // 1. ADMIN CHECK
-    if (email === 'admin@boarderq.com' && password === 'admin123') {
-      localStorage.setItem('role', 'landlord');
-      localStorage.setItem('userEmail', email);
+  try {
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Login failed');
+    }
+
+    // Login Success
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('role', data.user.role);
+    localStorage.setItem('userEmail', data.user.email);
+
+    // Redirect based on role from Database
+    if (data.user.role === 'admin') {
       router.push('/admin/dashboard');
-      return;
-    }
-
-    // 2. TENANT CHECK
-    const localData = localStorage.getItem('tenants');
-    const tenants = localData ? JSON.parse(localData) : [];
-
-    const foundTenant = tenants.find(
-      (t) => t.email.toLowerCase() === email.toLowerCase() && t.password === password
-    );
-
-    if (foundTenant) {
-      if (foundTenant.status !== 'approved') {
-        alert('Access Restricted: Your account is pending approval.');
-        return;
-      }
-
-      localStorage.setItem('role', 'tenant');
-      localStorage.setItem('userEmail', foundTenant.email);
+    } else {
       router.push('/tenant/dashboard');
-      return;
     }
 
-    alert('Invalid credentials');
-  };
+  } catch (err) {
+    alert(err.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
-    <div className="min-h-[calc(100vh-140px)] flex items-center justify-center p-6 bg-slate-50">
+    <div className="h-screen w-full flex items-center justify-center bg-[#0a0a0a] overflow-hidden p-4 md:p-8">
+      {/* Background Glow */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#00A3CC]/10 blur-[120px] rounded-full animate-pulse" />
       
-      <div className="bg-white p-10 w-full max-w-md border border-slate-200 shadow-2xl rounded-sm relative overflow-hidden">
+      <div className="w-full max-w-5xl h-full max-h-[700px] flex rounded-[40px] overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-white/5 bg-[#111] animate-in fade-in zoom-in duration-700">
         
-        <Fingerprint className="absolute -right-4 -top-4 w-32 h-32 text-slate-50 -rotate-12 pointer-events-none" />
-
-        <div className="text-center mb-10 relative z-10">
-          <div className="bg-purple-50 border border-purple-100 px-4 py-1 inline-block mb-4 rounded-sm">
-            <span className="text-purple-700 text-[9px] tracking-[0.4em] uppercase font-black italic">
-              Identity Verification
-            </span>
+        {/* Left Section: Branding */}
+        <div className="hidden lg:flex flex-1 bg-white relative items-center justify-center overflow-hidden">
+          {/* Decorative Curve */}
+          <div className="absolute top-0 right-[-120px] h-full w-[240px] bg-white rounded-[100%] z-0 shadow-[-20px_0_40px_rgba(0,0,0,0.05)]" />
+          
+          <div className="relative z-10 flex flex-col items-center">
+          <div className="mb-8 p-8 bg-slate-50 rounded-full shadow-inner animate-bounce [animation-duration:3s] flex items-center justify-center">
+            <img
+              src="/images/logo.png"
+              alt="Logo"
+              className="w-25 h-25 object-contain"
+            />
+          </div>            
+          <h2 className="text-5xl font-[1000] text-black tracking-tighter uppercase leading-none italic">
+              BOARDER<span className="text-[#00A3CC]">Q</span>
+            </h2>
+            <div className="h-1 w-12 bg-[#00A3CC] my-4 rounded-full" />
+            <p className="text-slate-400 text-[10px] font-bold tracking-[0.5em] uppercase">
+              Management Interface
+            </p>
           </div>
-          <h1 className="text-5xl font-black text-slate-900 italic tracking-tighter uppercase leading-none">
-            Log In
-          </h1>
-          <p className="text-slate-400 text-[10px] font-mono tracking-widest mt-3 uppercase">
-            Secure Terminal Access <span className="text-cyan-600">v2.0</span>
-          </p>
+
+          <div className="absolute bottom-10 left-12 text-[9px] text-slate-300 font-mono tracking-widest uppercase">
+            System Node: <span className="text-slate-900 font-bold">BQ-MAIN-01</span>
+          </div>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-6 relative z-10">
-          <div className="space-y-2">
-            <label className="text-[10px] font-mono uppercase tracking-[0.3em] text-slate-500 block font-bold">
-              User Identification
-            </label>
-            <div className="relative group">
-              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-cyan-600 w-4 h-4 transition-colors" />
-              <input 
-                type="email" 
-                name="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="USER@BOARDERQ.COM" 
-                className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-300 focus:outline-none focus:border-cyan-600 focus:bg-white focus:ring-4 focus:ring-cyan-600/5 transition-all font-mono text-sm uppercase"
-              />
-            </div>
+        {/* Right Section: Form */}
+        <div className="w-full lg:w-[450px] bg-[#161616] p-10 md:p-14 flex flex-col justify-center relative">
+          <div className="mb-10 transform transition-all duration-500 hover:translate-x-2">
+            <h1 className="text-4xl font-[1000] text-white tracking-tighter uppercase leading-none">
+              LOGIN
+            </h1>
+            <p className="text-[#00A3CC] text-[10px] font-black tracking-[0.3em] uppercase mt-2">
+              Authentication Required
+            </p>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-[10px] font-mono uppercase tracking-[0.3em] text-slate-500 block font-bold">
-              Security Protocol
-            </label>
-            <div className="relative group">
-              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-cyan-600 w-4 h-4 transition-colors" />
+          <form onSubmit={handleLogin} className="space-y-5">
+            <div className="group space-y-2">
+              <label className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 group-focus-within:text-[#00A3CC] transition-colors">Credential Email</label>
               <input 
-                type="password" 
-                name="password"
-                required
-                value={formData.password}
-                onChange={handleChange}
+                type="email" name="email" required value={formData.email} onChange={handleChange}
+                placeholder="identity@boarderq.com" 
+                className="w-full px-6 py-4 bg-[#222] border border-white/5 rounded-2xl text-white placeholder:text-white/10 focus:outline-none focus:border-[#00A3CC] focus:ring-4 focus:ring-[#00A3CC]/10 transition-all text-sm"
+              />
+            </div>
+
+            <div className="group space-y-2">
+              <div className="flex justify-between items-center">
+                <label className="text-[9px] font-black uppercase tracking-[0.2em] text-white/40 group-focus-within:text-[#00A3CC] transition-colors">Access Key</label>
+                <button type="button" className="text-[8px] font-bold text-white/20 hover:text-[#00A3CC] uppercase tracking-widest transition-colors">Reset Key</button>
+              </div>
+              <input 
+                type="password" name="password" required value={formData.password} onChange={handleChange}
                 placeholder="••••••••" 
-                className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-300 focus:outline-none focus:border-cyan-600 focus:bg-white focus:ring-4 focus:ring-cyan-600/5 transition-all font-mono text-sm"
+                className="w-full px-6 py-4 bg-[#222] border border-white/5 rounded-2xl text-white placeholder:text-white/10 focus:outline-none focus:border-[#00A3CC] focus:ring-4 focus:ring-[#00A3CC]/10 transition-all text-sm"
               />
             </div>
-          </div>
 
-          <div className="pt-4 space-y-4">
             <Button 
-              type="submit"
-              className="w-full py-4 text-[11px] shadow-lg shadow-cyan-600/20 bg-cyan-600 hover:bg-cyan-700 text-white" 
-            >
-              Sign In <ShieldCheck className="w-4 h-4 ml-2" />
+              type="submit" 
+              disabled={loading}
+className="w-full py-4 rounded-2xl bg-[#00A3CC] hover:bg-[#008BB3] text-white hover:text-slate-900 font-[1000] tracking-[0.2em] text-xs transition-all active:scale-95 shadow-lg shadow-[#00A3CC]/20 flex justify-center items-center"            >
+              {loading ? <Loader2 className="animate-spin" /> : <>AUTHORIZE ACCESS <ChevronRight className="ml-2 w-4 h-4" /></>}
             </Button>
-          </div>
-        </form>
+          </form>
 
-        <div className="mt-10 pt-6 border-t border-slate-100 text-center">
-          <p className="text-slate-400 text-[10px] font-mono uppercase tracking-widest">
-            New Entity?{' '}
-            <Link href="/public/register" className="text-cyan-600 font-black hover:underline ml-1">
-              Register Account
-            </Link>
-          </p>
+          <div className="mt-8 text-center">
+            <p className="text-white/30 text-[10px] font-bold uppercase tracking-widest">
+              New entity?{' '}
+              <Link href="/public/register" className="text-[#00A3CC] hover:text-white transition-colors underline-offset-4 hover:underline ml-1">
+                Register Profile
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

@@ -1,336 +1,183 @@
 'use client';
-import React from 'react';
-import Sidebar from '@/components/Sidebar';
+import React, { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion'; 
 import { 
-  Users, 
-  Home, 
-  CreditCard, 
-  AlertCircle,
-  ArrowUpRight,
-  ArrowDownRight,
-  Plus,
-  Megaphone,
-  FileText,
-  ChevronRight
+  Users, Home, CreditCard, AlertCircle, Plus, Megaphone, Activity, X
 } from 'lucide-react';
 import Button from '@/components/Button';
 
 export default function LandlordDashboard() {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
+  // Modal States
+  const [showRoomModal, setShowRoomModal] = useState(false);
+  const [showAnnounceModal, setShowAnnounceModal] = useState(false);
+  
+  // Form States
+  const [roomForm, setRoomForm] = useState({ name: '', monthly_rate: '', amenities: '',   image_url: '' });
+  const [announceForm, setAnnounceForm] = useState({ title: '', body: '' });
+
+  const currentMonth = new Date().toLocaleString('en-US', { month: 'long' }).toUpperCase();
+
+  const fetchDashboardData = () => {
+    fetch('/api/admin/dashboard')
+      .then(res => res.json())
+      .then(resData => {
+        setData(resData);
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const handleAddRoom = async (e) => {
+    e.preventDefault();
+    const res = await fetch('/api/rooms', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(roomForm),
+    });
+    if (res.ok) {
+      alert("Room Added!");
+      setShowRoomModal(false);
+      fetchDashboardData(); // Refresh stats
+    }
+  };
+
+  const handleAnnounce = async (e) => {
+    e.preventDefault();
+    const res = await fetch('/api/announcements', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(announceForm),
+    });
+    if (res.ok) {
+      alert("Announcement Broadcasted!");
+      setShowAnnounceModal(false);
+    }
+  };
+
   const stats = [
-    { label: 'Total Tenants', value: '24', icon: Users, color: 'text-cyan-600', bg: 'bg-cyan-500/10', border: 'border-cyan-500/20', trend: '+2 this month', trendUp: true },
-    { label: 'Available Rooms', value: '05', icon: Home, color: 'text-emerald-600', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', trend: '-1 this week', trendUp: false },
-    { label: 'Total Revenue', value: '₱142.5K', icon: CreditCard, color: 'text-purple-600', bg: 'bg-purple-500/10', border: 'border-purple-500/20', trend: '+12% vs last month', trendUp: true },
-    { label: 'Maintenance', value: '03', icon: AlertCircle, color: 'text-amber-600', bg: 'bg-amber-500/10', border: 'border-amber-500/20', trend: '2 urgent', trendUp: false },
+    { label: 'Total Tenants', value: data?.tenants ?? '0', icon: Users, bgColor: 'bg-[#C5C7C7]' },
+    { label: 'Available Rooms', value: data?.available ?? '0', icon: Home, bgColor: 'bg-[#B0B2B2]' },
+    { label: 'Total Revenue', value: `₱${data?.revenue ? (data.revenue / 1000).toFixed(1) : '0'}K`, icon: CreditCard, bgColor: 'bg-[#A1A3A3]' },
+    { label: 'Maintenance', value: data?.maintenance ?? '0', icon: AlertCircle, bgColor: 'bg-[#919393]' },
   ];
 
+  if (loading) return <div className="h-screen w-full flex items-center justify-center bg-black font-mono text-[#00A3CC]">INITIALIZING...</div>;
+
   return (
-    <div className="flex min-h-screen bg-slate-50 font-sans text-slate-900">
-
+    <div className="flex min-h-screen bg-gradient-to-r from-black via-[#2a2a2a] via-20% to-[#efefef] font-sans text-white">     
       <main className="flex-1 p-8 lg:p-12">
-        <div className="w-full flex items-center gap-6 mb-12">
-          <div className="bg-cyan-500/10 border border-cyan-500/20 px-6 py-2 rounded-sm shrink-0 shadow-sm">
-            <span className="text-cyan-700 font-black text-[11px] tracking-[0.3em] uppercase italic">
-              SYSTEM OVERVIEW
-            </span>
-          </div>
-          <h1 className="text-4xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">
-            Dashboard
+        
+        {/* Header */}
+        <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="flex items-baseline gap-4 mb-12">
+          <h1 className="text-4xl font-black tracking-tighter uppercase leading-none">
+            <span className="text-white">DASH</span>
+            <span className="text-[#00A3CC]">BOARD</span>
           </h1>
-          <div className="flex-1 h-[1px] bg-slate-200"></div>
-          <div className="hidden md:block">
-             <p className="text-slate-400 text-[10px] font-mono tracking-widest uppercase">
-               Terminal v1.0
-             </p>
-          </div>
-        </div>
+          <span className="text-white text-xs font-bold tracking-[0.3em] uppercase opacity-80">SYSTEM OVERVIEW</span>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
           {stats.map((stat, i) => (
-            <div key={i} className="glass-panel bg-white p-6 border-l-2 border-slate-200 hover:border-l-cyan-500 transition-all shadow-sm">
-              <div className="flex justify-between items-start mb-4">
-                <div className={`p-2 border ${stat.border} ${stat.bg}`}>
-                  <stat.icon className={`w-4 h-4 ${stat.color}`} />
-                </div>
-                <div className={`flex items-center gap-1 font-mono text-[9px] font-bold ${stat.trendUp ? 'text-emerald-600' : 'text-rose-600'}`}>
-                  {stat.trendUp ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-                  {stat.trend}
-                </div>
-              </div>
-              <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1 font-semibold">{stat.label}</p>
-              <p className="text-3xl font-black text-slate-900 italic uppercase tracking-tighter">{stat.value}</p>
-            </div>
+            <motion.div key={i} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: i * 0.1 }}
+              className={`${stat.bgColor} p-6 rounded-2xl flex flex-col items-center justify-center h-40 shadow-2xl text-center relative overflow-hidden group`}
+            >
+              <h2 className="text-xl font-[1000] text-black leading-[0.9] uppercase mb-1 z-10">
+                {stat.label.split(' ').map((word, idx) => <span key={idx} className="block">{word}</span>)}
+              </h2>
+              <p className="text-5xl font-[1000] text-white leading-none tracking-tighter my-1 z-10">{stat.value}</p>
+              {/* DYNAMIC MONTH HERE */}
+              <div className="mt-2 text-[10px] font-black text-white tracking-[0.15em] uppercase opacity-80 z-10">AS OF {currentMonth}</div>
+              <stat.icon className="absolute -right-2 -bottom-2 text-black/5" size={100} />
+            </motion.div>
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          <div className="lg:col-span-2 glass-panel bg-white border border-slate-200 overflow-hidden shadow-sm">
-            <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-              <h2 className="text-[11px] font-black text-slate-900 uppercase italic tracking-[0.2em] flex items-center gap-2">
-                <div className="w-2 h-2 bg-cyan-500"></div>
-                Recent Applications
-              </h2>
-              <span className="px-2 py-0.5 bg-slate-900 text-white text-[9px] font-mono">03 PENDING</span>
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+          <div className="xl:col-span-2 bg-white/10 backdrop-blur-md border border-white/10 rounded-xl p-8 flex flex-col">
+            <div className="flex justify-between items-end mb-8 border-b-2 border-black pb-3">
+              <h2 className="text-sm font-black text-white uppercase tracking-[0.3em]">RECENT APPLICATION</h2>
+              <button className="bg-[#333] hover:bg-black text-white text-[10px] font-black px-6 py-2 rounded-xl transition-all uppercase tracking-widest">View Records</button>
             </div>
-            <div className="divide-y divide-slate-100">
-              {[
-                { name: 'John Doe', room: 'Room 102', time: '2 hours ago', initial: 'JD' },
-                { name: 'Sarah Chen', room: 'Room 205', time: '5 hours ago', initial: 'SC' },
-                { name: 'Mike Ross', room: 'Room 101', time: 'Yesterday', initial: 'MR' },
-              ].map((app, i) => (
-                <div key={i} className="flex items-center justify-between p-6 hover:bg-slate-50/50 transition-colors group cursor-pointer">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-slate-100 group-hover:bg-slate-900 group-hover:text-white transition-colors flex items-center justify-center font-black italic text-xs border border-slate-200">
-                      {app.initial}
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-slate-900 uppercase text-sm tracking-tight">{app.name}</h4>
-                      <p className="text-[10px] font-mono text-slate-500 uppercase tracking-tight">
-                        {app.room} <span className="mx-2 opacity-30">|</span> {app.time}
-                      </p>
-                    </div>
+            <div className="space-y-3">
+              {data?.applications?.map((app, i) => (
+                <div key={i} className="bg-[#6F7171] p-5 rounded-lg flex items-center justify-between shadow-md">
+                  <h4 className="font-black text-white uppercase text-xl">{app.applicant_name}</h4>
+                  <div className="flex gap-10 text-[11px] font-bold text-white uppercase">
+                    <span>PENDING</span>
+                    <span>{app.room_name}</span>
                   </div>
-                  <button className="flex items-center gap-1 text-[10px] font-black uppercase italic text-cyan-600 group-hover:translate-x-1 transition-transform tracking-widest">
-                    Review <ChevronRight className="w-3 h-3" />
-                  </button>
                 </div>
               ))}
             </div>
-            <div className="p-4 bg-slate-50/80 border-t border-slate-100 text-center">
-              <button className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] hover:text-cyan-600 transition-colors">
-                View All Records
-              </button>
-            </div>
           </div>
 
+          {/* Quick Actions */}
           <div className="space-y-6">
-            <div className="bg-slate-900 p-8 text-white border-b-4 border-cyan-500 shadow-xl">
-              <h3 className="text-xl font-black italic uppercase tracking-tighter mb-6">Quick Actions</h3>
+            <div className="bg-black/40 backdrop-blur-xl p-8 border-l-4 border-[#00A3CC] shadow-2xl rounded-r-lg">
+              <h3 className="text-lg font-black uppercase tracking-widest mb-6 text-white">Quick Actions</h3>
               <div className="space-y-3">
-                <Button className="w-full justify-start rounded-none bg-cyan-600 hover:bg-cyan-500 text-[10px] tracking-[0.2em] font-bold h-12">
+                <Button onClick={() => setShowRoomModal(true)} className="w-full justify-start rounded-xl bg-[#00A3CC] hover:bg-[#008BB3] text-[10px] tracking-[0.2em] font-black h-12 border-none">
                   <Plus className="mr-3 w-4 h-4" /> ADD NEW ROOM
                 </Button>
-                <Button variant="outline" className="w-full justify-start rounded-none border-slate-700 text-slate-300 hover:bg-white hover:text-slate-900 text-[10px] tracking-[0.2em] font-bold h-12">
+                <Button onClick={() => setShowAnnounceModal(true)} variant="outline" className="w-full justify-start rounded-xl border-white/20 text-white hover:bg-white hover:text-black text-[10px] tracking-[0.2em] font-black h-12">
                   <Megaphone className="mr-3 w-4 h-4" /> ANNOUNCEMENT
                 </Button>
-                <Button variant="outline" className="w-full justify-start rounded-none border-slate-700 text-slate-300 hover:bg-white hover:text-slate-900 text-[10px] tracking-[0.2em] font-bold h-12">
-                  <FileText className="mr-3 w-4 h-4" /> REPORTS
-                </Button>
               </div>
-            </div>
-
-            <div className="glass-panel border border-slate-200 p-6 bg-white shadow-sm">
-              <div className="flex items-center gap-2 mb-4">
-                <AlertCircle className="w-4 h-4 text-purple-500" />
-                <h4 className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">System Notice</h4>
-              </div>
-              <p className="text-xs text-slate-600 italic leading-relaxed uppercase tracking-tighter">
-                Server maintenance scheduled for <span className="text-purple-600 font-bold">Sunday 02:00 AM</span>. 
-              </p>
             </div>
           </div>
         </div>
 
-        <footer className="mt-20 py-8 text-slate-400 text-[8px] tracking-[0.5em] font-mono uppercase border-t border-slate-200 w-full text-center">
-          Console <span className="mx-2 text-cyan-500 opacity-50">/</span> Secure <span className="mx-2 text-cyan-500 opacity-50">/</span> Boarder-Q 2026
+        {/* --- MODALS --- */}
+        <AnimatePresence>
+          {showRoomModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+              <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-[#161616] border border-white/10 p-8 rounded-[30px] w-full max-w-md relative">
+                <button onClick={() => setShowRoomModal(false)} className="absolute top-6 right-6 text-white/40 hover:text-white"><X size={20}/></button>
+                <h2 className="text-2xl font-black uppercase tracking-tighter mb-6">Create <span className="text-[#00A3CC]">Room</span></h2>
+                <form onSubmit={handleAddRoom} className="space-y-4">
+                  <input type="text" placeholder="ROOM NAME (e.g. Unit A1)" required className="w-full bg-[#222] border border-white/5 p-4 rounded-xl text-sm" onChange={(e) => setRoomForm({...roomForm, name: e.target.value})} />
+                  <input type="number" placeholder="MONTHLY RATE (₱)" required className="w-full bg-[#222] border border-white/5 p-4 rounded-xl text-sm" onChange={(e) => setRoomForm({...roomForm, monthly_rate: e.target.value})} />
+                    {/* NEW: Image Input */}
+                    <input 
+                      type="text" 
+                      placeholder="IMAGE PATH (e.g. /images/Image (1).jpg)" 
+                      className="w-full bg-[#222] border border-white/5 p-4 rounded-xl text-sm" 
+                      onChange={(e) => setRoomForm({...roomForm, image_url: e.target.value})} 
+                    />
+                  <textarea placeholder="AMENITIES (comma separated)" className="w-full bg-[#222] border border-white/5 p-4 rounded-xl text-sm h-24" onChange={(e) => setRoomForm({...roomForm, amenities: e.target.value})} />
+                  <Button type="submit" className="w-full bg-[#00A3CC] font-black py-4 rounded-xl uppercase tracking-widest text-[10px]">Initialize Room</Button>
+                </form>
+              </motion.div>
+            </div>
+          )}
+
+          {showAnnounceModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+              <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-[#161616] border border-white/10 p-8 rounded-[30px] w-full max-w-md relative">
+                <button onClick={() => setShowAnnounceModal(false)} className="absolute top-6 right-6 text-white/40 hover:text-white"><X size={20}/></button>
+                <h2 className="text-2xl font-black uppercase tracking-tighter mb-6">New <span className="text-[#00A3CC]">Broadcast</span></h2>
+                <form onSubmit={handleAnnounce} className="space-y-4">
+                  <input type="text" placeholder="TITLE" required className="w-full bg-[#222] border border-white/5 p-4 rounded-xl text-sm uppercase" onChange={(e) => setAnnounceForm({...announceForm, title: e.target.value})} />
+                  <textarea placeholder="ANNOUNCEMENT CONTENT..." required className="w-full bg-[#222] border border-white/5 p-4 rounded-xl text-sm h-32" onChange={(e) => setAnnounceForm({...announceForm, body: e.target.value})} />
+                  <Button type="submit" className="w-full bg-[#00A3CC] font-black py-4 rounded-xl uppercase tracking-widest text-[10px]">Send to All Nodes</Button>
+                </form>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        <footer className="mt-20 py-8 text-white/30 text-[8px] tracking-[0.5em] font-mono uppercase border-t border-white/5 w-full text-center">
+          Console <span className="mx-2 text-[#00A3CC]">/</span> Secure <span className="mx-2 text-[#00A3CC]">/</span> Boarder-Q Development v2.0
         </footer>
       </main>
     </div>
   );
 }
-
-
-
-// 'use client';
-// import React from 'react';
-// import { useTheme } from '@/context/ThemeContext';
-// import { 
-//   Users, 
-//   Home, 
-//   CreditCard, 
-//   AlertCircle,
-//   ArrowUpRight,
-//   ArrowDownRight,
-//   Plus,
-//   Megaphone,
-//   FileText,
-//   ChevronRight
-// } from 'lucide-react';
-// import Button from '@/components/Button';
-
-// export default function LandlordDashboard() {
-//   const { isDarkMode } = useTheme();
-
-//   const stats = [
-//     { label: 'Total Tenants', value: '24', icon: Users, color: 'text-cyan-600', bg: 'bg-cyan-500/10', border: 'border-cyan-500/20', trend: '+2 this month', trendUp: true },
-//     { label: 'Available Rooms', value: '05', icon: Home, color: 'text-emerald-600', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', trend: '-1 this week', trendUp: false },
-//     { label: 'Total Revenue', value: '₱142.5K', icon: CreditCard, color: 'text-purple-600', bg: 'bg-purple-500/10', border: 'border-purple-500/20', trend: '+12% vs last month', trendUp: true },
-//     { label: 'Maintenance', value: '03', icon: AlertCircle, color: 'text-amber-600', bg: 'bg-amber-500/10', border: 'border-amber-500/20', trend: '2 urgent', trendUp: false },
-//   ];
-
-//   return (
-//     <div className={`flex min-h-screen font-sans transition-colors duration-300 ${
-//       isDarkMode ? 'bg-[#0B1120] text-white' : 'bg-slate-50 text-slate-900'
-//     }`}>
-
-//       <main className="flex-1 p-8 lg:p-12">
-
-//         {/* Header */}
-//         <div className="w-full flex items-center gap-6 mb-12">
-//           <div className="bg-cyan-500/10 border border-cyan-500/20 px-6 py-2 rounded-sm shrink-0 shadow-sm">
-//             <span className="text-cyan-700 font-black text-[11px] tracking-[0.3em] uppercase italic">
-//               SYSTEM OVERVIEW
-//             </span>
-//           </div>
-//           <h1 className={`text-4xl font-black tracking-tighter uppercase italic leading-none ${
-//             isDarkMode ? 'text-white' : 'text-slate-900'
-//           }`}>
-//             Dashboard
-//           </h1>
-//           <div className={`flex-1 h-[1px] ${isDarkMode ? 'bg-white/10' : 'bg-slate-200'}`}></div>
-//           <div className="hidden md:block">
-//             <p className="text-slate-400 text-[10px] font-mono tracking-widest uppercase">
-//               Terminal v1.0
-//             </p>
-//           </div>
-//         </div>
-
-//         {/* Stats Grid */}
-//         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-//           {stats.map((stat, i) => (
-//             <div key={i} className={`p-6 border-l-2 hover:border-l-cyan-500 transition-all shadow-sm ${
-//               isDarkMode
-//                 ? 'bg-white/5 border-white/10 hover:bg-white/10'
-//                 : 'bg-white border-slate-200'
-//             }`}>
-//               <div className="flex justify-between items-start mb-4">
-//                 <div className={`p-2 border ${stat.border} ${stat.bg}`}>
-//                   <stat.icon className={`w-4 h-4 ${stat.color}`} />
-//                 </div>
-//                 <div className={`flex items-center gap-1 font-mono text-[9px] font-bold ${
-//                   stat.trendUp ? 'text-emerald-500' : 'text-rose-500'
-//                 }`}>
-//                   {stat.trendUp ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
-//                   {stat.trend}
-//                 </div>
-//               </div>
-//               <p className={`text-[10px] uppercase tracking-widest mb-1 font-semibold ${
-//                 isDarkMode ? 'text-white/40' : 'text-slate-500'
-//               }`}>{stat.label}</p>
-//               <p className={`text-3xl font-black italic uppercase tracking-tighter ${
-//                 isDarkMode ? 'text-white' : 'text-slate-900'
-//               }`}>{stat.value}</p>
-//             </div>
-//           ))}
-//         </div>
-
-//         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-//           {/* Recent Applications */}
-//           <div className={`lg:col-span-2 border overflow-hidden shadow-sm ${
-//             isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-slate-200'
-//           }`}>
-//             <div className={`px-6 py-4 border-b flex justify-between items-center ${
-//               isDarkMode ? 'border-white/10 bg-white/5' : 'border-slate-100 bg-slate-50/50'
-//             }`}>
-//               <h2 className={`text-[11px] font-black uppercase italic tracking-[0.2em] flex items-center gap-2 ${
-//                 isDarkMode ? 'text-white' : 'text-slate-900'
-//               }`}>
-//                 <div className="w-2 h-2 bg-cyan-500"></div>
-//                 Recent Applications
-//               </h2>
-//               <span className={`px-2 py-0.5 text-[9px] font-mono ${
-//                 isDarkMode ? 'bg-white text-slate-900' : 'bg-slate-900 text-white'
-//               }`}>03 PENDING</span>
-//             </div>
-//             <div className={`divide-y ${isDarkMode ? 'divide-white/10' : 'divide-slate-100'}`}>
-//               {[
-//                 { name: 'John Doe', room: 'Room 102', time: '2 hours ago', initial: 'JD' },
-//                 { name: 'Sarah Chen', room: 'Room 205', time: '5 hours ago', initial: 'SC' },
-//                 { name: 'Mike Ross', room: 'Room 101', time: 'Yesterday', initial: 'MR' },
-//               ].map((app, i) => (
-//                 <div key={i} className={`flex items-center justify-between p-6 transition-colors group cursor-pointer ${
-//                   isDarkMode ? 'hover:bg-white/5' : 'hover:bg-slate-50/50'
-//                 }`}>
-//                   <div className="flex items-center gap-4">
-//                     <div className={`w-10 h-10 flex items-center justify-center font-black italic text-xs border transition-colors ${
-//                       isDarkMode
-//                         ? 'bg-white/10 border-white/20 group-hover:bg-white group-hover:text-slate-900'
-//                         : 'bg-slate-100 border-slate-200 group-hover:bg-slate-900 group-hover:text-white'
-//                     }`}>
-//                       {app.initial}
-//                     </div>
-//                     <div>
-//                       <h4 className={`font-bold uppercase text-sm tracking-tight ${
-//                         isDarkMode ? 'text-white' : 'text-slate-900'
-//                       }`}>{app.name}</h4>
-//                       <p className={`text-[10px] font-mono uppercase tracking-tight ${
-//                         isDarkMode ? 'text-white/40' : 'text-slate-500'
-//                       }`}>
-//                         {app.room} <span className="mx-2 opacity-30">|</span> {app.time}
-//                       </p>
-//                     </div>
-//                   </div>
-//                   <button className="flex items-center gap-1 text-[10px] font-black uppercase italic text-cyan-500 group-hover:translate-x-1 transition-transform tracking-widest">
-//                     Review <ChevronRight className="w-3 h-3" />
-//                   </button>
-//                 </div>
-//               ))}
-//             </div>
-//             <div className={`p-4 border-t text-center ${
-//               isDarkMode ? 'bg-white/5 border-white/10' : 'bg-slate-50/80 border-slate-100'
-//             }`}>
-//               <button className={`text-[10px] font-bold uppercase tracking-[0.2em] hover:text-cyan-500 transition-colors ${
-//                 isDarkMode ? 'text-white/30' : 'text-slate-400'
-//               }`}>
-//                 View All Records
-//               </button>
-//             </div>
-//           </div>
-
-//           {/* Actions Sidebar */}
-//           <div className="space-y-6">
-//             <div className="bg-slate-900 p-8 text-white border-b-4 border-cyan-500 shadow-xl">
-//               <h3 className="text-xl font-black italic uppercase tracking-tighter mb-6">Quick Actions</h3>
-//               <div className="space-y-3">
-//                 <Button className="w-full justify-start rounded-none bg-cyan-600 hover:bg-cyan-500 text-[10px] tracking-[0.2em] font-bold h-12">
-//                   <Plus className="mr-3 w-4 h-4" /> ADD NEW ROOM
-//                 </Button>
-//                 <Button variant="outline" className="w-full justify-start rounded-none border-slate-700 text-slate-300 hover:bg-white hover:text-slate-900 text-[10px] tracking-[0.2em] font-bold h-12">
-//                   <Megaphone className="mr-3 w-4 h-4" /> ANNOUNCEMENT
-//                 </Button>
-//                 <Button variant="outline" className="w-full justify-start rounded-none border-slate-700 text-slate-300 hover:bg-white hover:text-slate-900 text-[10px] tracking-[0.2em] font-bold h-12">
-//                   <FileText className="mr-3 w-4 h-4" /> REPORTS
-//                 </Button>
-//               </div>
-//             </div>
-
-//             <div className={`border p-6 shadow-sm ${
-//               isDarkMode ? 'bg-white/5 border-white/10' : 'bg-white border-slate-200'
-//             }`}>
-//               <div className="flex items-center gap-2 mb-4">
-//                 <AlertCircle className="w-4 h-4 text-purple-500" />
-//                 <h4 className={`text-[10px] font-mono uppercase tracking-widest ${
-//                   isDarkMode ? 'text-white/40' : 'text-slate-400'
-//                 }`}>System Notice</h4>
-//               </div>
-//               <p className={`text-xs italic leading-relaxed uppercase tracking-tighter ${
-//                 isDarkMode ? 'text-white/60' : 'text-slate-600'
-//               }`}>
-//                 Server maintenance scheduled for <span className="text-purple-400 font-bold">Sunday 02:00 AM</span>.
-//               </p>
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* Footer */}
-//         <footer className={`mt-20 py-8 text-[8px] tracking-[0.5em] font-mono uppercase border-t w-full text-center ${
-//           isDarkMode ? 'text-white/20 border-white/10' : 'text-slate-400 border-slate-200'
-//         }`}>
-//           Console <span className="mx-2 text-cyan-500 opacity-50">/</span> Secure <span className="mx-2 text-cyan-500 opacity-50">/</span> Boarder-Q 2026
-//         </footer>
-
-//       </main>
-//     </div>
-//   );
-// }

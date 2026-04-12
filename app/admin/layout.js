@@ -1,24 +1,25 @@
+// app/admin/layout.js
 'use client';
 import { usePathname } from 'next/navigation';
+import Sidebar from '@/components/Sidebar'; 
 
 export default function DashboardLayout({ children }) {
   const pathname = usePathname();
   
-  const getActiveTab = () => {
-    if (pathname.includes('/rooms')) return 'rooms';
-    if (pathname.includes('/applications')) return 'applications';
-    if (pathname.includes('/payments')) return 'payments';
-    if (pathname.includes('/maintenance')) return 'maintenance';
-    return 'dashboard';
-  };
-
   return (
-    <div className="flex min-h-[calc(100vh-100px)]">
-      <div className="flex-1 bg-transparent transition-colors duration-300">
-        <div className="max-w-6xl mx-auto p-8 lg:p-12">
+    <div className="flex h-screen w-full overflow-hidden bg-transparent relative">
+      
+      <Sidebar />
+
+      <main className="flex-1 flex flex-col min-w-0 h-full overflow-y-auto bg-transparent relative z-10">
+        <div className="w-full">
           {children}
         </div>
-      </div>
+      </main>
+
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.03]" 
+           style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)', backgroundSize: '40px 40px' }} 
+      />
     </div>
   );
 }
