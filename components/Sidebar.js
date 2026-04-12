@@ -44,7 +44,7 @@ export default function Sidebar() {
           subItems: [
             { label: 'NEW APPLICATIONS', href: '/admin/applications' },
             { label: 'ACCESS CONTROL', href: '/admin/tenants' }, 
-            { label: 'ACTIVE LIST', href: '#' }, 
+            { label: 'ACTIVE LIST', href: '/admin/active-list' },
           ]
         },
         { id: 'payments', label: 'REPORTS', icon: FileText, href: '/admin/payments' },

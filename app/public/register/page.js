@@ -104,8 +104,11 @@ export default function RegisterPage() {
             </div>
 
             <div className="pt-4">
-              <Button type="submit" disabled={loading} className="w-full py-4 rounded-2xl bg-[#00A3CC] hover:bg-[#008BB3] text-white font-[1000] tracking-[0.2em] text-xs transition-all active:scale-95 flex justify-center items-center">
-                {loading ? <Loader2 className="animate-spin" /> : <>INITIALIZE PROFILE <Zap className="ml-2 w-4 h-4" /></>}
+<Button
+  type="submit"
+  disabled={loading}
+  className="w-full py-4 rounded-2xl bg-[#00A3CC] hover:bg-[#008BB3] text-white hover:text-slate-900 font-[1000] tracking-[0.2em] text-xs transition-all active:scale-95 flex justify-center items-center"
+>                {loading ? <Loader2 className="animate-spin" /> : <>INITIALIZE PROFILE <Zap className="ml-2 w-4 h-4" /></>}
               </Button>
             </div>
           </form>

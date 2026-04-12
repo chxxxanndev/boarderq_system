@@ -12,17 +12,25 @@ export default function LandlordApplications() {
   const [loading, setLoading] = useState(true);
 
   const fetchApplications = async () => {
-    try {
-      const res = await fetch('/api/admin/applications');
-      const data = await res.json();
-      setApps(data.applications || []);
-      setStatsData(data.stats || { total: 0, pending: 0, approved: 0, rejected: 0 });
-    } catch (err) {
-      console.error("Fetch error:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+      try {
+        const res = await fetch('/api/admin/applications');
+        const data = await res.json();
+        
+        setApps(data.applications || []);
+        
+        // Merge with defaults to ensure no field is missing
+        setStatsData({
+          total: data.stats?.total ?? 0,
+          pending: data.stats?.pending ?? 0,
+          approved: data.stats?.approved ?? 0,
+          rejected: data.stats?.rejected ?? 0
+        });
+      } catch (err) {
+        console.error("Fetch error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
   useEffect(() => {
     fetchApplications();
@@ -44,13 +52,31 @@ export default function LandlordApplications() {
     }
   };
 
-  const stats = [
-    { label: 'TOTAL RECEIVED', value: statsData.total.toString().padStart(2, '0'), bgColor: 'bg-[#C5C7C7]' },
-    { label: 'PENDING REVIEW', value: statsData.pending.toString().padStart(2, '0'), bgColor: 'bg-[#B0B2B2]' },
-    { label: 'APPROVED', value: statsData.approved.toString().padStart(2, '0'), bgColor: 'bg-[#A1A3A3]' },
-    { label: 'REJECTED', value: statsData.rejected.toString().padStart(2, '0'), bgColor: 'bg-[#919393]' },
-  ];
+  // Helper to safely format numbers (handles null/undefined and pads with zero)
+    const formatValue = (val) => (val ?? 0).toString().padStart(2, '0');
 
+    const stats = [
+      { 
+        label: 'TOTAL RECEIVED', 
+        value: formatValue(statsData?.total), 
+        bgColor: 'bg-[#C5C7C7]' 
+      },
+      { 
+        label: 'PENDING REVIEW', 
+        value: formatValue(statsData?.pending), 
+        bgColor: 'bg-[#B0B2B2]' 
+      },
+      { 
+        label: 'APPROVED', 
+        value: formatValue(statsData?.approved), 
+        bgColor: 'bg-[#A1A3A3]' 
+      },
+      { 
+        label: 'REJECTED', 
+        value: formatValue(statsData?.rejected), 
+        bgColor: 'bg-[#919393]' 
+      },
+    ];
   if (loading) return (
     <div className="h-screen w-full flex items-center justify-center bg-black font-mono text-[#00A3CC]">
       <Loader2 className="animate-spin mr-2" /> LOADING ARCHIVES...

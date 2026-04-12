@@ -146,12 +146,12 @@ export default function LandlordDashboard() {
                   <input type="text" placeholder="ROOM NAME (e.g. Unit A1)" required className="w-full bg-[#222] border border-white/5 p-4 rounded-xl text-sm" onChange={(e) => setRoomForm({...roomForm, name: e.target.value})} />
                   <input type="number" placeholder="MONTHLY RATE (₱)" required className="w-full bg-[#222] border border-white/5 p-4 rounded-xl text-sm" onChange={(e) => setRoomForm({...roomForm, monthly_rate: e.target.value})} />
                     {/* NEW: Image Input */}
-                  <input 
-                    type="text" 
-                    placeholder="IMAGE PATH (e.g. /images/Image (1).jpg)" 
-                    className="w-full bg-[#222] border border-white/5 p-4 rounded-xl text-sm" 
-                    onChange={(e) => setRoomForm({...roomForm, image_url: e.target.value})} 
-                  />
+                    <input 
+                      type="text" 
+                      placeholder="IMAGE PATH (e.g. /images/Image (1).jpg)" 
+                      className="w-full bg-[#222] border border-white/5 p-4 rounded-xl text-sm" 
+                      onChange={(e) => setRoomForm({...roomForm, image_url: e.target.value})} 
+                    />
                   <textarea placeholder="AMENITIES (comma separated)" className="w-full bg-[#222] border border-white/5 p-4 rounded-xl text-sm h-24" onChange={(e) => setRoomForm({...roomForm, amenities: e.target.value})} />
                   <Button type="submit" className="w-full bg-[#00A3CC] font-black py-4 rounded-xl uppercase tracking-widest text-[10px]">Initialize Room</Button>
                 </form>

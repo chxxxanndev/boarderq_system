@@ -121,8 +121,7 @@ export default function LoginPage() {
             <Button 
               type="submit" 
               disabled={loading}
-              className="w-full py-4 rounded-2xl bg-[#00A3CC] hover:bg-[#008BB3] text-white font-[1000] tracking-[0.2em] text-xs transition-all active:scale-95 shadow-lg shadow-[#00A3CC]/20 flex justify-center items-center"
-            >
+className="w-full py-4 rounded-2xl bg-[#00A3CC] hover:bg-[#008BB3] text-white hover:text-slate-900 font-[1000] tracking-[0.2em] text-xs transition-all active:scale-95 shadow-lg shadow-[#00A3CC]/20 flex justify-center items-center"            >
               {loading ? <Loader2 className="animate-spin" /> : <>AUTHORIZE ACCESS <ChevronRight className="ml-2 w-4 h-4" /></>}
             </Button>
           </form>
