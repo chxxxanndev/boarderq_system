@@ -1,24 +1,29 @@
 'use client';
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom'; // IMPORT THIS
 import { motion, AnimatePresence } from 'framer-motion'; 
 import { 
-  Users, Home, CreditCard, AlertCircle, Plus, Megaphone, Activity, X
+  Users, Home, CreditCard, AlertCircle, Plus, Megaphone, Activity, X, ChevronRight
 } from 'lucide-react';
 import Button from '@/components/Button';
 
 export default function LandlordDashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false); // To handle Portal on client-side
   
-  // Modal States
   const [showRoomModal, setShowRoomModal] = useState(false);
   const [showAnnounceModal, setShowAnnounceModal] = useState(false);
   
-  // Form States
-  const [roomForm, setRoomForm] = useState({ name: '', monthly_rate: '', amenities: '',   image_url: '' });
+  const [roomForm, setRoomForm] = useState({ name: '', monthly_rate: '', amenities: '', image_url: '' });
   const [announceForm, setAnnounceForm] = useState({ title: '', body: '' });
 
   const currentMonth = new Date().toLocaleString('en-US', { month: 'long' }).toUpperCase();
+
+  useEffect(() => {
+    setMounted(true); // Needed for Portal
+    fetchDashboardData();
+  }, []);
 
   const fetchDashboardData = () => {
     fetch('/api/admin/dashboard')
@@ -28,10 +33,6 @@ export default function LandlordDashboard() {
         setLoading(false);
       });
   };
-
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
 
   const handleAddRoom = async (e) => {
     e.preventDefault();
@@ -43,7 +44,7 @@ export default function LandlordDashboard() {
     if (res.ok) {
       alert("Room Added!");
       setShowRoomModal(false);
-      fetchDashboardData(); // Refresh stats
+      fetchDashboardData();
     }
   };
 
@@ -61,121 +62,155 @@ export default function LandlordDashboard() {
   };
 
   const stats = [
-    { label: 'Total Tenants', value: data?.tenants ?? '0', icon: Users, bgColor: 'bg-[#C5C7C7]' },
-    { label: 'Available Rooms', value: data?.available ?? '0', icon: Home, bgColor: 'bg-[#B0B2B2]' },
-    { label: 'Total Revenue', value: `₱${data?.revenue ? (data.revenue / 1000).toFixed(1) : '0'}K`, icon: CreditCard, bgColor: 'bg-[#A1A3A3]' },
-    { label: 'Maintenance', value: data?.maintenance ?? '0', icon: AlertCircle, bgColor: 'bg-[#919393]' },
+    { label: 'Total Tenants', value: data?.tenants ?? '0', icon: Users, bgColor: 'bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF]', textColor: 'text-white' },
+    { label: 'Available Rooms', value: data?.available ?? '0', icon: Home, bgColor: 'bg-white', textColor: 'text-[#0B1F3B]' },
+    { label: 'Total Revenue', value: `₱${data?.revenue ? (data.revenue / 1000).toFixed(1) : '0'}K`, icon: CreditCard, bgColor: 'bg-[#0B1F3B]', textColor: 'text-white' },
+    { label: 'Maintenance', value: data?.maintenance ?? '0', icon: AlertCircle, bgColor: 'bg-white', textColor: 'text-[#0B1F3B]' },
   ];
 
-  if (loading) return <div className="h-screen w-full flex items-center justify-center bg-black font-mono text-[#00A3CC]">INITIALIZING...</div>;
+  if (loading) return (
+    <div className="h-screen w-full flex items-center justify-center bg-[#F8FAFC] font-sans text-[#1E5EFF]">
+      <Activity className="animate-spin mr-2" /> INITIALIZING...
+    </div>
+  );
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-r from-black via-[#2a2a2a] via-20% to-[#efefef] font-sans text-white">     
+    <div className="flex min-h-screen bg-[#F8FAFC] font-sans text-[#0B1F3B]">     
       <main className="flex-1 p-8 lg:p-12">
         
-        {/* Header */}
-        <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="flex items-baseline gap-4 mb-12">
-          <h1 className="text-4xl font-black tracking-tighter uppercase leading-none">
-            <span className="text-white">DASH</span>
-            <span className="text-[#00A3CC]">BOARD</span>
-          </h1>
-          <span className="text-white text-xs font-bold tracking-[0.3em] uppercase opacity-80">SYSTEM OVERVIEW</span>
-        </motion.div>
+        {/* Dashboard Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
+          <div>
+            <h1 className="text-4xl font-black tracking-tight uppercase leading-none text-[#0B1F3B]">
+              DASH<span className="text-[#1E5EFF]">BOARD</span>
+            </h1>
+            <p className="text-[#6B7280] text-[10px] font-black tracking-[0.3em] uppercase mt-2">Administrative Node Oversight</p>
+          </div>
+        </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           {stats.map((stat, i) => (
-            <motion.div key={i} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: i * 0.1 }}
-              className={`${stat.bgColor} p-6 rounded-2xl flex flex-col items-center justify-center h-40 shadow-2xl text-center relative overflow-hidden group`}
-            >
-              <h2 className="text-xl font-[1000] text-black leading-[0.9] uppercase mb-1 z-10">
-                {stat.label.split(' ').map((word, idx) => <span key={idx} className="block">{word}</span>)}
-              </h2>
-              <p className="text-5xl font-[1000] text-white leading-none tracking-tighter my-1 z-10">{stat.value}</p>
-              {/* DYNAMIC MONTH HERE */}
-              <div className="mt-2 text-[10px] font-black text-white tracking-[0.15em] uppercase opacity-80 z-10">AS OF {currentMonth}</div>
-              <stat.icon className="absolute -right-2 -bottom-2 text-black/5" size={100} />
-            </motion.div>
+            <div key={i} className={`${stat.bgColor} p-6 rounded-2xl flex flex-col justify-between h-44 shadow-sm border border-[#E5E7EB]/50 relative overflow-hidden group`}>
+              <div className="z-10">
+                <h2 className={`text-[11px] font-black uppercase tracking-widest mb-1 ${stat.textColor === 'text-white' ? 'opacity-70' : 'text-[#6B7280]'}`}>
+                  {stat.label}
+                </h2>
+                <p className={`text-4xl font-black tracking-tighter ${stat.textColor}`}>{stat.value}</p>
+              </div>
+              <stat.icon className={`absolute -right-4 -bottom-4 opacity-10 -rotate-12 ${stat.textColor === 'text-white' ? 'text-white' : 'text-[#0B1F3B]'}`} size={120} />
+              {stat.bgColor === 'bg-white' && <div className="absolute top-0 left-0 w-full h-1.5 bg-[#22D3EE]"></div>}
+            </div>
           ))}
         </div>
 
-        {/* Main Content Grid */}
+        {/* Content Section */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-          <div className="xl:col-span-2 bg-white/10 backdrop-blur-md border border-white/10 rounded-xl p-8 flex flex-col">
-            <div className="flex justify-between items-end mb-8 border-b-2 border-black pb-3">
-              <h2 className="text-sm font-black text-white uppercase tracking-[0.3em]">RECENT APPLICATION</h2>
-              <button className="bg-[#333] hover:bg-black text-white text-[10px] font-black px-6 py-2 rounded-xl transition-all uppercase tracking-widest">View Records</button>
-            </div>
-            <div className="space-y-3">
+          <div className="xl:col-span-2 bg-white border border-[#E5E7EB] rounded-2xl p-8 shadow-sm">
+            <h2 className="text-sm font-black text-[#0B1F3B] uppercase tracking-widest mb-6 pb-4 border-b border-[#E5E7EB]">Recent Activity</h2>
+            <div className="space-y-4">
               {data?.applications?.map((app, i) => (
-                <div key={i} className="bg-[#6F7171] p-5 rounded-lg flex items-center justify-between shadow-md">
-                  <h4 className="font-black text-white uppercase text-xl">{app.applicant_name}</h4>
-                  <div className="flex gap-10 text-[11px] font-bold text-white uppercase">
-                    <span>PENDING</span>
-                    <span>{app.room_name}</span>
-                  </div>
+                <div key={i} className="bg-[#F8FAFC] p-4 rounded-xl flex items-center justify-between border border-transparent hover:border-[#1E5EFF] transition-all cursor-pointer">
+                  <span className="font-bold text-[#0B1F3B]">{app.applicant_name}</span>
+                  <ChevronRight size={18} className="text-[#6B7280]" />
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Quick Actions */}
           <div className="space-y-6">
-            <div className="bg-black/40 backdrop-blur-xl p-8 border-l-4 border-[#00A3CC] shadow-2xl rounded-r-lg">
-              <h3 className="text-lg font-black uppercase tracking-widest mb-6 text-white">Quick Actions</h3>
+            <div className="bg-[#0B1F3B] p-8 rounded-2xl shadow-xl">
+              <h3 className="text-sm font-black uppercase tracking-widest mb-6 text-white border-l-4 border-[#22D3EE] pl-4">Actions</h3>
               <div className="space-y-3">
-                <Button onClick={() => setShowRoomModal(true)} className="w-full justify-start rounded-xl bg-[#00A3CC] hover:bg-[#008BB3] text-[10px] tracking-[0.2em] font-black h-12 border-none">
-                  <Plus className="mr-3 w-4 h-4" /> ADD NEW ROOM
+                <Button onClick={() => setShowRoomModal(true)} className="w-full justify-start rounded-xl h-14">
+                  <Plus className="mr-3 w-5 h-5" /> Add Property Unit
                 </Button>
-                <Button onClick={() => setShowAnnounceModal(true)} variant="outline" className="w-full justify-start rounded-xl border-white/20 text-white hover:bg-white hover:text-black text-[10px] tracking-[0.2em] font-black h-12">
-                  <Megaphone className="mr-3 w-4 h-4" /> ANNOUNCEMENT
+                <Button onClick={() => setShowAnnounceModal(true)} variant="outline" className="w-full justify-start rounded-xl border-white/20 text-white h-14 hover:bg-white/10">
+                  <Megaphone className="mr-3 w-5 h-5" /> System Broadcast
                 </Button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* --- MODALS --- */}
-        <AnimatePresence>
-          {showRoomModal && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-              <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-[#161616] border border-white/10 p-8 rounded-[30px] w-full max-w-md relative">
-                <button onClick={() => setShowRoomModal(false)} className="absolute top-6 right-6 text-white/40 hover:text-white"><X size={20}/></button>
-                <h2 className="text-2xl font-black uppercase tracking-tighter mb-6">Create <span className="text-[#00A3CC]">Room</span></h2>
-                <form onSubmit={handleAddRoom} className="space-y-4">
-                  <input type="text" placeholder="ROOM NAME (e.g. Unit A1)" required className="w-full bg-[#222] border border-white/5 p-4 rounded-xl text-sm" onChange={(e) => setRoomForm({...roomForm, name: e.target.value})} />
-                  <input type="number" placeholder="MONTHLY RATE (₱)" required className="w-full bg-[#222] border border-white/5 p-4 rounded-xl text-sm" onChange={(e) => setRoomForm({...roomForm, monthly_rate: e.target.value})} />
-                    {/* NEW: Image Input */}
-                    <input 
-                      type="text" 
-                      placeholder="IMAGE PATH (e.g. /images/Image (1).jpg)" 
-                      className="w-full bg-[#222] border border-white/5 p-4 rounded-xl text-sm" 
-                      onChange={(e) => setRoomForm({...roomForm, image_url: e.target.value})} 
-                    />
-                  <textarea placeholder="AMENITIES (comma separated)" className="w-full bg-[#222] border border-white/5 p-4 rounded-xl text-sm h-24" onChange={(e) => setRoomForm({...roomForm, amenities: e.target.value})} />
-                  <Button type="submit" className="w-full bg-[#00A3CC] font-black py-4 rounded-xl uppercase tracking-widest text-[10px]">Initialize Room</Button>
-                </form>
-              </motion.div>
-            </div>
-          )}
+        {/* BULLETPROOF PORTAL MODAL SECTION */}
+        {mounted && createPortal(
+          <AnimatePresence>
+            {(showRoomModal || showAnnounceModal) && (
+              <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+                
+                {/* 1. Full-screen Backdrop (Dismissible) */}
+                <motion.div 
+                  initial={{ opacity: 0 }} 
+                  animate={{ opacity: 1 }} 
+                  exit={{ opacity: 0 }}
+                  onClick={() => { setShowRoomModal(false); setShowAnnounceModal(false); }}
+                  className="absolute inset-0 bg-[#0B1F3B]/80 backdrop-blur-md cursor-pointer"
+                />
 
-          {showAnnounceModal && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-              <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="bg-[#161616] border border-white/10 p-8 rounded-[30px] w-full max-w-md relative">
-                <button onClick={() => setShowAnnounceModal(false)} className="absolute top-6 right-6 text-white/40 hover:text-white"><X size={20}/></button>
-                <h2 className="text-2xl font-black uppercase tracking-tighter mb-6">New <span className="text-[#00A3CC]">Broadcast</span></h2>
-                <form onSubmit={handleAnnounce} className="space-y-4">
-                  <input type="text" placeholder="TITLE" required className="w-full bg-[#222] border border-white/5 p-4 rounded-xl text-sm uppercase" onChange={(e) => setAnnounceForm({...announceForm, title: e.target.value})} />
-                  <textarea placeholder="ANNOUNCEMENT CONTENT..." required className="w-full bg-[#222] border border-white/5 p-4 rounded-xl text-sm h-32" onChange={(e) => setAnnounceForm({...announceForm, body: e.target.value})} />
-                  <Button type="submit" className="w-full bg-[#00A3CC] font-black py-4 rounded-xl uppercase tracking-widest text-[10px]">Send to All Nodes</Button>
-                </form>
-              </motion.div>
-            </div>
-          )}
-        </AnimatePresence>
+                {/* 2. Standardized Modal Card (Centered) */}
+                <motion.div 
+                  initial={{ scale: 0.95, opacity: 0, y: 20 }} 
+                  animate={{ scale: 1, opacity: 1, y: 0 }} 
+                  exit={{ scale: 0.95, opacity: 0, y: 20 }}
+                  onClick={(e) => e.stopPropagation()} 
+                  className="relative bg-white rounded-[2rem] w-full max-w-lg shadow-2xl border border-[#E5E7EB] overflow-hidden flex flex-col max-h-[90vh]"
+                >
+                  {/* Modal Header */}
+                  <div className="p-6 border-b border-[#E5E7EB] flex justify-between items-center bg-[#F8FAFC]">
+                    <h2 className="text-2xl font-black uppercase tracking-tight text-[#0B1F3B]">
+                      {showRoomModal ? <>ADD <span className="text-[#1E5EFF]">ROOM</span></> : <>NEW <span className="text-[#1E5EFF]">BROADCAST</span></>}
+                    </h2>
+                    <button onClick={() => { setShowRoomModal(false); setShowAnnounceModal(false); }} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
+                      <X size={20} className="text-[#6B7280]" />
+                    </button>
+                  </div>
 
-        <footer className="mt-20 py-8 text-white/30 text-[8px] tracking-[0.5em] font-mono uppercase border-t border-white/5 w-full text-center">
-          Console <span className="mx-2 text-[#00A3CC]">/</span> Secure <span className="mx-2 text-[#00A3CC]">/</span> Boarder-Q Development v2.0
+                  {/* Scrollable Modal Content */}
+                  <div className="p-8 overflow-y-auto">
+                    {showRoomModal ? (
+                      <form onSubmit={handleAddRoom} className="space-y-4">
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-black text-[#6B7280] uppercase ml-1">Room Designation</label>
+                          <input required type="text" placeholder="e.g. Unit 302" className="w-full bg-[#F8FAFC] border border-[#E5E7EB] p-4 rounded-2xl text-sm focus:border-[#1E5EFF] outline-none font-bold transition-all" onChange={(e) => setRoomForm({...roomForm, name: e.target.value})} />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-black text-[#6B7280] uppercase ml-1">Monthly Rate (PHP)</label>
+                          <input required type="number" placeholder="4500" className="w-full bg-[#F8FAFC] border border-[#E5E7EB] p-4 rounded-2xl text-sm focus:border-[#1E5EFF] outline-none font-bold transition-all" onChange={(e) => setRoomForm({...roomForm, monthly_rate: e.target.value})} />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-black text-[#6B7280] uppercase ml-1">Image Path</label>
+                          <input type="text" placeholder="/images/room-1.jpg" className="w-full bg-[#F8FAFC] border border-[#E5E7EB] p-4 rounded-2xl text-sm focus:border-[#1E5EFF] outline-none" onChange={(e) => setRoomForm({...roomForm, image_url: e.target.value})} />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-black text-[#6B7280] uppercase ml-1">Amenities</label>
+                          <textarea placeholder="WiFi, Laundry..." className="w-full bg-[#F8FAFC] border border-[#E5E7EB] p-4 rounded-2xl text-sm h-32 focus:border-[#1E5EFF] outline-none resize-none transition-all" onChange={(e) => setRoomForm({...roomForm, amenities: e.target.value})} />
+                        </div>
+                        <Button type="submit" className="w-full py-5 rounded-2xl shadow-lg shadow-blue-500/20">Initialize Room Node</Button>
+                      </form>
+                    ) : (
+                      <form onSubmit={handleAnnounce} className="space-y-4">
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-black text-[#6B7280] uppercase ml-1">Title</label>
+                          <input required type="text" placeholder="URGENT UPDATE" className="w-full bg-[#F8FAFC] border border-[#E5E7EB] p-4 rounded-2xl text-sm uppercase font-black focus:border-[#1E5EFF] outline-none" onChange={(e) => setAnnounceForm({...announceForm, title: e.target.value})} />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-black text-[#6B7280] uppercase ml-1">Message</label>
+                          <textarea required placeholder="Message content..." className="w-full bg-[#F8FAFC] border border-[#E5E7EB] p-4 rounded-2xl text-sm h-60 focus:border-[#1E5EFF] outline-none resize-none" onChange={(e) => setAnnounceForm({...announceForm, body: e.target.value})} />
+                        </div>
+                        <Button type="submit" className="w-full py-5 rounded-2xl shadow-lg shadow-blue-500/20">Broadcast to All</Button>
+                      </form>
+                    )}
+                  </div>
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>,
+          document.body // This renders the modal at the root level of your website!
+        )}
+
+                <footer className="mt-20 py-10 text-[#6B7280] text-[9px] tracking-[0.4em] font-bold uppercase border-t border-[#E5E7EB] w-full text-center">
+          Boarder-Q <span className="mx-2 text-[#1E5EFF]">|</span> Administrative Core <span className="mx-2 text-[#1E5EFF]">|</span> v2.0.4
         </footer>
       </main>
     </div>

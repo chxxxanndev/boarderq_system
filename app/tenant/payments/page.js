@@ -1,6 +1,7 @@
 'use client';
-import React, { useState, useEffect } from 'react';
-import { CreditCard, Send, ShieldCheck, History, Loader2, Clock } from 'lucide-react';
+import React, { useState } from 'react';
+import { CreditCard, Send, ShieldCheck, History, Loader2, Clock, Info } from 'lucide-react';
+import Button from '@/components/Button'; // Assuming you'll use the button component we fixed
 
 export default function TenantPayments() {
   const [loading, setLoading] = useState(false);
@@ -11,7 +12,7 @@ export default function TenantPayments() {
     amount: '',
     method: 'gcash',
     reference_number: '',
-    proof_url: '', // NEW
+    proof_url: '', 
     month_covered: new Date().toISOString().split('T')[0],
     notes: ''
   });
@@ -33,9 +34,7 @@ export default function TenantPayments() {
 
       if (res.ok) {
         setSuccess(true);
-        // Clear form after success
-        setFormData({ amount: '', method: 'gcash', reference_number: '', month_covered: '', notes: '' });
-        // Reset success message after 5 seconds
+        setFormData({ amount: '', method: 'gcash', reference_number: '', month_covered: new Date().toISOString().split('T')[0], notes: '' });
         setTimeout(() => setSuccess(false), 5000);
       }
     } catch (err) {
@@ -46,39 +45,45 @@ export default function TenantPayments() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-r from-black via-[#2a2a2a] via-20% to-[#efefef] font-sans text-white">     
+    <div className="flex min-h-screen bg-[#F8FAFC] font-sans text-[#0B1F3B]">     
       <main className="flex-1 p-8 lg:p-12">
         
-        {/* Header matching your Industrial Style */}
-        <div className="flex items-baseline gap-4 mb-12">
-          <h1 className="text-4xl font-black tracking-tighter uppercase leading-none">
-            <span className="text-white">PAYMENT</span>
-            <span className="text-[#00A3CC]"> PORTAL</span>
-          </h1>
-          <span className="text-white/40 text-[10px] font-mono tracking-[0.4em] uppercase">LEDGER_SYSTEM_V1</span>
+        {/* Header - SaaS Style */}
+        <div className="flex flex-col md:flex-row md:items-end gap-4 mb-12">
+          <div>
+            <h1 className="text-4xl font-black tracking-tight uppercase leading-none">
+              Payment <span className="text-[#1E5EFF]">Portal</span>
+            </h1>
+            <p className="text-[#6B7280] text-[10px] font-bold tracking-[0.3em] uppercase mt-2">Financial Transaction Management</p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
           
           {/* Submission Form Section */}
-          <div className="xl:col-span-2 bg-white/10 backdrop-blur-md border border-white/10 rounded-xl p-8 flex flex-col shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-1.5 h-full bg-[#00A3CC]"></div>
+          <div className="xl:col-span-2 bg-white border border-[#E5E7EB] rounded-2xl p-8 flex flex-col shadow-sm relative overflow-hidden">
+            {/* Brand Accent Bar */}
+            <div className="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-[#22D3EE] to-[#1E5EFF]"></div>
             
-            <div className="flex justify-between items-end mb-8 border-b-2 border-black pb-3">
-              <h2 className="text-sm font-black text-white uppercase tracking-[0.3em]">REPORT TRANSACTION</h2>
-              <Clock className="text-[#00A3CC] w-4 h-4" />
+            <div className="flex justify-between items-center mb-8 border-b border-[#E5E7EB] pb-5">
+              <h2 className="text-sm font-black text-[#0B1F3B] uppercase tracking-widest">Submit Transaction Report</h2>
+              <div className="p-2 bg-[#F8FAFC] rounded-lg">
+                <Clock className="text-[#1E5EFF] w-4 h-4" />
+              </div>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-[#00A3CC] uppercase tracking-widest">Amount (PHP)</label>
-                  <input required type="number" className="w-full bg-black/40 border border-white/10 p-4 text-sm focus:border-[#00A3CC] outline-none"
+                  <label className="text-[10px] font-black text-[#6B7280] uppercase tracking-widest">Amount (PHP)</label>
+                  <input required type="number" 
+                    className="w-full bg-[#F8FAFC] border border-[#E5E7EB] p-4 rounded-xl text-sm focus:border-[#1E5EFF] focus:ring-1 focus:ring-[#1E5EFF] outline-none transition-all font-bold"
                     value={formData.amount} onChange={(e) => setFormData({...formData, amount: e.target.value})} />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-[#00A3CC] uppercase tracking-widest">Method</label>
-                  <select className="w-full bg-black/40 border border-white/10 p-4 text-sm outline-none text-white"
+                  <label className="text-[10px] font-black text-[#6B7280] uppercase tracking-widest">Payment Method</label>
+                  <select 
+                    className="w-full bg-[#F8FAFC] border border-[#E5E7EB] p-4 rounded-xl text-sm outline-none text-[#0B1F3B] font-bold focus:border-[#1E5EFF]"
                     onChange={(e) => setFormData({...formData, method: e.target.value})}>
                     <option value="gcash">GCASH</option>
                     <option value="cash">CASH</option>
@@ -88,62 +93,73 @@ export default function TenantPayments() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-[#00A3CC] uppercase tracking-widest">Reference Number</label>
-                  <input required type="text" className="w-full bg-black/40 border border-white/10 p-4 text-sm focus:border-[#00A3CC] outline-none font-mono"
+                  <label className="text-[10px] font-black text-[#6B7280] uppercase tracking-widest">Reference Number</label>
+                  <input required type="text" 
+                    className="w-full bg-[#F8FAFC] border border-[#E5E7EB] p-4 rounded-xl text-sm focus:border-[#1E5EFF] outline-none font-mono font-bold"
                     value={formData.reference_number} onChange={(e) => setFormData({...formData, reference_number: e.target.value})} />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-[#00A3CC] uppercase tracking-widest">Proof URL (Optional)</label>
-                  <input type="text" placeholder="Link to screenshot" className="w-full bg-black/40 border border-white/10 p-4 text-sm focus:border-[#00A3CC] outline-none font-mono text-[10px]"
+                  <label className="text-[10px] font-black text-[#6B7280] uppercase tracking-widest">Proof URL (Optional)</label>
+                  <input type="text" placeholder="https://image-link.com" 
+                    className="w-full bg-[#F8FAFC] border border-[#E5E7EB] p-4 rounded-xl text-sm focus:border-[#1E5EFF] outline-none font-mono text-[11px]"
                     value={formData.proof_url} onChange={(e) => setFormData({...formData, proof_url: e.target.value})} />
                 </div>
               </div>
               
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-[#00A3CC] uppercase tracking-widest">Billing Month</label>
-                <input required type="date" className="w-full bg-black/40 border border-white/10 p-4 text-sm focus:border-[#00A3CC] outline-none uppercase"
+                <label className="text-[10px] font-black text-[#6B7280] uppercase tracking-widest">Billing Month Covered</label>
+                <input required type="date" 
+                  className="w-full bg-[#F8FAFC] border border-[#E5E7EB] p-4 rounded-xl text-sm focus:border-[#1E5EFF] outline-none uppercase font-bold"
                   value={formData.month_covered} onChange={(e) => setFormData({...formData, month_covered: e.target.value})} />
               </div>
 
-              {/* NEW Row 4: Notes */}
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-[#00A3CC] uppercase tracking-widest">Additional Notes</label>
-                <textarea rows="3" placeholder="e.g. Paid for both rent and water" 
-                  className="w-full bg-black/40 border border-white/10 p-4 text-sm focus:border-[#00A3CC] outline-none"
+                <label className="text-[10px] font-black text-[#6B7280] uppercase tracking-widest">Additional Notes</label>
+                <textarea rows="3" placeholder="Add any details for the admin..." 
+                  className="w-full bg-[#F8FAFC] border border-[#E5E7EB] p-4 rounded-xl text-sm focus:border-[#1E5EFF] outline-none resize-none"
                   value={formData.notes} onChange={(e) => setFormData({...formData, notes: e.target.value})} />
               </div>
 
               <button type="submit" disabled={loading}
-                className="w-full bg-[#00A3CC] text-black py-5 font-black uppercase text-[11px] tracking-[0.3em] hover:bg-white transition-all flex items-center justify-center gap-3 shadow-lg">
-                {loading ? <Loader2 className="animate-spin" /> : <><Send size={16} /> INITIALIZE TRANSMISSION</>}
+                className="w-full bg-gradient-to-r from-[#22D3EE] to-[#1E5EFF] text-white py-5 rounded-xl font-black uppercase text-[11px] tracking-[0.3em] hover:shadow-lg hover:shadow-blue-500/20 transition-all flex items-center justify-center gap-3 disabled:opacity-50">
+                {loading ? <Loader2 className="animate-spin" /> : <><Send size={16} /> Submit Transaction</>}
               </button>
             </form>
 
             {success && (
-              <div className="mt-6 p-4 bg-emerald-500/10 border border-emerald-500/40 text-emerald-400 flex items-center gap-3 animate-pulse">
-                <ShieldCheck /> <span className="text-[10px] font-black tracking-widest uppercase">LOGGED. AWAITING AUDIT.</span>
+              <div className="mt-6 p-4 bg-[#14B8A6]/10 border border-[#14B8A6]/30 text-[#14B8A6] rounded-xl flex items-center gap-3 animate-pulse">
+                <ShieldCheck size={20} /> 
+                <span className="text-[10px] font-black tracking-widest uppercase">Transaction Logged. Admin review pending.</span>
               </div>
             )}
           </div>
 
           {/* Quick Info Sidebar */}
           <div className="space-y-6">
-             <div className="bg-black/40 backdrop-blur-xl p-8 border-l-4 border-[#00A3CC] shadow-2xl rounded-r-lg">
-                <h3 className="text-lg font-black uppercase tracking-widest mb-6">Payment Info</h3>
-                <p className="text-[11px] text-white/40 leading-relaxed font-mono uppercase">
-                  Ensure the reference number matches your receipt exactly. Manual verification takes 12-24 hours.
-                </p>
+             <div className="bg-[#0B1F3B] p-8 rounded-2xl shadow-xl relative overflow-hidden">
+                <div className="relative z-10">
+                  <div className="flex items-center gap-2 mb-6">
+                    <Info className="text-[#22D3EE] w-5 h-5" />
+                    <h3 className="text-sm font-black uppercase tracking-widest text-white">Guidelines</h3>
+                  </div>
+                  <p className="text-[11px] text-white/70 leading-relaxed font-bold uppercase tracking-tight">
+                    Please ensure the reference number matches your GCash/Bank receipt exactly. 
+                    Verification typically takes <span className="text-[#22D3EE]">12-24 hours</span>.
+                  </p>
+                </div>
+                {/* Decorative background circle */}
+                <div className="absolute -right-10 -top-10 w-32 h-32 bg-[#1E5EFF]/20 rounded-full blur-3xl"></div>
              </div>
              
-             <div className="border-2 border-dashed border-white/5 p-12 text-center rounded-xl">
-                <History className="mx-auto mb-4 text-white/10" size={32} />
-                <p className="text-white/20 font-mono text-[9px] uppercase tracking-[0.4em]">Transaction History Locked</p>
+             <div className="bg-white border border-[#E5E7EB] border-dashed p-12 text-center rounded-2xl">
+                <History className="mx-auto mb-4 text-[#E5E7EB]" size={40} />
+                <p className="text-[#6B7280] font-bold text-[10px] uppercase tracking-[0.2em]">History data is loading...</p>
              </div>
           </div>
         </div>
 
-        <footer className="mt-20 py-8 text-white/30 text-[8px] tracking-[0.5em] font-mono uppercase border-t border-white/5 w-full text-center">
-          Console <span className="mx-2 text-[#00A3CC]">/</span> Payment Logic <span className="mx-2 text-[#00A3CC]">/</span> v1.0
+        <footer className="mt-20 py-8 text-[#6B7280] text-[9px] tracking-[0.3em] font-bold uppercase border-t border-[#E5E7EB] w-full text-center">
+          Boarder-Q <span className="mx-2 text-[#1E5EFF]">|</span> Payment Systems <span className="mx-2 text-[#1E5EFF]">|</span> Secure Node
         </footer>
       </main>
     </div>

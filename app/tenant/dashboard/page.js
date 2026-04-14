@@ -1,25 +1,24 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { 
-  Home, CreditCard, Wrench, ChevronRight, Zap, ShieldCheck, User,
-  ArrowUpRight, ArrowDownRight, Loader2
+  Home, CreditCard, Wrench, ChevronRight, Zap, ShieldCheck, 
+  Loader2, Calendar, Bell
 } from 'lucide-react';
 import Button from '@/components/Button';
 
 export default function TenantDashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [noticeDate, setNoticeDate] = useState("");
 
   useEffect(() => {
     const fetchDashboard = async () => {
       const token = localStorage.getItem('token');
-      console.log("Using Token:", token); // DEBUG LINE 1
       try {
         const res = await fetch('/api/tenant/dashboard', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const result = await res.json();
-        console.log("API Result:", result); // DEBUG LINE 2
         setData(result);
       } catch (err) {
         console.error("Fetch error");
@@ -30,115 +29,160 @@ export default function TenantDashboard() {
     fetchDashboard();
   }, []);
 
+  const handleScheduleMoveOut = async () => {
+    if (!noticeDate) return alert("Please select a date first.");
+    try {
+      const res = await fetch('/api/tenant/notice', {
+        method: 'PATCH',
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}` 
+        },
+        body: JSON.stringify({ date: noticeDate })
+      });
+      if (res.ok) {
+        alert("Notice submitted successfully.");
+        window.location.reload();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   if (loading) return (
-    <div className="h-screen w-full flex items-center justify-center bg-black font-mono text-[#00A3CC]">
-      <Loader2 className="animate-spin mr-2" /> SYNCHRONIZING NODE...
+    <div className="h-screen w-full flex items-center justify-center bg-white font-sans text-[#1E5EFF]">
+      <Loader2 className="animate-spin mr-2" /> SYNCHRONIZING...
     </div>
   );
 
-
-    // Logic to determine the Rent Card trend and label
   const getPaymentTrend = () => {
     const status = data?.paymentStatus;
-    if (status === 'confirmed') return { text: 'PAID', up: true };
-    if (status === 'pending') return { text: 'VERIFYING', up: true };
-    return { text: 'UNPAID', up: false };
+    if (status === 'confirmed') return { text: 'PAID', color: 'text-emerald-500' };
+    if (status === 'pending') return { text: 'VERIFYING', color: 'text-amber-500' };
+    return { text: 'UNPAID', color: 'text-rose-500' };
   };
 
   const paymentTrend = getPaymentTrend();
 
   const stats = [
-    { label: 'Room Assignment', 
-      value: data?.user?.room_name || 'PENDING', // Fallback to PENDING
-      icon: Home, 
-      bgColor: 'bg-[#C5C7C7]', 
-      trend: 'Floor 1', 
-      trendUp: true },
-    { label: 'Monthly Rent', value: `₱${data?.user?.monthly_rate || '0'}`, icon: CreditCard, bgColor: 'bg-[#B0B2B2]', 
-      trend: paymentTrend.text, // DYNAMIC STATUS
-      trendUp: paymentTrend.up 
-    },
-    { label: 'Utility Balance', value: '₱0.00', icon: Zap, bgColor: 'bg-[#A1A3A3]', trend: 'Current', trendUp: true },
-    { label: 'Account Status', value: 'ACTIVE', icon: ShieldCheck, bgColor: 'bg-[#919393]', trend: 'Verified', trendUp: true },
+    { label: 'Room Assignment', value: data?.user?.room_name || 'PENDING', icon: Home, trend: 'Floor 1' },
+    { label: 'Monthly Rent', value: `₱${data?.user?.monthly_rate || '0'}`, icon: CreditCard, trend: paymentTrend.text, trendColor: paymentTrend.color },
+    { label: 'Utility Balance', value: '₱0.00', icon: Zap, trend: 'Current' },
+    { label: 'Account Status', value: 'ACTIVE', icon: ShieldCheck, trend: 'Verified' },
   ];
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-r from-black via-[#2a2a2a] via-20% to-[#efefef] font-sans text-white">     
+    <div className="flex min-h-screen bg-[#F8FAFC] font-sans text-[#0B1F3B]">     
       <main className="flex-1 p-8 lg:p-12">
-        
         {/* Header Section */}
-        <div className="flex items-baseline gap-4 mb-12">
-          <h1 className="text-4xl font-[1000] tracking-tighter uppercase leading-none">
-            <span className="text-white">HELLO, </span>
-            <span className="text-[#00A3CC]">
-              {data?.user?.name ? data.user.name.split(' ')[0] : 'RESIDENT'}!
-            </span>          
-          </h1>
-          <div className="bg-[#00A3CC]/10 border border-[#00A3CC]/20 px-4 py-1 rounded-sm">
-            <span className="text-[#00A3CC] text-[9px] font-black tracking-[0.4em] uppercase">RESIDENT NODE</span>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-12">
+          <div>
+            <h1 className="text-3xl font-black tracking-tight uppercase leading-none">
+              Welcome back, <span className="text-[#1E5EFF]">{data?.user?.name ? data.user.name.split(' ')[0] : 'RESIDENT'}</span>          
+            </h1>
+            <p className="text-[#6B7280] text-xs font-bold mt-2 uppercase tracking-widest">Resident Dashboard Oversight</p>
+          </div>
+          <div className="flex items-center gap-2 bg-[#E5E7EB]/50 border border-[#E5E7EB] px-4 py-2 rounded-lg">
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+            <span className="text-[#0B1F3B] text-[10px] font-bold tracking-wider uppercase">Node Status: Active</span>
           </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+        {/* Stats Grid - Using the requested Blue/Cyan Gradient */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           {stats.map((stat, i) => (
-            <div key={i} className={`${stat.bgColor} p-6 rounded-2xl flex flex-col items-center justify-center h-40 shadow-2xl relative overflow-hidden group transition-transform hover:scale-[1.02]`}>
-              <div className={`absolute top-3 right-4 flex items-center gap-1 font-bold text-[9px] ${stat.trendUp ? 'text-emerald-700' : 'text-rose-700'}`}>
-                {stat.trend.toUpperCase()}
+            <div key={i} className="bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF] p-6 rounded-2xl flex flex-col justify-between h-44 shadow-lg shadow-blue-500/10 relative overflow-hidden transition-transform hover:scale-[1.02]">
+              <div className="flex justify-between items-start z-10">
+                <div className="p-2 bg-white/20 rounded-lg">
+                  <stat.icon className="w-5 h-5 text-white" />
+                </div>
+                <span className={`text-[10px] font-black px-2 py-1 bg-white/20 rounded text-white`}>
+                  {stat.trend.toUpperCase()}
+                </span>
               </div>
-              <h2 className="text-sm font-[1000] text-black uppercase mb-1">{stat.label}</h2>
-              <p className="text-3xl font-[1000] text-white tracking-tighter z-10">{stat.value}</p>
-              <stat.icon className="absolute -left-2 -bottom-2 w-12 h-12 text-black/5 -rotate-12" />
+              <div className="z-10">
+                <h2 className="text-xs font-bold text-white/80 uppercase mb-1">{stat.label}</h2>
+                <p className="text-2xl font-black text-white tracking-tight">{stat.value}</p>
+              </div>
+              {/* Decorative background icon */}
+              <stat.icon className="absolute -right-4 -bottom-4 w-24 h-24 text-white/10 -rotate-12" />
             </div>
           ))}
         </div>
 
-        {/* Main Content */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-          <div className="xl:col-span-2 bg-white/10 backdrop-blur-md border border-white/10 rounded-xl p-8">
-            <div className="flex justify-between items-end mb-8 border-b-2 border-black pb-3">
-              <h2 className="text-sm font-black text-white uppercase tracking-[0.3em]">SYSTEM ANNOUNCEMENTS</h2>
-              <div className="bg-black px-3 py-1 text-[9px] font-black text-white">
-                {data?.announcements?.length.toString().padStart(2, '0')} BROADCASTS
+          {/* Main Content Area */}
+          <div className="xl:col-span-2 bg-white border border-[#E5E7EB] rounded-2xl p-8 shadow-sm">
+            <div className="flex justify-between items-center mb-8 border-b border-[#E5E7EB] pb-5">
+              <div className="flex items-center gap-3">
+                <Bell className="w-5 h-5 text-[#2563EB]" />
+                <h2 className="text-sm font-black text-[#0B1F3B] uppercase tracking-widest">Announcements</h2>
+              </div>
+              <div className="bg-[#1E5EFF]/10 px-3 py-1 rounded text-[10px] font-black text-[#1E5EFF]">
+                {data?.announcements?.length.toString().padStart(2, '0')} RECENT
               </div>
             </div>
             
-            <div className="space-y-3">
+            <div className="space-y-4">
               {data?.announcements?.map((ann, i) => (
-                <div key={i} className="bg-[#6F7171] hover:bg-[#5a5c5c] p-5 rounded-lg flex items-center justify-between group cursor-pointer shadow-md border-l-4 border-transparent hover:border-[#00A3CC]">
+                <div key={i} className="group bg-[#F8FAFC] hover:bg-white border border-[#E5E7EB] hover:border-[#1E5EFF] p-5 rounded-xl flex items-center justify-between transition-all cursor-pointer shadow-sm">
                   <div>
-                    <h4 className="font-black text-white uppercase text-lg">{ann.title}</h4>
-                    <p className="text-[10px] font-bold text-white/50 tracking-widest">
-                      {new Date(ann.created_at).toLocaleDateString()}
+                    <h4 className="font-bold text-[#0B1F3B] uppercase text-base group-hover:text-[#1E5EFF] transition-colors">{ann.title}</h4>
+                    <p className="text-[10px] font-bold text-[#6B7280] mt-1 flex items-center gap-2 italic">
+                      <Calendar className="w-3 h-3" /> {new Date(ann.created_at).toLocaleDateString()}
                     </p>
                   </div>
-                  <button className="text-[10px] font-black text-white group-hover:text-[#00A3CC] flex items-center gap-2">
-                    REVIEW <ChevronRight className="w-4 h-4" />
-                  </button>
+                  <ChevronRight className="w-5 h-5 text-[#E5E7EB] group-hover:text-[#1E5EFF] group-hover:translate-x-1 transition-all" />
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Quick Actions */}
+          {/* Sidebar Area */}
           <div className="space-y-6">
-            <div className="bg-black/40 backdrop-blur-xl p-8 border-l-4 border-[#00A3CC] shadow-2xl rounded-r-lg">
-              <h3 className="text-lg font-black uppercase tracking-widest mb-6">Quick Actions</h3>
+            <div className="bg-[#0B1F3B] p-8 shadow-xl rounded-2xl">
+              <h3 className="text-sm font-black uppercase tracking-widest mb-6 text-white border-l-4 border-[#22D3EE] pl-4">Quick Actions</h3>
               <div className="space-y-3">
-                <Button className="w-full justify-start rounded-xl bg-[#00A3CC] hover:bg-[#008BB3] text-[10px] tracking-[0.2em] font-[1000] h-12">
-                  <CreditCard className="mr-3 w-4 h-4" /> INITIALIZE PAYMENT
+                <Button className="w-full justify-start rounded-xl">
+                  <CreditCard className="mr-3 w-4 h-4" /> Initialize Payment
                 </Button>
-                <Button variant="outline" className="w-full justify-start rounded-xl border-white/20 text-white hover:bg-white hover:text-black text-[10px] tracking-[0.2em] h-12">
-                  <Wrench className="mr-3 w-4 h-4" /> REPAIR REQUEST
+                <Button variant="outline" className="w-full justify-start rounded-xl border-white/20 text-white hover:bg-white/10">
+                  <Wrench className="mr-3 w-4 h-4" /> Repair Request
                 </Button>
               </div>
             </div>
 
-            <div className="bg-white/5 border border-white/10 p-6 rounded-xl">
-              <span className="text-[10px] font-black uppercase tracking-widest text-[#00A3CC]">Next rent due on:</span>
-              <p className="text-white font-black underline decoration-[#00A3CC] mt-1 uppercase">
-                {data?.nextDueDate}
+            <div className="bg-white border border-[#E5E7EB] p-6 rounded-2xl shadow-sm">
+              <span className="text-[10px] font-black uppercase tracking-widest text-[#6B7280]">Upcoming Obligation:</span>
+              <p className="text-[#0B1F3B] font-black text-lg mt-1 uppercase border-b-2 border-[#22D3EE] inline-block">{data?.nextDueDate || '---'}</p>
+            </div>
+
+            <div className="bg-white border border-[#E5E7EB] p-6 rounded-2xl shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <ShieldCheck className="w-4 h-4 text-[#14B8A6]" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-[#6B7280]">Lease Status:</span>
+              </div>
+              <p className="text-[#0B1F3B] font-black uppercase text-xs mb-4">
+                {data?.user?.move_out_date 
+                  ? `Move-out scheduled: ${new Date(data.user.move_out_date).toLocaleDateString()}` 
+                  : 'Active Contract'}
               </p>
+              
+              {!data?.user?.move_out_date && (
+                <div className="pt-4 border-t border-[#E5E7EB]">
+                  <p className="text-[9px] font-bold text-[#6B7280] uppercase mb-2">Notice of Intent to Vacate</p>
+                  <div className="flex flex-col gap-2">
+                    <input 
+                      type="date" 
+                      className="bg-[#F8FAFC] border border-[#E5E7EB] text-[10px] p-2 rounded-lg text-[#0B1F3B] outline-none focus:border-[#1E5EFF]" 
+                      onChange={(e) => setNoticeDate(e.target.value)}
+                    />
+                    <button onClick={handleScheduleMoveOut} className="bg-[#E5E7EB] hover:bg-rose-500 hover:text-white text-[#0B1F3B] px-3 py-2 text-[10px] font-black uppercase rounded-lg transition-all">
+                      Submit Notice
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

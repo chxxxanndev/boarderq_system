@@ -1,26 +1,40 @@
-import { User, MapPin, ArrowRight } from 'lucide-react';
+// components/RoomCard.js
+'use client'; // Add this to ensure event handlers work correctly
+
+import { User, MapPin, ArrowRight, ImageOff } from 'lucide-react';
 import Link from 'next/link';
+import { useState } from 'react';
 
 export default function RoomCard({ room }) {
-  // Database uses lowercase 'available', 'occupied', etc.
+  const [imageError, setImageError] = useState(false);
+  
   const isAvailable = room.status?.toLowerCase() === 'available';
 
-  // Handle the images from your public/images folder
-  // If no image_url exists in DB, it defaults to Image (1).jpg
-  const imagePath = room.image_url 
-    ? room.image_url 
-    : `/images/Image (${(room.id % 5) + 1}).jpg`; // Cycles through Image (1) to Image (5) based on ID
+  // Standardize the URL: replace spaces with %20 for the browser
+  const getDefaultImage = (id) => {
+    const imgNumber = (id % 5) + 1;
+    return `/images/Image%20(${imgNumber}).jpg`; 
+  };
+
+  const imagePath = room.image_url ? room.image_url : getDefaultImage(room.id);
 
   return (
     <div className="glass-panel overflow-hidden group hover:border-cyan-500/40 transition-all duration-500 flex flex-col h-full border-l-2 border-l-slate-800 hover:border-l-cyan-400">
       
-      <div className="h-52 bg-slate-900 relative overflow-hidden">
-        <img 
-          src={imagePath} 
-          alt={room.name}
-          className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700 grayscale-[30%] group-hover:grayscale-0"
-          onError={(e) => { e.target.src = "/images/Image (1).jpg"; }} // Fallback if file doesn't exist
-        />
+      <div className="h-52 bg-slate-900 relative overflow-hidden flex items-center justify-center">
+        {!imageError ? (
+          <img 
+            src={imagePath} 
+            alt={room.name}
+            className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700 grayscale-[30%] group-hover:grayscale-0"
+            onError={() => setImageError(true)} // Set state to true once, prevents loop
+          />
+        ) : (
+          <div className="flex flex-col items-center text-slate-600">
+            <ImageOff className="w-12 h-12 mb-2" />
+            <span className="text-[10px] font-mono uppercase">Image Not Found</span>
+          </div>
+        )}
         
         <div className={`absolute top-4 right-4 px-4 py-1 border text-[10px] font-black uppercase tracking-widest italic flex items-center gap-2 ${
           isAvailable 
@@ -38,7 +52,7 @@ export default function RoomCard({ room }) {
         </div>
       </div>
 
-      <div className="p-6 flex flex-col flex-1">
+      <div className="p-6 flex flex-col flex-1 bg-black/20">
         <h3 className="text-2xl font-black text-white uppercase italic tracking-tighter mb-4 group-hover:text-cyan-400 transition-colors">
           {room.name}
         </h3>
@@ -55,9 +69,8 @@ export default function RoomCard({ room }) {
           
           <div className="flex items-center gap-3 pt-2 border-t border-slate-800/60 mt-2">
             <div className="text-[10px] font-mono text-slate-600 uppercase">Monthly Rate:</div>
-            <div className="text-xl font-black text-cyan-400 glow-text flex items-center gap-1">
+            <div className="text-xl font-black text-cyan-400 flex items-center gap-1">
               <span className="text-xs font-mono">PHP</span> 
-              {/* FIXED: Using monthly_rate and adding safety check */}
               {Number(room.monthly_rate || 0).toLocaleString()}
             </div>
           </div>
@@ -67,7 +80,7 @@ export default function RoomCard({ room }) {
           {isAvailable ? (
             <Link 
               href={`/public/apply?room=${room.id}`}
-              className="w-full flex items-center justify-center gap-2 py-3 bg-cyan-500 text-slate-950 font-black text-[11px] uppercase tracking-[0.2em] hover:bg-white transition-all shadow-[0_0_20px_rgba(34,211,238,0.1)] group-hover:shadow-[0_0_25px_rgba(34,211,238,0.2)]"
+              className="w-full flex items-center justify-center gap-2 py-3 bg-cyan-500 text-slate-950 font-black text-[11px] uppercase tracking-[0.2em] hover:bg-white transition-all shadow-[0_0_20px_rgba(34,211,238,0.1)]"
             >
               Initiate Application <ArrowRight className="w-4 h-4" />
             </Link>

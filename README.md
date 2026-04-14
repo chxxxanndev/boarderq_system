@@ -161,6 +161,8 @@ app/
 │   ├── rooms/
 │   ├── applications/
 │   ├── payments/
+│   ├── active-list/
+│   ├── tenants/
 │   └── maintenance/
 │
 ├── public/                  # Public / unauthenticated pages
@@ -178,12 +180,25 @@ app/
 │   └── announcements/
 │
 ├── api/                     # API routes
-│   ├── admins/dashboard
+│   ├── admins/
+│             ├── active-list/route.js
+│             ├── applications/route.js
+│             ├── dashboard/route.js
+│             ├── payments/route.js
+│             └── users/route.js
 │   ├── announcements/
 │   ├── rooms/
 │   ├── applications/
 │   ├── auth/
+│             ├── approve-user/route.js
+│             ├── hash/route.js
+│             ├── login/route.js
+│             ├── me/route.js
+│             └── register/route.js
 │   ├── payments/
+│   ├── tenant/
+│   ├── users/
+│   ├── notifications/
 │   └── maintenance/
 │
 ├── components/                  
@@ -194,10 +209,14 @@ app/
 │   ├── Card.js                   
 │   ├── RoomCard.js              
 │   ├── PaymentCard.js            
-│   ├── MaintenanceCard.js        
+│   ├── MaintenanceCard.js  
+│   ├── ProfileSettingsModal.js
+│   ├── ThemeProvider.js        
 │   └── ApplicationCard.js       
 │
-├── context/                        
+├── context/          
+│   ├── HelpContext.js        
+│   ├── SidebarContext.js        
 │   └── ThemeContext.js   
 │
 ├── lib/                        
@@ -338,3 +357,5 @@ CREATE TABLE announcements (
   created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
 );
+
+

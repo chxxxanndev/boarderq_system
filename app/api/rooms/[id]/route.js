@@ -2,42 +2,34 @@
 import pool from '@/lib/db';
 import { NextResponse } from 'next/server';
 
-// UPDATE ROOM (Modify or Toggle Status)
 export async function PUT(request, { params }) {
   try {
-    const { id } = params;
+    // FIX: Await params for Next.js 15
+    const { id } = await params;
     const body = await request.json();
     
-    // We dynamically build the query based on provided fields
-    const fields = [];
-    const values = [];
-    
-    for (const [key, value] of Object.entries(body)) {
-      if (key !== 'id' && key !== 'created_at') {
-        fields.push(`${key} = ?`);
-        values.push(value);
-      }
+    if (Object.keys(body).length === 1 && body.status) {
+      await pool.query('UPDATE rooms SET status = ? WHERE id = ?', [body.status, id]);
+    } else {
+      const { name, monthly_rate, location, capacity, image_url } = body;
+      await pool.query(
+        `UPDATE rooms SET name=?, monthly_rate=?, location=?, capacity=?, image_url=? WHERE id=?`,
+        [name, monthly_rate, location, capacity, image_url, id]
+      );
     }
-    
-    if (fields.length === 0) return NextResponse.json({ error: "No fields to update" }, { status: 400 });
-
-    values.push(id);
-    const query = `UPDATE rooms SET ${fields.join(', ')} WHERE id = ?`;
-    
-    await pool.query(query, values);
-    return NextResponse.json({ message: "Updated successfully" });
+    return NextResponse.json({ message: "Update successful" });
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Update failed" }, { status: 500 });
   }
 }
 
-// DELETE/ARCHIVE ROOM
 export async function DELETE(request, { params }) {
   try {
-    const { id } = params;
+    // FIX: Await params for Next.js 15
+    const { id } = await params;
     await pool.query('DELETE FROM rooms WHERE id = ?', [id]);
     return NextResponse.json({ message: "Deleted successfully" });
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Delete failed" }, { status: 500 });
   }
 }
