@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, Search, MapPin, Users, X, 
-  Settings2, Upload, Loader2, Home, Archive, Activity
+  Settings2, Upload, Loader2, Home, Archive, Activity, ImageIcon
 } from 'lucide-react';
 import Button from '@/components/Button';
 
@@ -83,7 +83,6 @@ export default function LandlordRooms() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const url = editingId ? `/api/rooms/${editingId}` : '/api/rooms';
     const method = editingId ? 'PUT' : 'POST';
 
@@ -103,21 +102,6 @@ export default function LandlordRooms() {
     setRoomToDelete(room);
   };
 
-  const confirmDelete = async () => {
-    if (!roomToDelete) return;
-
-    const res = await fetch(`/api/rooms/${roomToDelete.id}`, {
-      method: 'DELETE'
-    });
-
-    if (res.ok) {
-      setRoomToDelete(null);
-      fetchRooms();
-    }
-  };
-
-  // ❌ FIXED: NO MORE TOGGLING AVAILABLE/OCCUPIED
-  // status is now computed from backend
   const toggleStatus = async (room) => {
     const res = await fetch(`/api/rooms/${room.id}`, {
       method: 'PUT',
@@ -126,7 +110,6 @@ export default function LandlordRooms() {
         status: room.status === 'maintenance' ? 'available' : 'maintenance'
       }),
     });
-
     if (res.ok) fetchRooms();
   };
 
@@ -141,11 +124,15 @@ export default function LandlordRooms() {
     </div>
   );
 
+  // Common Input Style
+  const inputClasses = "w-full bg-[#F8FAFC] border border-[#E5E7EB] rounded-xl py-4 px-5 focus:outline-none focus:border-[#1E5EFF] text-sm font-bold placeholder:text-[#9CA3AF] transition-all";
+  const labelClasses = "block text-[10px] font-black uppercase tracking-[0.2em] text-[#6B7280] mb-2 ml-1";
+
   return (
     <div className="flex min-h-screen bg-[#F8FAFC] font-sans text-[#0B1F3B]">
       <main className="flex-1 p-8 lg:p-12">
 
-        {/* HEADER (UNCHANGED) */}
+        {/* HEADER */}
         <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-12">
           <div>
             <h1 className="text-4xl font-black tracking-tight uppercase leading-none">
@@ -176,149 +163,160 @@ export default function LandlordRooms() {
         {/* ROOMS GRID */}
         <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-8">
           {filteredRooms.map((room) => {
-
             const capacity = Number(room.capacity || 0);
             const current = Number(room.current_tenants || 0);
             const isFull = capacity > 0 && current >= capacity;
-
-            const displayStatus =
-              room.status === 'maintenance'
-                ? 'maintenance'
-                : isFull
-                  ? 'FULL'
-                  : 'AVAILABLE';
+            const displayStatus = room.status === 'maintenance' ? 'maintenance' : isFull ? 'FULL' : 'AVAILABLE';
 
             return (
               <div key={room.id} className="group bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col">
-
                 <div className="relative aspect-[4/3] overflow-hidden">
                   <img
                     src={room.image_url || '/images/room-placeholder.png'}
                     alt={room.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    onError={(e) => {
-                      e.target.src = 'https://via.placeholder.com/400x400?text=No+Image';
-                    }}
+                    onError={(e) => { e.target.src = 'https://via.placeholder.com/400x400?text=No+Image'; }}
                   />
-
                   <div className={`absolute top-4 right-4 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-md border ${
-                    displayStatus === 'AVAILABLE'
-                      ? 'bg-emerald-500 text-white border-emerald-400'
-                      : displayStatus === 'FULL'
-                      ? 'bg-rose-500 text-white border-rose-400'
-                      : 'bg-gray-500 text-white border-gray-400'
+                    displayStatus === 'AVAILABLE' ? 'bg-emerald-500 text-white border-emerald-400' : 
+                    displayStatus === 'FULL' ? 'bg-rose-500 text-white border-rose-400' : 
+                    'bg-gray-500 text-white border-gray-400'
                   }`}>
                     {displayStatus}
                   </div>
                 </div>
 
                 <div className="p-6 flex-1 flex flex-col">
-
                   <div className="flex justify-between items-start mb-6">
-                    <h3 className="text-2xl font-black text-[#0B1F3B] uppercase tracking-tight group-hover:text-[#1E5EFF] transition-colors">
-                      {room.name}
-                    </h3>
-
+                    <h3 className="text-2xl font-black text-[#0B1F3B] uppercase tracking-tight group-hover:text-[#1E5EFF] transition-colors">{room.name}</h3>
                     <div className="text-right">
                       <p className="text-[10px] font-black text-[#6B7280] uppercase">Monthly Rate</p>
-                      <p className="text-lg font-black text-[#0B1F3B]">
-                        ₱{Number(room.monthly_rate).toLocaleString()}
-                      </p>
+                      <p className="text-lg font-black text-[#0B1F3B]">₱{Number(room.monthly_rate).toLocaleString()}</p>
                     </div>
                   </div>
-
                   <div className="space-y-3 mb-8">
                     <div className="flex items-center gap-3 text-[#6B7280]">
                       <MapPin size={16} className="text-[#22D3EE]" />
-                      <span className="text-[11px] font-bold uppercase tracking-wider">
-                        {room.location || 'NOT SPECIFIED'}
-                      </span>
+                      <span className="text-[11px] font-bold uppercase tracking-wider">{room.location || 'NOT SPECIFIED'}</span>
                     </div>
-
                     <div className="flex items-center gap-3 text-[#6B7280]">
                       <Users size={16} className="text-[#22D3EE]" />
-                      <span className="text-[11px] font-bold uppercase tracking-wider">
-                        {current} / {capacity || 'N/A'} Persons
-                      </span>
+                      <span className="text-[11px] font-bold uppercase tracking-wider">{current} / {capacity || 'N/A'} Persons</span>
                     </div>
                   </div>
-
                   <div className="grid grid-cols-3 gap-2 mt-auto">
-
-                    <button onClick={() => openEditModal(room)} className="flex items-center justify-center gap-2 bg-[#F8FAFC] hover:bg-[#E5E7EB] text-[#0B1F3B] py-3 rounded-lg text-[10px] font-black uppercase transition-all">
-                      <Settings2 size={14} /> Edit
-                    </button>
-
-                    <button onClick={() => promptDelete(room)} className="flex items-center justify-center gap-2 bg-[#F8FAFC] hover:bg-rose-50 text-rose-500 py-3 rounded-lg text-[10px] font-black uppercase transition-all">
-                      <Archive size={14} /> Archive
-                    </button>
-
-                    <button onClick={() => toggleStatus(room)} className="flex items-center justify-center gap-2 bg-[#1E5EFF]/10 text-[#1E5EFF] hover:bg-[#1E5EFF] hover:text-white py-3 rounded-lg text-[10px] font-black uppercase transition-all italic">
-                      <Activity size={14} /> Status
-                    </button>
-
+                    <button onClick={() => openEditModal(room)} className="flex items-center justify-center gap-2 bg-[#F8FAFC] hover:bg-[#E5E7EB] text-[#0B1F3B] py-3 rounded-lg text-[10px] font-black uppercase transition-all"><Settings2 size={14} /> Edit</button>
+                    <button onClick={() => promptDelete(room)} className="flex items-center justify-center gap-2 bg-[#F8FAFC] hover:bg-rose-50 text-rose-500 py-3 rounded-lg text-[10px] font-black uppercase transition-all"><Archive size={14} /> Archive</button>
+                    <button onClick={() => toggleStatus(room)} className="flex items-center justify-center gap-2 bg-[#1E5EFF]/10 text-[#1E5EFF] hover:bg-[#1E5EFF] hover:text-white py-3 rounded-lg text-[10px] font-black uppercase transition-all italic"><Activity size={14} /> Status</button>
                   </div>
                 </div>
               </div>
             );
           })}
 
-          {/* ADD CARD (UNCHANGED) */}
           <div onClick={openAddModal} className="aspect-square bg-white border-2 border-dashed border-[#E5E7EB] rounded-2xl flex flex-col items-center justify-center cursor-pointer group hover:border-[#1E5EFF] transition-all">
-            <div className="p-4 bg-[#F8FAFC] group-hover:bg-[#1E5EFF]/10 rounded-full transition-colors">
-              <Plus className="w-8 h-8 text-[#6B7280] group-hover:text-[#1E5EFF]" />
-            </div>
-            <h4 className="font-black text-[#0B1F3B] uppercase text-xs mt-4 tracking-widest">
-              Register New Unit
-            </h4>
+            <div className="p-4 bg-[#F8FAFC] group-hover:bg-[#1E5EFF]/10 rounded-full transition-colors"><Plus className="w-8 h-8 text-[#6B7280] group-hover:text-[#1E5EFF]" /></div>
+            <h4 className="font-black text-[#0B1F3B] uppercase text-xs mt-4 tracking-widest">Register New Unit</h4>
           </div>
         </div>
 
-        {/* MODALS (UNCHANGED) */}
+        {/* MODAL PORTAL */}
         {mounted && createPortal(
           <AnimatePresence>
             {isModalOpen && (
               <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
                 <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
+                  initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                   onClick={() => setIsModalOpen(false)}
                   className="absolute inset-0 bg-[#0B1F3B]/80 backdrop-blur-md"
                 />
 
                 <motion.div
-                  initial={{ scale: 0.95, opacity: 0, y: 20 }}
-                  animate={{ scale: 1, opacity: 1, y: 0 }}
-                  exit={{ scale: 0.95, opacity: 0, y: 20 }}
+                  initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }}
                   onClick={e => e.stopPropagation()}
-                  className="relative bg-white rounded-[2.5rem] w-full max-w-xl shadow-2xl border border-[#E5E7EB] overflow-hidden flex flex-col max-h-[90vh]"
+                  className="relative bg-white rounded-[2.5rem] w-full max-w-xl shadow-2xl border border-[#E5E7EB] overflow-hidden flex flex-col max-h-[95vh]"
                 >
-
                   <div className="p-8 border-b border-[#E5E7EB] flex justify-between items-center bg-[#F8FAFC]">
                     <h2 className="text-2xl font-black uppercase tracking-tight text-[#0B1F3B]">
                       {editingId ? 'Modify' : 'Register'} <span className="text-[#1E5EFF]">Unit Node</span>
                     </h2>
-                    <button onClick={() => setIsModalOpen(false)}>
-                      <X size={24} />
-                    </button>
+                    <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-gray-200 rounded-full transition-colors"><X size={24} /></button>
                   </div>
 
                   <div className="p-8 overflow-y-auto">
-                    <form onSubmit={handleSubmit} className="space-y-5">
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                      
+                      {/* Image Preview / Upload Button */}
+                      <div className="space-y-2">
+                        <label className={labelClasses}>Property Asset Image</label>
+                        <div 
+                          onClick={() => fileInputRef.current.click()}
+                          className="relative h-40 w-full bg-[#F8FAFC] border-2 border-dashed border-[#E5E7EB] rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:border-[#1E5EFF] transition-all overflow-hidden"
+                        >
+                          {formData.image_url ? (
+                            <img src={formData.image_url} className="w-full h-full object-cover" alt="Preview" />
+                          ) : (
+                            <div className="text-center">
+                              {isUploading ? <Loader2 className="w-8 h-8 animate-spin text-[#1E5EFF] mx-auto" /> : <Upload className="w-8 h-8 text-[#6B7280] mx-auto mb-2" />}
+                              <span className="text-[10px] font-black uppercase text-[#6B7280]">Click to upload texture</span>
+                            </div>
+                          )}
+                          <input type="file" ref={fileInputRef} hidden onChange={handleFileUpload} accept="image/*" />
+                        </div>
+                      </div>
 
-                      <input value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
-                      <input value={formData.monthly_rate} onChange={e => setFormData({ ...formData, monthly_rate: e.target.value })} />
-                      <input value={formData.location} onChange={e => setFormData({ ...formData, location: e.target.value })} />
-                      <input value={formData.capacity} onChange={e => setFormData({ ...formData, capacity: e.target.value })} />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div className="space-y-2">
+                          <label className={labelClasses}>Unit Identifier</label>
+                          <input 
+                            placeholder="e.g. Unit 402-A"
+                            className={inputClasses}
+                            value={formData.name} 
+                            onChange={e => setFormData({ ...formData, name: e.target.value })} 
+                            required
+                          />
+                        </div>
 
-                      <Button type="submit">
+                        <div className="space-y-2">
+                          <label className={labelClasses}>Monthly Rate (PHP)</label>
+                          <input 
+                            type="number"
+                            placeholder="0.00"
+                            className={inputClasses}
+                            value={formData.monthly_rate} 
+                            onChange={e => setFormData({ ...formData, monthly_rate: e.target.value })} 
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className={labelClasses}>Geographic Location</label>
+                        <input 
+                          placeholder="Building, Floor, or Address"
+                          className={inputClasses}
+                          value={formData.location} 
+                          onChange={e => setFormData({ ...formData, location: e.target.value })} 
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className={labelClasses}>Occupancy Limit</label>
+                        <input 
+                          type="number"
+                          placeholder="Max persons"
+                          className={inputClasses}
+                          value={formData.capacity} 
+                          onChange={e => setFormData({ ...formData, capacity: e.target.value })} 
+                          required
+                        />
+                      </div>
+
+                      <Button type="submit" className="w-full h-16 rounded-2xl text-md shadow-xl shadow-blue-500/20">
                         {editingId ? 'COMMIT CHANGES' : 'INITIALIZE PROPERTY'}
                       </Button>
-
                     </form>
                   </div>
-
                 </motion.div>
               </div>
             )}
