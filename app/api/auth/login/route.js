@@ -50,7 +50,7 @@ export async function POST(request) {
         role: user.role 
       }, 
       process.env.JWT_SECRET,
-      { expiresIn: '1d' }
+      { expiresIn: '1d' } //Expiration
     );
     
     console.log("Result: LOGIN SUCCESS!");
