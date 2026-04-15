@@ -15,7 +15,7 @@ export default function ApplyPage() {
     applicant_email: '',
     applicant_phone: '',
     message: '',
-    room_id: roomId
+    room_id: ''
   });
 
   // Ensure room_id is set even if the component re-renders
