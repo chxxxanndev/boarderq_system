@@ -13,9 +13,18 @@ export default function RoomsPage() {
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const res = await fetch('/api/rooms');
+        // We use cache: 'no-store' to ensure we see the most recent data from the Admin panel
+        const res = await fetch('/api/rooms', { cache: 'no-store' });
         const data = await res.json();
-        const availableRooms = data.filter(room => room.status === 'available');
+
+        // LOGIC FIX: 
+        // 1. We check 'computed_status' (which your backend calculates based on capacity)
+        // 2. We fallback to 'status' or 'available' if the database field is empty
+        const availableRooms = data.filter(room => {
+          const status = (room.computed_status || room.status || 'available').toLowerCase();
+          return status === 'available';
+        });
+
         setRooms(availableRooms);
       } catch (error) {
         console.error("Failed to fetch rooms:", error);
@@ -27,7 +36,8 @@ export default function RoomsPage() {
   }, []);
 
   const filteredRooms = rooms.filter(room => 
-    room.name.toLowerCase().includes(searchTerm.toLowerCase())
+    room.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    room.location?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -53,7 +63,7 @@ export default function RoomsPage() {
               </p>
             </div>
 
-            {/* SEARCH COMPONENT: Modern SaaS Style */}
+            {/* SEARCH COMPONENT */}
             <div className="flex items-center gap-3 w-full lg:w-auto">
               <div className="relative flex-1 lg:w-96 group">
                 <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-[#6B7280] group-focus-within:text-[#1E5EFF] transition-colors w-5 h-5" />
@@ -87,7 +97,6 @@ export default function RoomsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.1 }}
               >
-                {/* Note: Ensure RoomCard.js is updated to the new white/blue brand colors as well */}
                 <RoomCard room={room} />
               </motion.div>
             ))
@@ -95,7 +104,7 @@ export default function RoomsPage() {
             <div className="col-span-full py-40 flex flex-col items-center justify-center border-2 border-dashed border-[#E5E7EB] rounded-[3rem] bg-white">
               <Compass className="w-20 h-20 text-[#E5E7EB] mb-6" />
               <p className="text-[#6B7280] font-black text-xs uppercase tracking-[0.4em]">
-                {searchTerm ? "Zero matching nodes found" : "Database is currently empty"}
+                {searchTerm ? "Zero matching nodes found" : "No rooms currently available"}
               </p>
             </div>
           )}
@@ -135,7 +144,6 @@ export default function RoomsPage() {
         </div>
       </main>
 
-      {/* 4. BRAND FOOTER */}
       <footer className="py-16 text-[#6B7280] text-[10px] tracking-[0.5em] font-bold uppercase border-t border-[#E5E7EB] w-full text-center bg-white">
         Boarder-Q <span className="mx-4 text-[#E5E7EB]">|</span> Directory Module <span className="mx-4 text-[#E5E7EB]">|</span> © 2026
       </footer>
