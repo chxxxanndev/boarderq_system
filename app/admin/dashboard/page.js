@@ -209,9 +209,30 @@ export default function LandlordDashboard() {
           document.body // This renders the modal at the root level of your website!
         )}
 
-                <footer className="mt-20 py-10 text-[#6B7280] text-[9px] tracking-[0.4em] font-bold uppercase border-t border-[#E5E7EB] w-full text-center">
-          Boarder-Q <span className="mx-2 text-[#1E5EFF]">|</span> Administrative Core <span className="mx-2 text-[#1E5EFF]">|</span> v2.0.4
-        </footer>
+<footer className="bg-white border-t border-[#E5E7EB] py-6 px-8 mt-auto">
+  <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+    <div className="flex items-center gap-4">
+      <div className="bg-[#1E5EFF]/5 p-2 rounded-lg border border-[#1E5EFF]/10">
+        <Cpu size={18} className="text-[#1E5EFF]" />
+      </div>
+      <div>
+        <p className="text-[10px] font-black text-[#0B1F3B] uppercase tracking-widest">System Infrastructure</p>
+        <p className="text-[9px] text-[#6B7280] font-bold uppercase tracking-tighter">Build v2.0.4.88 • Stable Core</p>
+      </div>
+    </div>
+    
+    <div className="flex items-center gap-6">
+      <div className="flex items-center gap-2">
+        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+        <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Database Sync: Online</span>
+      </div>
+      <div className="h-4 w-px bg-[#E5E7EB] hidden md:block" />
+      <span className="text-[9px] font-black text-[#CBD5E1] uppercase tracking-[0.4em]">
+        BOARDER-Q ADMIN CONSOLE © 2026
+      </span>
+    </div>
+  </div>
+</footer>
       </main>
     </div>
   );

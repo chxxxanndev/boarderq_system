@@ -2,193 +2,285 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { 
-  Home, ShieldCheck, LayoutDashboard, ArrowRight, 
-  Activity, Search, Zap, CheckCircle2 
+import {
+  ArrowRight, Activity, Zap, CheckCircle2, MapPin,
+  Users, Megaphone, Clock, BedDouble, TrendingUp, Wrench,
+  Globe, Mail, Phone, ExternalLink, ShieldCheck // Replaced Facebook with Globe
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import Button from '@/components/Button';
+
+const STATUS_COLORS = {
+  available:   'text-emerald-600 bg-emerald-50 border-emerald-200',
+  occupied:    'text-rose-600 bg-rose-50 border-rose-200',
+  maintenance: 'text-amber-600 bg-amber-50 border-amber-200',
+};
 
 export default function LandingPage() {
   const router = useRouter();
-  const [role, setRole] = useState(null);
-  const [mounted, setMounted] = useState(false);
+  const [rooms, setRooms] = useState([]);
+  const [announcements, setAnnouncements] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setMounted(true);
-    const storedRole = localStorage.getItem('role');
-    setRole(storedRole);
+    Promise.all([
+      fetch('/api/public/rooms').then(r => r.json()).catch(() => []),
+      fetch('/api/public/announcements').then(r => r.json()).catch(() => []),
+    ]).then(([r, a]) => {
+      setRooms(Array.isArray(r) ? r : []);
+      setAnnouncements(Array.isArray(a) ? a.slice(0, 3) : []);
+    }).finally(() => setLoading(false));
   }, []);
 
-  const handleDashboardRedirect = () => {
-    if (role === 'admin') {
-      router.push('/admin/dashboard');
-    } else if (role === 'tenant') {
-      router.push('/tenant/dashboard');
-    } else {
-      router.push('/public/login');
-    }
+  const stats = {
+    total: rooms.length,
+    available: rooms.filter(r => r.status === 'available').length,
+    occupied: rooms.filter(r => r.status === 'occupied').length,
+    maintenance: rooms.filter(r => r.status === 'maintenance').length,
   };
 
-  if (!mounted) return null;
+  const featuredRooms = rooms.filter(r => r.status === 'available').slice(0, 3);
+
+  const formatDate = (d) => new Date(d).toLocaleDateString('en-PH', {
+    month: 'short', day: 'numeric', year: 'numeric'
+  });
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#0B1F3B] font-sans overflow-x-hidden">
-      
-      {/* 1. HERO SECTION */}
-      <main className="max-w-7xl mx-auto px-8 pt-20 pb-20">
-        
-        {/* Top Tech Badge */}
-        <motion.div 
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex justify-center mb-8"
-        >
-          <div className="bg-[#1E5EFF]/5 border border-[#1E5EFF]/10 px-6 py-2 rounded-full shadow-sm">
-            <span className="text-[#1E5EFF] text-[10px] tracking-[0.4em] uppercase font-black">
-              Property Management Suite v2.1
+      <main className="max-w-7xl mx-auto px-6 md:px-8 pt-16 pb-24 space-y-20">
+
+        {/* ── HERO ── */}
+        <section>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-center"
+          >
+            <h1 className="text-6xl md:text-25px font-black tracking-tighter uppercase leading-none">
+              BOARDER<span className="text-[#1E5EFF] italic">Q</span>
+            </h1>
+            <div className="mt-6 flex items-center justify-center gap-6">
+              <div className="h-[2px] w-12 bg-[#22D3EE] rounded-full" />
+              <p className="text-[#6B7280] text-xs md:text-sm font-black tracking-[0.3em] uppercase">
+                Next-Gen Housing Ecosystem
+              </p>
+              <div className="h-[2px] w-12 bg-[#22D3EE] rounded-full" />
+            </div>
+          </motion.div>
+        </section>
+
+        {/* ── LIVE STATS STRIP ── */}
+        <section>
+          <div className="flex items-center justify-between mb-5 border-b border-[#E5E7EB] pb-4">
+            <h2 className="text-[11px] font-black text-[#0B1F3B] tracking-[0.4em] uppercase flex items-center gap-2">
+              <Activity size={15} className="text-[#1E5EFF]" /> Live Property Status
+            </h2>
+            <span className="flex items-center gap-1.5 text-[10px] font-black text-emerald-500 uppercase tracking-widest">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse inline-block" />
+              Live
             </span>
           </div>
-        </motion.div>
 
-        {/* Brand Title */}
-        <header className="text-center mb-16">
-          <motion.h1 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-7xl md:text-9xl font-black tracking-tighter uppercase leading-none"
-          >
-            BOARDER<span className="text-[#1E5EFF] italic">Q</span>
-          </motion.h1>
-          
-          <div className="mt-8 flex items-center justify-center gap-6">
-             <div className="h-[2px] w-12 bg-[#22D3EE] rounded-full"></div>
-             <p className="text-[#6B7280] text-sm md:text-base font-black tracking-[0.3em] uppercase">
-               Next-Gen Housing Ecosystem
-             </p>
-             <div className="h-[2px] w-12 bg-[#22D3EE] rounded-full"></div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { label: 'Total Units',    value: stats.total,       icon: BedDouble,   color: 'text-[#1E5EFF]',  bg: 'bg-[#1E5EFF]/5'  },
+              { label: 'Available',      value: stats.available,   icon: CheckCircle2,color: 'text-emerald-600', bg: 'bg-emerald-50'   },
+              { label: 'Occupied',       value: stats.occupied,    icon: Users,       color: 'text-rose-500',    bg: 'bg-rose-50'      },
+              { label: 'In Maintenance', value: stats.maintenance, icon: Wrench,      color: 'text-amber-500',   bg: 'bg-amber-50'     },
+            ].map((s, i) => (
+              <motion.div
+                key={s.label}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.07 }}
+                className="bg-white border border-[#E5E7EB] rounded-2xl p-6 flex flex-col gap-4 shadow-sm"
+              >
+                <div className={`w-10 h-10 ${s.bg} rounded-xl flex items-center justify-center ${s.color}`}>
+                  <s.icon size={20} />
+                </div>
+                <div>
+                  <p className="text-3xl font-black text-[#0B1F3B]">
+                    {loading ? '—' : s.value}
+                  </p>
+                  <p className="text-[10px] font-black text-[#6B7280] uppercase tracking-widest mt-0.5">{s.label}</p>
+                </div>
+              </motion.div>
+            ))}
           </div>
-        </header>
+        </section>
 
-        {/* 2. DUAL INTERFACE GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full mt-10">
-          
-          {/* Card 1: PUBLIC / TENANT SIDE */}
-          <motion.div 
-            whileHover={{ y: -5 }}
-            className="bg-white border border-[#E5E7EB] p-10 rounded-[2.5rem] flex flex-col justify-between h-[400px] shadow-xl shadow-blue-500/5 relative group transition-all"
-          >
-            <div className="flex justify-between items-start">
-              <div className="p-4 bg-[#F8FAFC] rounded-2xl border border-[#E5E7EB] text-[#1E5EFF]">
-                 <Home size={40} />
-              </div>
-              <div className="text-right">
-                 <p className="text-[10px] font-black text-[#6B7280] tracking-widest uppercase">Sector: Public</p>
-                 <span className="text-[10px] font-bold text-emerald-500 bg-emerald-50 px-2 py-0.5 rounded uppercase">Active Access</span>
-              </div>
-            </div>
-
-            <div className="mt-8">
-              <h2 className="text-4xl font-black text-[#0B1F3B] leading-[0.9] uppercase tracking-tight mb-4">
-                FIND YOUR<br/><span className="text-[#1E5EFF]">RESIDENCE</span>
+        {/* ── AVAILABLE ROOMS PREVIEW + ANNOUNCEMENTS ── */}
+        <section className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+          <div className="lg:col-span-3">
+            <div className="flex items-center justify-between mb-5 border-b border-[#E5E7EB] pb-4">
+              <h2 className="text-[11px] font-black text-[#0B1F3B] tracking-[0.4em] uppercase flex items-center gap-2">
+                <BedDouble size={15} className="text-[#1E5EFF]" /> Available Rooms
               </h2>
-              <p className="text-[#6B7280] font-bold text-xs uppercase tracking-tight leading-relaxed max-w-[280px]">
-                Browse high-quality boarding units, verify amenities, and submit applications instantly via our cloud portal.
-              </p>
+              <button onClick={() => router.push('/public/rooms')} className="text-[10px] font-black text-[#1E5EFF] uppercase tracking-widest flex items-center gap-1 hover:gap-2 transition-all">
+                View All <ArrowRight size={12} />
+              </button>
             </div>
-            
-            <button 
-              onClick={() => router.push('/public/rooms')}
-              className="mt-8 bg-[#0B1F3B] hover:bg-[#1E5EFF] text-white text-[12px] font-black px-10 py-5 rounded-2xl transition-all tracking-[0.2em] uppercase flex items-center justify-center gap-3 shadow-lg"
-            >
-              BROWSE INVENTORY <ArrowRight size={18} />
-            </button>
-          </motion.div>
-
-          {/* Card 2: ADMIN / MANAGEMENT SIDE */}
-          <motion.div 
-            whileHover={{ y: -5 }}
-            className="bg-[#0B1F3B] p-10 rounded-[2.5rem] flex flex-col justify-between h-[400px] shadow-2xl relative group overflow-hidden"
-          >
-            {/* Background Decorative Element */}
-            <div className="absolute -right-20 -top-20 w-64 h-64 bg-[#1E5EFF]/20 rounded-full blur-3xl opacity-50"></div>
-
-            <div className="flex justify-between items-start z-10">
-              <div className="p-4 bg-white/5 rounded-2xl border border-white/10 text-[#22D3EE]">
-                 <ShieldCheck size={40} />
-              </div>
-              <div className="text-right">
-                 <p className="text-[10px] font-black text-white/40 tracking-widest uppercase italic">Secure Node</p>
-                 <span className="text-[10px] font-bold text-[#22D3EE] bg-white/5 px-2 py-0.5 rounded uppercase">Admin Shell</span>
-              </div>
-            </div>
-
-            <div className="mt-8 z-10">
-              <h2 className="text-4xl font-black text-white leading-[0.9] uppercase tracking-tight mb-4">
-                {role ? 'RESUME' : 'MANAGE'}<br/><span className="text-[#22D3EE]">SYSTEM</span>
-              </h2>
-              <p className="text-white/60 font-bold text-xs uppercase tracking-tight leading-relaxed max-w-[280px]">
-                 {role 
-                   ? `Current session: ${role.toUpperCase()}. Re-authorize to access your administrative dashboard and tools.`
-                   : "Initialize the management core to oversee tenants, track financial cycles, and monitor maintenance tickets."
-                 }
-              </p>
-            </div>
-            
-            <button 
-              onClick={handleDashboardRedirect}
-              className="mt-8 bg-gradient-to-r from-[#22D3EE] to-[#1E5EFF] text-white text-[12px] font-black px-10 py-5 rounded-2xl transition-all tracking-[0.2em] uppercase flex items-center justify-center gap-3 shadow-xl shadow-blue-500/20 active:scale-95 z-10"
-            >
-              {role ? 'RETURN TO TERMINAL' : 'AUTHORIZE ADMIN'} <LayoutDashboard size={18} />
-            </button>
-          </motion.div>
-        </div>
-
-        {/* 3. SYSTEM CAPABILITIES */}
-        <div className="mt-32 w-full">
-          <div className="flex justify-between items-center mb-10 border-b border-[#E5E7EB] pb-6">
-             <h3 className="text-sm font-black text-[#0B1F3B] tracking-[0.4em] uppercase flex items-center gap-3">
-               <Activity size={18} className="text-[#1E5EFF]" /> Core Capabilities
-             </h3>
-             <span className="text-[10px] font-black text-[#1E5EFF] bg-[#1E5EFF]/5 px-4 py-1 rounded-full border border-[#1E5EFF]/10 uppercase tracking-widest">Build v2.0.4.88</span>
+            {loading ? (
+                <div className="space-y-3">
+                    {[1,2,3].map(i => <div key={i} className="h-24 bg-white border border-[#E5E7EB] rounded-2xl animate-pulse" />)}
+                </div>
+            ) : featuredRooms.map((room, i) => (
+                <motion.div key={room.id} transition={{ delay: i * 0.08 }} onClick={() => router.push(`/public/rooms/${room.id}`)} className="bg-white border border-[#E5E7EB] hover:border-[#1E5EFF] rounded-2xl p-5 mb-3 flex items-center gap-5 cursor-pointer group transition-all shadow-sm">
+                    <div className="w-16 h-16 rounded-xl overflow-hidden bg-[#F8FAFC] border border-[#E5E7EB] flex-shrink-0">
+                      {room.image_url ? <img src={room.image_url} alt={room.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" /> : <div className="w-full h-full flex items-center justify-center text-[#CBD5E1] text-2xl font-black">{room.name.charAt(0)}</div>}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-black uppercase tracking-tight text-[#0B1F3B] group-hover:text-[#1E5EFF] transition-colors truncate">{room.name}</p>
+                      <div className="flex items-center gap-3 mt-1 text-[10px] font-bold text-[#6B7280] uppercase">
+                        {room.location && <span className="flex items-center gap-1"><MapPin size={10} />{room.location}</span>}
+                        {room.capacity && <span className="flex items-center gap-1"><Users size={10} />{room.capacity}</span>}
+                      </div>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <p className="text-base font-black text-[#0B1F3B]">₱{Number(room.monthly_rate).toLocaleString()}</p>
+                      <span className={`mt-1 inline-block text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border ${STATUS_COLORS[room.status]}`}>{room.status}</span>
+                    </div>
+                </motion.div>
+            ))}
           </div>
 
+          <div className="lg:col-span-2">
+            <div className="flex items-center justify-between mb-5 border-b border-[#E5E7EB] pb-4">
+              <h2 className="text-[11px] font-black text-[#0B1F3B] tracking-[0.4em] uppercase flex items-center gap-2">
+                <Megaphone size={15} className="text-[#1E5EFF]" /> Announcements
+              </h2>
+              <button onClick={() => router.push('/public/rooms')} className="text-[10px] font-black text-[#1E5EFF] uppercase tracking-widest flex items-center gap-1 hover:gap-2 transition-all">
+                View All <ArrowRight size={12} />
+              </button>
+            </div>
+            {announcements.map((a, i) => (
+                <motion.div key={a.id} onClick={() => router.push('/public/announcements')} className="bg-white border border-[#E5E7EB] hover:border-[#1E5EFF] rounded-2xl p-5 mb-3 cursor-pointer group transition-all shadow-sm">
+                    <p className="text-[11px] font-black uppercase tracking-tight text-[#0B1F3B] group-hover:text-[#1E5EFF] mb-2 line-clamp-2">{a.title}</p>
+                    <div className="flex items-center justify-between text-[9px] font-black uppercase tracking-widest text-[#9CA3AF]">
+                        <span>{formatDate(a.created_at)}</span>
+                        <span className="text-[#1E5EFF]">{a.author}</span>
+                    </div>
+                </motion.div>
+            ))}
+          </div>
+        </section>
+
+        {/* ── SYSTEM CAPABILITIES ── */}
+        <section>
+          <div className="flex justify-between items-center mb-6 border-b border-[#E5E7EB] pb-4">
+            <h2 className="text-[11px] font-black text-[#0B1F3B] tracking-[0.4em] uppercase flex items-center gap-2">
+              <Activity size={15} className="text-[#1E5EFF]" /> Core Capabilities
+            </h2>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
-              { title: "Real-Time Sync", icon: Zap, detail: "INSTANT INVENTORY UPDATES" },
-              { title: "Cloud Ledger", icon: CheckCircle2, detail: "AUTOMATED REVENUE TRACKING" },
-              { title: "Smart Support", icon: Activity, detail: "INTEGRATED MAINTENANCE ENGINE" }
+              { title: "Real-Time Sync",  icon: Zap,          detail: "INSTANT INVENTORY UPDATES"    },
+              { title: "Cloud Ledger",    icon: TrendingUp,   detail: "AUTOMATED REVENUE TRACKING"   },
+              { title: "Smart Support",   icon: Wrench,       detail: "INTEGRATED MAINTENANCE ENGINE" },
             ].map((item, i) => (
               <div key={i} className="bg-white border border-[#E5E7EB] hover:border-[#1E5EFF] p-6 rounded-2xl flex items-center justify-between shadow-sm transition-all group cursor-default">
-                 <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-[#F8FAFC] border border-[#E5E7EB] rounded-xl flex items-center justify-center text-[#1E5EFF] group-hover:bg-[#1E5EFF] group-hover:text-white transition-all">
-                       <item.icon size={20} />
-                    </div>
-                    <div>
-                      <span className="block text-sm font-black text-[#0B1F3B] tracking-tight group-hover:text-[#1E5EFF] transition-colors">{item.title}</span>
-                      <span className="text-[9px] font-bold text-[#6B7280] uppercase tracking-widest">{item.detail}</span>
-                    </div>
-                 </div>
-                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 bg-[#F8FAFC] border border-[#E5E7EB] rounded-xl flex items-center justify-center text-[#1E5EFF] group-hover:bg-[#1E5EFF] group-hover:text-white transition-all">
+                    <item.icon size={20} />
+                  </div>
+                  <div>
+                    <span className="block text-sm font-black text-[#0B1F3B] tracking-tight group-hover:text-[#1E5EFF] transition-colors">{item.title}</span>
+                    <span className="text-[9px] font-bold text-[#6B7280] uppercase tracking-widest">{item.detail}</span>
+                  </div>
+                </div>
               </div>
             ))}
-            
           </div>
-        </div>
+        </section>
       </main>
 
-      {/* <section className="bg-[#1E5EFF] p-16 text-center text-white">
-   <h2 className="text-4xl font-black mb-4">READY TO FIND YOUR NEW HOME?</h2>
-   <p className="opacity-80 mb-8 max-w-xl mx-auto">Join hundreds of residents who enjoy a seamless boarding house experience with Boarder-Q.</p>
-   <div className="flex justify-center gap-4">
-      <Button variant="secondary" size="lg">Browse Rooms</Button>
-      <Button variant="outline" size="lg" className="border-white text-white">Contact Support</Button>
-   </div>
-</section> */}
+      {/* ── INFORMATIVE FOOTER ── */}
+      <footer className="bg-white border-t border-[#E5E7EB] pt-12 pb-6">
+        <div className="max-w-7xl mx-auto px-6 md:px-8">
 
-      {/* 4. FOOTER */}
-      <footer className="py-16 text-[#6B7280] text-[10px] tracking-[0.4em] font-bold uppercase border-t border-[#E5E7EB] w-full text-center bg-white shadow-inner">
-        BOARDER-Q <span className="mx-4 text-[#E5E7EB]">|</span> INFRASTRUCTURE CORE <span className="mx-4 text-[#E5E7EB]">|</span> © 2026 
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
+
+            <div className="space-y-4">
+              <h3 className="text-2xl font-black tracking-tighter uppercase leading-none text-[#0B1F3B]">
+                BOARDER<span className="text-[#1E5EFF] italic">Q</span>
+              </h3>
+              <p className="text-[11px] text-[#6B7280] font-bold leading-relaxed tracking-wider">
+                Redefining the boarding house experience through automated logistics and real-time inventory synchronization.
+              </p>
+              <div className="flex items-center gap-3">
+                <a href="#" className="w-9 h-9 bg-[#F8FAFC] border border-[#E5E7EB] rounded-lg flex items-center justify-center text-[#6B7280] hover:text-[#1E5EFF] hover:border-[#1E5EFF] transition-all">
+                  <Globe size={18} />
+                </a>
+                <a href="#" className="w-9 h-9 bg-[#F8FAFC] border border-[#E5E7EB] rounded-lg flex items-center justify-center text-[#6B7280] hover:text-[#1E5EFF] hover:border-[#1E5EFF] transition-all">
+                  <Mail size={18} />
+                </a>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="text-[10px] font-black text-[#0B1F3B] uppercase tracking-[0.4em] mb-6">Ecosystem</h4>
+              <ul className="space-y-3">
+                {['Overview', 'Browse Rooms', 'About Project', 'Announcements'].map((link) => (
+                  <li key={link}>
+                    <a href="#" className="text-[11px] font-bold text-[#6B7280] hover:text-[#1E5EFF] uppercase tracking-widest transition-colors flex items-center gap-2 group">
+                      <div className="w-1 h-1 bg-[#E5E7EB] group-hover:bg-[#1E5EFF] transition-colors" /> 
+                      {link}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-[10px] font-black text-[#0B1F3B] uppercase tracking-[0.4em] mb-6">Landlord Connect</h4>
+              <div className="space-y-4">
+                <a href="https://www.facebook.com/che.ann.abal.2024" target="_blank" className="flex items-start gap-3 group">
+                  <Globe className="text-[#1E5EFF] mt-1" size={18} />
+                  <div>
+                    <p className="text-[11px] font-black text-[#0B1F3B] uppercase tracking-tight group-hover:text-[#1E5EFF] transition-colors">
+                      Official Facebook
+                    </p>
+                    <p className="text-[10px] text-[#6B7280] font-bold uppercase mt-1 flex items-center gap-1">
+                      Visit Page <ExternalLink size={10} />
+                    </p>
+                  </div>
+                </a>
+
+                <div className="flex items-start gap-3">
+                  <Mail className="text-[#1E5EFF] mt-1" size={18} />
+                  <div>
+                    <p className="text-[11px] font-black text-[#0B1F3B] uppercase tracking-tight">
+                      Support Email
+                    </p>
+                    <p className="text-[10px] text-[#6B7280] font-bold mt-1">
+                      boarderqadmin123@gmail.com
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="text-[10px] font-black text-[#0B1F3B] uppercase tracking-[0.4em] mb-6">Property Hub</h4>
+              <div className="bg-[#F8FAFC] border border-[#E5E7EB] rounded-2xl p-4">
+                <div className="flex items-start gap-3">
+                  <MapPin size={18} className="text-[#1E5EFF] flex-shrink-0" />
+                  <p className="text-[11px] font-bold text-[#6B7280] uppercase tracking-wide leading-relaxed">
+                    Dapitan City, <br /> Zamboanga Del Norte, 7101<br /> Philippines
+                  </p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div className="pt-6 flex flex-col md:flex-row justify-center items-center gap-4">
+            <span className="text-[9px] font-black text-[#6B7280] uppercase tracking-[0.4em] text-center">
+              BOARDER-Q © 2026
+            </span>
+          </div>
+
+        </div>
       </footer>
     </div>
   );

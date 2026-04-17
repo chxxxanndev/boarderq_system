@@ -100,6 +100,12 @@ export default function Navbar() {
             <Link href="/public/rooms" className={`text-[11px] font-black uppercase tracking-[0.2em] transition-colors ${pathname === '/public/rooms' ? 'text-[#1E5EFF]' : 'text-[#6B7280] hover:text-[#0B1F3B]'}`}>
               Browse Rooms
             </Link>
+            <Link href="/public/about" className={`text-[11px] font-black uppercase tracking-[0.2em] transition-colors ${pathname === '/public/about' ? 'text-[#1E5EFF]' : 'text-[#6B7280] hover:text-[#0B1F3B]'}`}>
+              About
+            </Link>
+            <Link href="/public/announcements" className={`text-[11px] font-black uppercase tracking-[0.2em] transition-colors ${pathname === '/public/announcements' ? 'text-[#1E5EFF]' : 'text-[#6B7280] hover:text-[#0B1F3B]'}`}>
+              Announcements
+            </Link>             
           </div>
         )}
 

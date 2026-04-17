@@ -1,151 +1,237 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import RoomCard from '@/components/RoomCard';
-import { Search, Filter, Compass, MapPin, Activity, Loader2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Search, MapPin, Users, ArrowRight } from 'lucide-react';
+import {
+  Activity, Zap, CheckCircle2, Megaphone, Clock, BedDouble, TrendingUp, Wrench,
+  Globe, Mail, Phone, ExternalLink, ShieldCheck // Replaced Facebook with Globe
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 
+const STATUS_COLORS = {
+  available: 'text-emerald-600 bg-emerald-50',
+  occupied:  'text-rose-600 bg-rose-50',
+  maintenance: 'text-amber-600 bg-amber-50',
+};
+
 export default function RoomsPage() {
+  const router = useRouter();
   const [rooms, setRooms] = useState([]);
+  const [filtered, setFiltered] = useState([]);
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    const fetchRooms = async () => {
-      try {
-        // We use cache: 'no-store' to ensure we see the most recent data from the Admin panel
-        const res = await fetch('/api/rooms', { cache: 'no-store' });
-        const data = await res.json();
-
-        // LOGIC FIX: 
-        // 1. We check 'computed_status' (which your backend calculates based on capacity)
-        // 2. We fallback to 'status' or 'available' if the database field is empty
-        const availableRooms = data.filter(room => {
-          const status = (room.computed_status || room.status || 'available').toLowerCase();
-          return status === 'available';
-        });
-
-        setRooms(availableRooms);
-      } catch (error) {
-        console.error("Failed to fetch rooms:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchRooms();
+    fetch('/api/public/rooms')
+      .then(r => r.json())
+      .then(data => { setRooms(data); setFiltered(data); })
+      .finally(() => setLoading(false));
   }, []);
 
-  const filteredRooms = rooms.filter(room => 
-    room.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    room.location?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  useEffect(() => {
+    let result = rooms;
+    if (statusFilter !== 'all') result = result.filter(r => r.status === statusFilter);
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      result = result.filter(r =>
+        r.name.toLowerCase().includes(q) || (r.location || '').toLowerCase().includes(q)
+      );
+    }
+    setFiltered(result);
+  }, [search, statusFilter, rooms]);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-[#0B1F3B] font-sans">
-      
-      <main className="w-full max-w-7xl mx-auto px-8 py-16 lg:py-20">
+    <div className="min-h-screen bg-[#F8FAFC] text-[#0B1F3B]">
+      <div className="max-w-7xl mx-auto px-8 pt-16 pb-24">
 
-        {/* 1. HEADER & SEARCH SECTION */}
-        <header className="mb-16">
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10">
-            <div>
-              <motion.div 
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="flex items-center gap-4 mb-4"
-              >
-                <h1 className="text-5xl md:text-6xl font-black tracking-tight uppercase leading-none">
-                  Available <span className="text-[#1E5EFF]">Rooms</span>
-                </h1>
-              </motion.div>
-              <p className="text-[#6B7280] text-sm md:text-base font-bold uppercase tracking-widest max-w-xl leading-relaxed">
-                Explore premium boarding units. Verified amenities, real-time availability, and direct digital application sequence.
-              </p>
-            </div>
+        {/* Header */}
+        <div className="mb-12">
+          <h1 className="text-5xl font-black uppercase tracking-tight mb-3">
+            ROOM <span className="text-[#1E5EFF]">INVENTORY</span>
+          </h1>
+          <p className="text-[#6B7280] text-sm font-bold uppercase tracking-widest">
+            Browse available units and submit an application
+          </p>
+        </div>
 
-            {/* SEARCH COMPONENT */}
-            <div className="flex items-center gap-3 w-full lg:w-auto">
-              <div className="relative flex-1 lg:w-96 group">
-                <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-[#6B7280] group-focus-within:text-[#1E5EFF] transition-colors w-5 h-5" />
-                <input 
-                  type="text" 
-                  placeholder="SEARCH UNIT ID OR LOCATION..." 
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-14 pr-6 py-5 bg-white border border-[#E5E7EB] rounded-2xl text-[#0B1F3B] focus:outline-none focus:border-[#1E5EFF] focus:ring-4 focus:ring-[#1E5EFF]/5 transition-all text-xs font-black tracking-widest uppercase shadow-sm"
-                />
-              </div>
-              <button className="p-5 bg-white border border-[#E5E7EB] hover:border-[#1E5EFF] text-[#0B1F3B] hover:text-[#1E5EFF] rounded-2xl transition-all shadow-sm group">
-                <Filter className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              </button>
-            </div>
+        {/* Search & Filter Bar */}
+        <div className="flex flex-col md:flex-row gap-4 mb-10">
+          <div className="relative flex-1">
+            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6B7280]" />
+            <input
+              type="text"
+              placeholder="Search by name or location..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 rounded-xl border border-[#E5E7EB] bg-white text-sm font-bold text-[#0B1F3B] focus:outline-none focus:border-[#1E5EFF] transition-colors"
+            />
           </div>
-        </header>
-
-        {/* 2. ROOM GRID */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-          {loading ? (
-            <div className="col-span-full py-32 text-center">
-              <Loader2 className="w-12 h-12 text-[#1E5EFF] animate-spin mx-auto mb-4" />
-              <p className="text-[#6B7280] font-black tracking-[0.4em] text-[10px] uppercase">Accessing Directory Nodes...</p>
-            </div>
-          ) : filteredRooms.length > 0 ? (
-            filteredRooms.map((room, i) => (
-              <motion.div 
-                key={room.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
+          <div className="flex gap-2">
+            {['all', 'available', 'occupied', 'maintenance'].map(s => (
+              <button
+                key={s}
+                onClick={() => setStatusFilter(s)}
+                className={`px-5 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest border transition-all ${
+                  statusFilter === s
+                    ? 'bg-[#0B1F3B] text-white border-[#0B1F3B]'
+                    : 'bg-white text-[#6B7280] border-[#E5E7EB] hover:border-[#0B1F3B]'
+                }`}
               >
-                <RoomCard room={room} />
+                {s}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Rooms Grid */}
+        {loading ? (
+          <div className="text-center py-24 text-[#6B7280] font-bold uppercase text-xs tracking-widest">Loading inventory...</div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-24 text-[#6B7280] font-bold uppercase text-xs tracking-widest">No rooms found.</div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filtered.map((room, i) => (
+              <motion.div
+                key={room.id}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.05 }}
+                className="bg-white border border-[#E5E7EB] rounded-[2rem] overflow-hidden hover:border-[#1E5EFF] transition-all group shadow-sm hover:shadow-lg hover:shadow-blue-500/5"
+              >
+                {/* Image */}
+                <div className="h-48 bg-[#F8FAFC] relative overflow-hidden">
+                  {room.image_url ? (
+                    <img src={room.image_url} alt={room.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-[#E5E7EB]">
+                      <span className="text-5xl font-black tracking-tighter opacity-30">{room.name.charAt(0)}</span>
+                    </div>
+                  )}
+                  <span className={`absolute top-4 right-4 text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${STATUS_COLORS[room.status]}`}>
+                    {room.status}
+                  </span>
+                </div>
+
+                {/* Content */}
+                <div className="p-6">
+                  <h2 className="text-lg font-black uppercase tracking-tight text-[#0B1F3B] mb-1">{room.name}</h2>
+
+                  <div className="flex items-center gap-4 text-[#6B7280] text-[11px] font-bold uppercase tracking-wide mb-4">
+                    {room.location && (
+                      <span className="flex items-center gap-1"><MapPin size={12} />{room.location}</span>
+                    )}
+                    {room.capacity && (
+                      <span className="flex items-center gap-1"><Users size={12} />{room.capacity}</span>
+                    )}
+                  </div>
+
+                  <div className="flex items-end justify-between">
+                    <div>
+                      <p className="text-[10px] font-black text-[#6B7280] uppercase tracking-widest">Monthly Rate</p>
+                      <p className="text-2xl font-black text-[#0B1F3B]">₱{Number(room.monthly_rate).toLocaleString()}</p>
+                    </div>
+                    <button
+                      onClick={() => router.push(`/public/rooms/${room.id}`)}
+                      className="flex items-center gap-2 bg-[#0B1F3B] group-hover:bg-[#1E5EFF] text-white text-[10px] font-black uppercase tracking-widest px-5 py-3 rounded-xl transition-all"
+                    >
+                      View <ArrowRight size={14} />
+                    </button>
+                  </div>
+                </div>
               </motion.div>
-            ))
-          ) : (
-            <div className="col-span-full py-40 flex flex-col items-center justify-center border-2 border-dashed border-[#E5E7EB] rounded-[3rem] bg-white">
-              <Compass className="w-20 h-20 text-[#E5E7EB] mb-6" />
-              <p className="text-[#6B7280] font-black text-xs uppercase tracking-[0.4em]">
-                {searchTerm ? "Zero matching nodes found" : "No rooms currently available"}
+            ))}
+          </div>
+        )}
+      </div>
+
+            <footer className="bg-white border-t border-[#E5E7EB] pt-12 pb-6">
+        <div className="max-w-7xl mx-auto px-6 md:px-8">
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
+
+            <div className="space-y-4">
+              <h3 className="text-2xl font-black tracking-tighter uppercase leading-none text-[#0B1F3B]">
+                BOARDER<span className="text-[#1E5EFF] italic">Q</span>
+              </h3>
+              <p className="text-[11px] text-[#6B7280] font-bold leading-relaxed tracking-wider">
+                Redefining the boarding house experience through automated logistics and real-time inventory synchronization.
               </p>
+              <div className="flex items-center gap-3">
+                <a href="#" className="w-9 h-9 bg-[#F8FAFC] border border-[#E5E7EB] rounded-lg flex items-center justify-center text-[#6B7280] hover:text-[#1E5EFF] hover:border-[#1E5EFF] transition-all">
+                  <Globe size={18} />
+                </a>
+                <a href="#" className="w-9 h-9 bg-[#F8FAFC] border border-[#E5E7EB] rounded-lg flex items-center justify-center text-[#6B7280] hover:text-[#1E5EFF] hover:border-[#1E5EFF] transition-all">
+                  <Mail size={18} />
+                </a>
+              </div>
             </div>
-          )}
+
+            <div>
+              <h4 className="text-[10px] font-black text-[#0B1F3B] uppercase tracking-[0.4em] mb-6">Ecosystem</h4>
+              <ul className="space-y-3">
+                {['Overview', 'Browse Rooms', 'About Project', 'Announcements'].map((link) => (
+                  <li key={link}>
+                    <a href="#" className="text-[11px] font-bold text-[#6B7280] hover:text-[#1E5EFF] uppercase tracking-widest transition-colors flex items-center gap-2 group">
+                      <div className="w-1 h-1 bg-[#E5E7EB] group-hover:bg-[#1E5EFF] transition-colors" /> 
+                      {link}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-[10px] font-black text-[#0B1F3B] uppercase tracking-[0.4em] mb-6">Landlord Connect</h4>
+              <div className="space-y-4">
+                <a href="https://www.facebook.com/che.ann.abal.2024" target="_blank" className="flex items-start gap-3 group">
+                  <Globe className="text-[#1E5EFF] mt-1" size={18} />
+                  <div>
+                    <p className="text-[11px] font-black text-[#0B1F3B] uppercase tracking-tight group-hover:text-[#1E5EFF] transition-colors">
+                      Official Facebook
+                    </p>
+                    <p className="text-[10px] text-[#6B7280] font-bold uppercase mt-1 flex items-center gap-1">
+                      Visit Page <ExternalLink size={10} />
+                    </p>
+                  </div>
+                </a>
+
+                <div className="flex items-start gap-3">
+                  <Mail className="text-[#1E5EFF] mt-1" size={18} />
+                  <div>
+                    <p className="text-[11px] font-black text-[#0B1F3B] uppercase tracking-tight">
+                      Support Email
+                    </p>
+                    <p className="text-[10px] text-[#6B7280] font-bold mt-1">
+                      boarderqadmin123@gmail.com
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="text-[10px] font-black text-[#0B1F3B] uppercase tracking-[0.4em] mb-6">Property Hub</h4>
+              <div className="bg-[#F8FAFC] border border-[#E5E7EB] rounded-2xl p-4">
+                <div className="flex items-start gap-3">
+                  <MapPin size={18} className="text-[#1E5EFF] flex-shrink-0" />
+                  <p className="text-[11px] font-bold text-[#6B7280] uppercase tracking-wide leading-relaxed">
+                    Dapitan City, <br /> Zamboanga Del Norte, 7101<br /> Philippines
+                  </p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div className="pt-6 flex flex-col md:flex-row justify-center items-center gap-4">
+            <span className="text-[9px] font-black text-[#6B7280] uppercase tracking-[0.4em] text-center">
+              BOARDER-Q © 2026
+            </span>
+          </div>
+
         </div>
-
-        {/* 3. DIRECTORY STATUS FOOTER BAR */}
-        <div className="mt-32">
-            <div className="flex justify-between items-center mb-8 border-b border-[#E5E7EB] pb-6">
-               <h3 className="text-sm font-black text-[#0B1F3B] tracking-[0.3em] uppercase flex items-center gap-3">
-                 <Activity size={18} className="text-[#22D3EE]" /> Directory Status
-               </h3>
-               <div className="flex items-center gap-2">
-                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                 <span className="text-[10px] font-black text-[#1E5EFF] uppercase tracking-widest">Live Updates: On</span>
-               </div>
-            </div>
-
-            <div className="bg-[#0B1F3B] p-8 rounded-3xl flex flex-col md:flex-row items-center justify-between shadow-2xl shadow-blue-900/10 border-l-8 border-[#22D3EE]">
-               <div className="mb-4 md:mb-0">
-                 <span className="text-2xl font-black text-white tracking-tight uppercase">Inventory Engine</span>
-                 <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mt-1">Global Node Synchronization</p>
-               </div>
-               <div className="flex items-center gap-12">
-                 <div className="text-center">
-                    <p className="text-[9px] font-black text-white/30 uppercase tracking-widest mb-1">Active Units</p>
-                    <span className="text-2xl font-black text-white">{rooms.length.toString().padStart(2, '0')}</span>
-                 </div>
-                 <div className="bg-white/10 h-10 w-[1px]"></div>
-                 <div className="text-center">
-                    <p className="text-[9px] font-black text-white/30 uppercase tracking-widest mb-1">State</p>
-                    <span className="text-[11px] font-black text-[#22D3EE] bg-[#22D3EE]/10 px-4 py-1.5 rounded-full border border-[#22D3EE]/20 uppercase">
-                      {loading ? "Syncing" : "Optimal"}
-                    </span>
-                 </div>
-               </div>
-            </div>
-        </div>
-      </main>
-
-      <footer className="py-16 text-[#6B7280] text-[10px] tracking-[0.5em] font-bold uppercase border-t border-[#E5E7EB] w-full text-center bg-white">
-        Boarder-Q <span className="mx-4 text-[#E5E7EB]">|</span> Directory Module <span className="mx-4 text-[#E5E7EB]">|</span> © 2026
       </footer>
     </div>
   );

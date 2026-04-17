@@ -1,127 +1,196 @@
 'use client';
-import React, { useState, useEffect, Suspense } from 'react'; // Added Suspense
-import { useSearchParams } from 'next/navigation';
-import { CheckCircle2, ArrowLeft, Loader2 } from 'lucide-react';
-import Link from 'next/link';
 
-// 1. We move the logic into a sub-component
-function ApplyForm() {
-  const searchParams = useSearchParams();
-  const roomId = searchParams.get('room');
-  
-  const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [formData, setFormData] = useState({
-    applicant_name: '',
-    applicant_email: '',
-    applicant_phone: '',
-    message: '',
-    room_id: ''
-  });
+import { useEffect, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { MapPin, Users, CheckCircle2, AlertCircle, ArrowLeft, Send } from 'lucide-react';
+
+const STATUS_COLORS = {
+  available:   'text-emerald-600 bg-emerald-50 border-emerald-200',
+  occupied:    'text-rose-600 bg-rose-50 border-rose-200',
+  maintenance: 'text-amber-600 bg-amber-50 border-amber-200',
+};
+
+export default function RoomDetailPage() {
+  const { id } = useParams();
+  const router = useRouter();
+  const [room, setRoom] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [form, setForm] = useState({ applicant_name: '', applicant_email: '', applicant_phone: '', message: '' });
+  const [submitting, setSubmitting] = useState(false);
+  const [result, setResult] = useState(null); // { type: 'success' | 'error', message }
 
   useEffect(() => {
-    if (roomId) setFormData(prev => ({ ...prev, room_id: roomId }));
-  }, [roomId]);
+    fetch(`/api/public/rooms/${id}`)
+      .then(r => r.json())
+      .then(setRoom)
+      .finally(() => setLoading(false));
+  }, [id]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  const handleSubmit = async () => {
+    if (!form.applicant_name || !form.applicant_email) {
+      setResult({ type: 'error', message: 'Name and email are required.' });
+      return;
+    }
+    setSubmitting(true);
     try {
-      const res = await fetch('/api/applications', {
+      const res = await fetch('/api/public/applications', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ room_id: id, ...form }),
       });
-      if (res.ok) setSubmitted(true);
-      else alert("Transmission Error. Please check your data.");
-    } catch (err) {
-      console.error("Apply Error:", err);
+      const data = await res.json();
+      if (res.ok) {
+        setResult({ type: 'success', message: "Application submitted! We'll reach out to your email soon." });
+        setForm({ applicant_name: '', applicant_email: '', applicant_phone: '', message: '' });
+      } else {
+        setResult({ type: 'error', message: data.error || 'Something went wrong.' });
+      }
+    } catch {
+      setResult({ type: 'error', message: 'Network error. Please try again.' });
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
-  if (submitted) {
-    return (
-      <div className="min-h-screen bg-black flex flex-col items-center justify-center p-6 font-sans">
-        <div className="bg-[#1a1a1a] border-2 border-[#00A3CC] p-12 rounded-none text-center max-w-md w-full shadow-[0_0_50px_rgba(0,163,204,0.2)]">
-          <div className="bg-[#00A3CC]/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 border border-[#00A3CC]">
-            <CheckCircle2 className="text-[#00A3CC] w-12 h-12" />
+  if (loading) return <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center text-[#6B7280] font-bold uppercase text-xs tracking-widest">Loading...</div>;
+  if (!room) return <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center text-rose-500 font-bold uppercase text-xs">Room not found.</div>;
+
+  const amenitiesList = room.amenities ? room.amenities.split(',').map(a => a.trim()).filter(Boolean) : [];
+  const rulesList = room.house_rules ? room.house_rules.split('\n').map(r => r.trim()).filter(Boolean) : [];
+
+  return (
+    <div className="min-h-screen bg-[#F8FAFC] text-[#0B1F3B]">
+      <div className="max-w-6xl mx-auto px-8 pt-12 pb-24">
+
+        {/* Back */}
+        <button onClick={() => router.back()} className="flex items-center gap-2 text-[#6B7280] hover:text-[#0B1F3B] text-[11px] font-black uppercase tracking-widest mb-10 transition-colors">
+          <ArrowLeft size={16} /> Back to rooms
+        </button>
+
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-10">
+
+          {/* LEFT: Room Info */}
+          <div className="lg:col-span-3 space-y-8">
+
+            {/* Image */}
+            <div className="rounded-[2rem] overflow-hidden h-72 bg-[#E5E7EB]">
+              {room.image_url
+                ? <img src={room.image_url} alt={room.name} className="w-full h-full object-cover" />
+                : <div className="w-full h-full flex items-center justify-center text-[#CBD5E1] text-8xl font-black">{room.name.charAt(0)}</div>
+              }
+            </div>
+
+            {/* Title block */}
+            <div className="bg-white border border-[#E5E7EB] rounded-[2rem] p-8">
+              <div className="flex items-start justify-between mb-4">
+                <h1 className="text-4xl font-black uppercase tracking-tight">{room.name}</h1>
+                <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border ${STATUS_COLORS[room.status]}`}>
+                  {room.status}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-6 text-[#6B7280] text-[11px] font-bold uppercase tracking-wide mb-6">
+                {room.location && <span className="flex items-center gap-1.5"><MapPin size={13} />{room.location}</span>}
+                {room.capacity && <span className="flex items-center gap-1.5"><Users size={13} />{room.capacity}</span>}
+              </div>
+
+              <div className="border-t border-[#E5E7EB] pt-6">
+                <p className="text-[10px] font-black text-[#6B7280] uppercase tracking-widest mb-1">Monthly Rate</p>
+                <p className="text-4xl font-black text-[#1E5EFF]">₱{Number(room.monthly_rate).toLocaleString()}</p>
+              </div>
+            </div>
+
+            {/* Amenities */}
+            {amenitiesList.length > 0 && (
+              <div className="bg-white border border-[#E5E7EB] rounded-[2rem] p-8">
+                <h2 className="text-[11px] font-black uppercase tracking-widest text-[#6B7280] mb-5">Amenities</h2>
+                <div className="flex flex-wrap gap-2">
+                  {amenitiesList.map((a, i) => (
+                    <span key={i} className="flex items-center gap-1.5 text-[11px] font-bold text-[#0B1F3B] bg-[#F8FAFC] border border-[#E5E7EB] px-4 py-2 rounded-full">
+                      <CheckCircle2 size={12} className="text-emerald-500" /> {a}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* House Rules */}
+            {rulesList.length > 0 && (
+              <div className="bg-white border border-[#E5E7EB] rounded-[2rem] p-8">
+                <h2 className="text-[11px] font-black uppercase tracking-widest text-[#6B7280] mb-5">House Rules</h2>
+                <ul className="space-y-3">
+                  {rulesList.map((rule, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm font-bold text-[#0B1F3B]">
+                      <span className="w-5 h-5 rounded-full bg-[#1E5EFF]/10 text-[#1E5EFF] flex items-center justify-center text-[10px] font-black mt-0.5 flex-shrink-0">{i + 1}</span>
+                      {rule}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
-          <h2 className="text-3xl font-black text-white uppercase tracking-tighter mb-4">APPLICATION LOGGED</h2>
-          <p className="text-white/60 font-mono text-xs tracking-widest mb-8 leading-relaxed">
-            Your request has been uploaded to the Boarder-Q main node. Admin review in progress.
-          </p>
-          <Link href="/public/rooms" className="block w-full bg-white text-black py-4 font-black uppercase tracking-[0.2em] text-[10px] hover:bg-[#00A3CC] hover:text-white transition-all">
-            Return to Directory
-          </Link>
+
+          {/* RIGHT: Application Form */}
+          <div className="lg:col-span-2">
+            <div className="sticky top-24 bg-[#0B1F3B] rounded-[2rem] p-8 text-white">
+              <h2 className="text-lg font-black uppercase tracking-tight mb-1">Apply for this room</h2>
+              <p className="text-white/50 text-[11px] font-bold uppercase tracking-widest mb-7">No account needed</p>
+
+              {result && (
+                <div className={`flex items-start gap-3 p-4 rounded-xl mb-6 text-[12px] font-bold ${result.type === 'success' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
+                  {result.type === 'success' ? <CheckCircle2 size={16} className="mt-0.5 flex-shrink-0" /> : <AlertCircle size={16} className="mt-0.5 flex-shrink-0" />}
+                  {result.message}
+                </div>
+              )}
+
+              <div className="space-y-4">
+                {[
+                  { field: 'applicant_name', label: 'Full Name', type: 'text', required: true },
+                  { field: 'applicant_email', label: 'Email Address', type: 'email', required: true },
+                  { field: 'applicant_phone', label: 'Phone Number', type: 'tel', required: false },
+                ].map(({ field, label, type, required }) => (
+                  <div key={field}>
+                    <label className="block text-[10px] font-black uppercase tracking-widest text-white/50 mb-1.5">{label}{required && ' *'}</label>
+                    <input
+                      type={type}
+                      value={form[field]}
+                      onChange={e => setForm(f => ({ ...f, [field]: e.target.value }))}
+                      className="w-full bg-white/5 border border-white/10 text-white text-sm font-bold px-4 py-3 rounded-xl focus:outline-none focus:border-[#22D3EE] transition-colors placeholder:text-white/20"
+                      placeholder={label}
+                    />
+                  </div>
+                ))}
+
+                <div>
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-white/50 mb-1.5">Message (optional)</label>
+                  <textarea
+                    value={form.message}
+                    onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
+                    rows={4}
+                    className="w-full bg-white/5 border border-white/10 text-white text-sm font-bold px-4 py-3 rounded-xl focus:outline-none focus:border-[#22D3EE] transition-colors placeholder:text-white/20 resize-none"
+                    placeholder="Introduce yourself or ask a question..."
+                  />
+                </div>
+
+                <button
+                  onClick={handleSubmit}
+                  disabled={submitting || room.status !== 'available'}
+                  className="w-full bg-gradient-to-r from-[#22D3EE] to-[#1E5EFF] text-white text-[12px] font-black uppercase tracking-widest py-4 rounded-xl flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {submitting ? 'Submitting...' : room.status !== 'available' ? 'Room Unavailable' : 'Submit Application'} 
+                  {!submitting && room.status === 'available' && <Send size={16} />}
+                </button>
+
+                {room.status !== 'available' && (
+                  <p className="text-[10px] font-bold text-white/30 text-center uppercase tracking-widest">
+                    This room is currently {room.status}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-[#1a1a1a] to-[#444] text-white font-sans pt-10">
-      <main className="max-w-3xl mx-auto px-6 py-12">
-        <Link href="/public/rooms" className="inline-flex items-center gap-2 text-[#00A3CC] text-[10px] font-black uppercase tracking-[0.3em] mb-8 hover:text-white transition-colors">
-          <ArrowLeft size={14} /> Back to Listings
-        </Link>
-        <div className="bg-black/40 border border-white/10 backdrop-blur-xl overflow-hidden relative">
-          <div className="h-1 w-full bg-[#00A3CC]"></div>
-          <div className="p-8 md:p-12">
-            <header className="mb-10">
-              <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase mb-2">
-                INITIATE <span className="text-[#00A3CC]">APPLICATION</span>
-              </h1>
-              <span className="text-[10px] font-mono text-white/40 tracking-[0.4em] uppercase">SYSTEM PROTOCOL: {roomId ? `ROOM_REF_${roomId}` : 'GENERAL_QUERY'}</span>
-            </header>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-[#00A3CC] uppercase tracking-[0.2em]">Full Name</label>
-                  <input required type="text" className="w-full bg-white/5 border border-white/10 p-4 text-sm focus:outline-none focus:border-[#00A3CC]"
-                    onChange={(e) => setFormData({...formData, applicant_name: e.target.value})} />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-[#00A3CC] uppercase tracking-[0.2em]">Email Address</label>
-                  <input required type="email" className="w-full bg-white/5 border border-white/10 p-4 text-sm focus:outline-none focus:border-[#00A3CC]"
-                    onChange={(e) => setFormData({...formData, applicant_email: e.target.value})} />
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-[#00A3CC] uppercase tracking-[0.2em]">Phone Number</label>
-                  <input required type="tel" className="w-full bg-white/5 border border-white/10 p-4 text-sm focus:outline-none focus:border-[#00A3CC]"
-                    onChange={(e) => setFormData({...formData, applicant_phone: e.target.value})} />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-[#00A3CC] uppercase tracking-[0.2em]">Current Occupation</label>
-                  <input required type="text" className="w-full bg-white/5 border border-white/10 p-4 text-sm focus:outline-none focus:border-[#00A3CC]" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black text-[#00A3CC] uppercase tracking-[0.2em]">Statement of Intent / Message</label>
-                <textarea rows="4" className="w-full bg-white/5 border border-white/10 p-4 text-sm focus:outline-none focus:border-[#00A3CC]"
-                  onChange={(e) => setFormData({...formData, message: e.target.value})}></textarea>
-              </div>
-              <div className="pt-6">
-                <button type="submit" disabled={loading} className="w-full bg-[#00A3CC] text-white py-5 font-black uppercase tracking-[0.3em] text-[11px] hover:bg-white hover:text-black transition-all flex items-center justify-center gap-3">
-                  {loading ? <Loader2 className="animate-spin" /> : 'EXECUTE APPLICATION SUBMISSION'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </main>
     </div>
-  );
-}
-
-// 2. Main export wraps the sub-component in Suspense
-export default function ApplyPage() {
-  return (
-    <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center text-[#00A3CC] font-black uppercase tracking-widest animate-pulse">Initializing Security Protocol...</div>}>
-      <ApplyForm />
-    </Suspense>
   );
 }
