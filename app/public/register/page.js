@@ -159,7 +159,7 @@ export default function RegisterPage() {
             </div>
 
             <div className="space-y-1">
-              <label className="text-[10px] font-black uppercase text-[#6B7280] ml-1 tracking-widest">Access Key</label>
+              <label className="text-[10px] font-black uppercase text-[#6B7280] ml-1 tracking-widest">Password</label>
               <div className="relative group">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] group-focus-within:text-[#1E5EFF] transition-colors" />
                 <input 

@@ -171,8 +171,8 @@ export default function LoginPage() {
             {/* PASSWORD */}
             <motion.div variants={itemVariants} className="space-y-1">
               <div className="flex justify-between">
-                <label className="text-[10px] font-black uppercase text-[#6B7280] ml-1 tracking-widest">Access Key</label>
-                <button type="button" className="text-[9px] font-black text-[#1E5EFF] uppercase hover:underline">Forgot Key?</button>
+                <label className="text-[10px] font-black uppercase text-[#6B7280] ml-1 tracking-widest">Enter Password</label>
+                <button type="button" className="text-[9px] font-black text-[#1E5EFF] uppercase hover:underline">Forgot Password?</button>
               </div>
 
               <motion.div
@@ -217,7 +217,7 @@ export default function LoginPage() {
 
               {loading 
                 ? <Loader2 className="animate-spin" size={18} /> 
-                : <>VERIFY & AUTHORIZE <ChevronRight size={16} /></>
+                : <>ACCESS PORTAL <ChevronRight size={16} /></>
               }
             </motion.button>
           </motion.form>
