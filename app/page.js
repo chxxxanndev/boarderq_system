@@ -135,7 +135,6 @@ export default function LandingPage() {
               transition={{ duration: 0.4, ease: 'backOut' }}
               className="inline-flex items-center gap-2 bg-white border border-[#E5E7EB] rounded-full px-4 py-1.5 mb-6 shadow-sm"
             >
-              {/* <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" /> */}
               <span className="text-[10px] font-black text-[#6B7280] uppercase tracking-[0.35em]">Your New Home Awaits</span>
             </motion.div>
 
@@ -186,8 +185,8 @@ export default function LandingPage() {
                 <span className="text-[#0B1F3B] font-black">comfortable, affordable, and ready for you.</span>
               </p>
               <p className="mt-3 text-[12px] font-black uppercase tracking-[0.25em] text-[#94A3B8]">
-                Looking for a{' '}
-                <Typewriter phrases={['cozy room', 'safe space', 'great deal', 'new home', 'fresh start']} />
+                Looking for a {' '}
+                <Typewriter phrases={['cozy room ?', 'safe space ?', 'great deal ?', 'new home ?', 'fresh start ?']} />
               </p>
             </motion.div>
 
