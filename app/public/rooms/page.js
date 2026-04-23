@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link'; // Add this to your imports
 import { useRouter } from 'next/navigation';
 import { Search, MapPin, Users, ArrowRight } from 'lucide-react';
 import {
@@ -146,46 +147,59 @@ export default function RoomsPage() {
         )}
       </div>
 
-            <footer className="bg-white border-t border-[#E5E7EB] pt-12 pb-6">
+      {/* ── INFORMATIVE FOOTER ── */}
+      <footer className="bg-white border-t border-[#E5E7EB] pt-12 pb-6">
         <div className="max-w-7xl mx-auto px-6 md:px-8">
-
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
 
+            {/* Brand Section */}
             <div className="space-y-4">
-              <h3 className="text-2xl font-black tracking-tighter uppercase leading-none text-[#0B1F3B]">
-                BOARDER<span className="text-[#1E5EFF] italic">Q</span>
-              </h3>
+              <Link href="/">
+                <h3 className="text-2xl font-black tracking-tighter uppercase leading-none text-[#0B1F3B] cursor-pointer">
+                  BOARDER<span className="text-[#1E5EFF] italic">Q</span>
+                </h3>
+              </Link>
               <p className="text-[11px] text-[#6B7280] font-bold leading-relaxed tracking-wider">
                 Redefining the boarding house experience through automated logistics and real-time inventory synchronization.
               </p>
               <div className="flex items-center gap-3">
-                <a href="#" className="w-9 h-9 bg-[#F8FAFC] border border-[#E5E7EB] rounded-lg flex items-center justify-center text-[#6B7280] hover:text-[#1E5EFF] hover:border-[#1E5EFF] transition-all">
+                <button className="w-9 h-9 bg-[#F8FAFC] border border-[#E5E7EB] rounded-lg flex items-center justify-center text-[#6B7280] hover:text-[#1E5EFF] transition-all">
                   <Globe size={18} />
-                </a>
-                <a href="#" className="w-9 h-9 bg-[#F8FAFC] border border-[#E5E7EB] rounded-lg flex items-center justify-center text-[#6B7280] hover:text-[#1E5EFF] hover:border-[#1E5EFF] transition-all">
+                </button>
+                <a href="mailto:boarderqadmin123@gmail.com" className="w-9 h-9 bg-[#F8FAFC] border border-[#E5E7EB] rounded-lg flex items-center justify-center text-[#6B7280] hover:text-[#1E5EFF] transition-all">
                   <Mail size={18} />
                 </a>
               </div>
             </div>
 
+            {/* FIXED: ECOSYSTEM LINKS */}
             <div>
               <h4 className="text-[10px] font-black text-[#0B1F3B] uppercase tracking-[0.4em] mb-6">Ecosystem</h4>
               <ul className="space-y-3">
-                {['Overview', 'Browse Rooms', 'About Project', 'Announcements'].map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-[11px] font-bold text-[#6B7280] hover:text-[#1E5EFF] uppercase tracking-widest transition-colors flex items-center gap-2 group">
+                {[
+                  { label: 'Overview', href: '/' },
+                  { label: 'Browse Rooms', href: '/public/rooms' },
+                  { label: 'About Project', href: '/public/about' },
+                  { label: 'Sign In', href: '/public/login' }
+                ].map((link) => (
+                  <li key={link.label}>
+                    <Link 
+                      href={link.href} 
+                      className="text-[11px] font-bold text-[#6B7280] hover:text-[#1E5EFF] uppercase tracking-widest transition-colors flex items-center gap-2 group"
+                    >
                       <div className="w-1 h-1 bg-[#E5E7EB] group-hover:bg-[#1E5EFF] transition-colors" /> 
-                      {link}
-                    </a>
+                      {link.label}
+                    </Link>
                   </li>
                 ))}
               </ul>
             </div>
 
+            {/* Landlord Connect */}
             <div>
               <h4 className="text-[10px] font-black text-[#0B1F3B] uppercase tracking-[0.4em] mb-6">Landlord Connect</h4>
               <div className="space-y-4">
-                <a href="https://www.facebook.com/che.ann.abal.2024" target="_blank" className="flex items-start gap-3 group">
+                <a href="https://www.facebook.com/che.ann.abal.2024" target="_blank" rel="noopener noreferrer" className="flex items-start gap-3 group">
                   <Globe className="text-[#1E5EFF] mt-1" size={18} />
                   <div>
                     <p className="text-[11px] font-black text-[#0B1F3B] uppercase tracking-tight group-hover:text-[#1E5EFF] transition-colors">
@@ -211,6 +225,7 @@ export default function RoomsPage() {
               </div>
             </div>
 
+            {/* Property Hub */}
             <div>
               <h4 className="text-[10px] font-black text-[#0B1F3B] uppercase tracking-[0.4em] mb-6">Property Hub</h4>
               <div className="bg-[#F8FAFC] border border-[#E5E7EB] rounded-2xl p-4">
@@ -225,12 +240,16 @@ export default function RoomsPage() {
 
           </div>
 
-          <div className="pt-6 flex flex-col md:flex-row justify-center items-center gap-4">
-            <span className="text-[9px] font-black text-[#6B7280] uppercase tracking-[0.4em] text-center">
-              BOARDER-Q © 2026
+          {/* Bottom Section */}
+          <div className="pt-6 border-t border-[#F8FAFC] flex flex-col md:flex-row justify-between items-center gap-4">
+            <span className="text-[9px] font-black text-[#CBD5E1] uppercase tracking-[0.4em]">
+              BOARDER-Q ADMIN CONSOLE © 2026
             </span>
+            {/* ADDED: Link to login for tenants/admin who find themselves at the bottom */}
+            <Link href="/public/login" className="text-[9px] font-black text-[#1E5EFF] uppercase tracking-widest hover:underline">
+              System Login
+            </Link>
           </div>
-
         </div>
       </footer>
     </div>

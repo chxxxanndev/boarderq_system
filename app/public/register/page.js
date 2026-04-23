@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
   UserPlus, Zap, ArrowLeft, Loader2, Mail, Lock, User, 
-  Eye, EyeOff, ShieldCheck, Activity, ChevronRight 
+  Eye, EyeOff, ShieldCheck, Activity, CheckCircle2, X 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -14,7 +14,15 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [showSuccessModal, setShowSuccessModal] = useState(false); // New Modal State
+  
+  // Updated state to include confirmPassword
+  const [formData, setFormData] = useState({ 
+    name: '', 
+    email: '', 
+    password: '', 
+    confirmPassword: '' 
+  });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -23,6 +31,13 @@ export default function RegisterPage() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    
+    // 1. Password Confirmation Check
+    if (formData.password !== formData.confirmPassword) {
+      setError("PASSWORDS DO NOT MATCH");
+      return;
+    }
+
     setLoading(true);
     setError("");
 
@@ -30,7 +45,11 @@ export default function RegisterPage() {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            password: formData.password
+        }),
       });
 
       const data = await response.json();
@@ -39,17 +58,16 @@ export default function RegisterPage() {
         throw new Error(data.error || 'Registration failed');
       }
 
-      alert('Profile Created Successfully! Please wait for Admin approval before logging in.');
-      router.push('/public/login');
+      // 2. Show Custom Modal instead of Alert
+      setShowSuccessModal(true);
 
     } catch (err) {
-      setError(err.message);
+      setError(err.message.toUpperCase());
     } finally {
       setLoading(false);
     }
   };
 
-  // Same Animation Variants as Login for perfect consistency
   const containerVariants = {
     hidden: {},
     show: { transition: { staggerChildren: 0.1 } }
@@ -61,7 +79,6 @@ export default function RegisterPage() {
   };
 
   return (
-    /* Locked height under Navbar */
     <div className="h-[calc(100vh-72px)] w-full flex flex-col lg:flex-row bg-white overflow-hidden font-sans">
       
       {/* LEFT SECTION: BRANDING */}
@@ -90,9 +107,7 @@ export default function RegisterPage() {
       </div>
 
       {/* RIGHT SECTION: FORM AREA */}
-      <div className="flex-1 flex flex-col justify-start items-center pt-24 p-8 md:p-1 relative bg-white">
-        
-        {/* Animated subtle background glow */}
+      <div className="flex-1 flex flex-col justify-start items-center pt-16 p-8 md:p-1 relative bg-white overflow-y-auto">
         <motion.div
           className="absolute inset-0 pointer-events-none opacity-40"
           animate={{
@@ -111,7 +126,7 @@ export default function RegisterPage() {
           animate="show"
           className="w-full max-w-md relative z-10"
         >
-          <motion.div variants={itemVariants} className="mb-0">
+          <motion.div variants={itemVariants} className="mb-6">
             <h1 className="text-5xl font-black text-[#0B1F3B] tracking-tight uppercase leading-none">
               Register
             </h1>
@@ -120,16 +135,16 @@ export default function RegisterPage() {
             </p>
           </motion.div>
 
-          <motion.form variants={itemVariants} onSubmit={handleRegister} className="space-y-5">
+          <motion.form variants={itemVariants} onSubmit={handleRegister} className="space-y-4">
             
             {/* Error Message */}
-            <AnimatePresence>
+            <AnimatePresence mode="wait">
               {error && (
                 <motion.div 
-                  initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                  className="p-4 bg-rose-50 border border-rose-100 rounded-2xl text-rose-600 flex items-center gap-3 text-[11px] font-black uppercase"
+                  initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+                  className="p-4 bg-rose-50 border border-rose-100 rounded-2xl text-rose-600 flex items-center gap-3 text-[10px] font-black uppercase tracking-wider"
                 >
-                  <ShieldCheck size={18} /> {error}
+                  <ShieldCheck size={16} /> {error}
                 </motion.div>
               )}
             </AnimatePresence>
@@ -158,44 +173,96 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            <div className="space-y-1">
-              <label className="text-[10px] font-black uppercase text-[#6B7280] ml-1 tracking-widest">Password</label>
-              <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] group-focus-within:text-[#1E5EFF] transition-colors" />
-                <input 
-                  type={showPassword ? "text" : "password"} 
-                  name="password" required value={formData.password} onChange={handleChange}
-                  placeholder="••••••••" 
-                  className="w-full pl-12 pr-14 py-4 bg-[#F8FAFC] border border-[#E5E7EB] rounded-2xl text-[#0B1F3B] font-bold focus:outline-none focus:border-[#1E5EFF] focus:ring-4 focus:ring-[#1E5EFF]/5 transition-all text-sm"
-                />
-                <button 
-                  type="button" 
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#6B7280] hover:text-[#0B1F3B] transition-colors"
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
+            {/* Password Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                    <label className="text-[10px] font-black uppercase text-[#6B7280] ml-1 tracking-widest">Password</label>
+                    <div className="relative group">
+                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] group-focus-within:text-[#1E5EFF] transition-colors" />
+                        <input 
+                        type={showPassword ? "text" : "password"} 
+                        name="password" required value={formData.password} onChange={handleChange}
+                        placeholder="••••••••" 
+                        className="w-full pl-11 pr-4 py-4 bg-[#F8FAFC] border border-[#E5E7EB] rounded-2xl text-[#0B1F3B] font-bold focus:outline-none focus:border-[#1E5EFF] transition-all text-sm"
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-1">
+                    <label className="text-[10px] font-black uppercase text-[#6B7280] ml-1 tracking-widest">Confirm</label>
+                    <div className="relative group">
+                        <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] group-focus-within:text-[#1E5EFF] transition-colors" />
+                        <input 
+                        type={showPassword ? "text" : "password"} 
+                        name="confirmPassword" required value={formData.confirmPassword} onChange={handleChange}
+                        placeholder="••••••••" 
+                        className="w-full pl-11 pr-12 py-4 bg-[#F8FAFC] border border-[#E5E7EB] rounded-2xl text-[#0B1F3B] font-bold focus:outline-none focus:border-[#1E5EFF] transition-all text-sm"
+                        />
+                        <button 
+                        type="button" 
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-[#6B7280] hover:text-[#0B1F3B]"
+                        >
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <motion.button 
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
               type="submit" 
               disabled={loading}
-              className="w-full py-5 rounded-2xl bg-[#0B1F3B] text-white font-black tracking-[0.2em] text-xs shadow-xl hover:bg-[#1E5EFF] transition-all flex justify-center items-center gap-3 disabled:opacity-50"
+              className="w-full py-5 mt-4 rounded-2xl bg-[#0B1F3B] text-white font-black tracking-[0.2em] text-xs shadow-xl hover:bg-[#1E5EFF] transition-all flex justify-center items-center gap-3 disabled:opacity-50"
             >
               {loading ? <Loader2 className="animate-spin" size={18} /> : <>INITIALIZE PROFILE <Zap size={16} /></>}
             </motion.button>
           </motion.form>
 
-          <motion.div variants={itemVariants} className="mt-1 text-center pt-2 border-t border-[#F8FAFC]">
+          <motion.div variants={itemVariants} className="mt-6 text-center pt-4 border-t border-[#F1F5F9]">
             <Link href="/public/login" className="text-[#6B7280] text-[10px] font-bold uppercase tracking-[0.2em] flex items-center justify-center hover:text-[#1E5EFF] transition-colors group">
               <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" /> Return to Secure Login
             </Link>
           </motion.div>
         </motion.div>
       </div>
+
+      {/* BRANDED SUCCESS MODAL */}
+      <AnimatePresence>
+        {showSuccessModal && (
+          <div className="fixed inset-0 z-[999] flex items-center justify-center p-6">
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-[#0B1F3B]/60 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              className="relative bg-white w-full max-w-sm rounded-[2.5rem] shadow-2xl border border-[#E5E7EB] overflow-hidden"
+            >
+              <div className="p-10 flex flex-col items-center text-center">
+                <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mb-6">
+                    <CheckCircle2 size={40} className="text-emerald-500" />
+                </div>
+                <h3 className="text-2xl font-black text-[#0B1F3B] uppercase tracking-tight leading-none mb-3">
+                    Registration <span className="text-[#1E5EFF]">Complete</span>
+                </h3>
+                <p className="text-[#6B7280] text-[11px] font-bold uppercase tracking-widest leading-relaxed">
+                    Identity created successfully. Please await <span className="text-[#0B1F3B]">Administrator Approval</span> before terminal access.
+                </p>
+                <button 
+                  onClick={() => router.push('/public/login')}
+                  className="w-full mt-8 py-4 bg-[#0B1F3B] text-white rounded-2xl font-black text-[10px] tracking-[0.3em] uppercase hover:bg-[#1E5EFF] transition-all shadow-lg shadow-blue-500/10"
+                >
+                  Understood
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

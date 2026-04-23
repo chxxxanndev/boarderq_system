@@ -1,3 +1,4 @@
+// app/api/auth/me/route.js
 import pool from '@/lib/db';
 import { NextResponse } from 'next/server';
 import { verify } from 'jsonwebtoken';
