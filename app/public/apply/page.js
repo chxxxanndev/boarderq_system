@@ -20,7 +20,7 @@ export default function RoomDetailPage() {
   const [result, setResult] = useState(null); // { type: 'success' | 'error', message }
 
   useEffect(() => {
-    fetch(`/api/public/rooms/${id}`)
+    fetch(`/api/rooms/${id}`)
       .then(r => r.json())
       .then(setRoom)
       .finally(() => setLoading(false));
