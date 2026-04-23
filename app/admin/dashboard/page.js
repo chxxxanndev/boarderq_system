@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom'; // IMPORT THIS
 import { motion, AnimatePresence } from 'framer-motion'; 
 import { 
-  Users, Home, CreditCard, AlertCircle, Plus, Megaphone, Activity, X, ChevronRight
+  Users, Home, CreditCard, AlertCircle, Plus, Megaphone, Activity, X, ChevronRight, Cpu
 } from 'lucide-react';
 import Button from '@/components/Button';
 
