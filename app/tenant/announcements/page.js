@@ -6,7 +6,7 @@ export default function TenantAnnouncements() {
   // Stats updated to your brand palette
   const stats = [
     { label: 'Total Broadcasts', value: mockAnnouncements.length.toString().padStart(2, '0'), bgColor: 'bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF]', textColor: 'text-white' },
-    { label: 'Last Update', value: '24H AGO', bgColor: 'bg-white', textColor: 'text-[#0B1F3B]' },
+    { label: 'Last Update', value: '10H AGO', bgColor: 'bg-white', textColor: 'text-[#0B1F3B]' },
     { label: 'Priority Level', value: 'HIGH', bgColor: 'bg-[#0B1F3B]', textColor: 'text-white' },
   ];
 
