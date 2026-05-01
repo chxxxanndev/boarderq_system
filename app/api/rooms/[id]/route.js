@@ -1,53 +1,59 @@
+// app/api/room/[id]/route.js
 import pool from '@/lib/db';
 import { NextResponse } from 'next/server';
 
-/**
- * GET /api/rooms/[id]
- * Fetch single room details
- */
 export async function GET(request, { params }) {
   try {
     const { id } = await params;
-    const [rows] = await pool.query('SELECT * FROM rooms WHERE id = ?', [id]);
+    
+    // We join with room_tenants to see how many people are actually inside
+    const query = `
+      SELECT 
+        r.*, 
+        (SELECT COUNT(*) FROM room_tenants WHERE room_id = r.id) AS current_occupants
+      FROM rooms r 
+      WHERE r.id = ?
+    `;
+    
+    const [rows] = await pool.query(query, [id]);
 
     if (rows.length === 0) {
       return NextResponse.json({ error: "Room not found" }, { status: 404 });
     }
 
-    return NextResponse.json(rows[0]);
+    const room = rows[0];
+    
+    // Ensure capacity is treated as a number for math
+    const capacityNum = parseInt(room.capacity) || 1;
+    const occupantsNum = parseInt(room.current_occupants) || 0;
+
+    // Add calculated fields for the frontend
+    room.slots_left = capacityNum - occupantsNum;
+    room.is_full = occupantsNum >= capacityNum;
+
+    return NextResponse.json(room);
   } catch (error) {
     console.error("GET /rooms/[id] error:", error);
     return NextResponse.json({ error: "Fetch failed" }, { status: 500 });
   }
 }
 
-/**
- * PUT /api/rooms/[id]
- * Update room details or status
- */
 export async function PUT(request, { params }) {
   try {
     const { id } = await params;
     const body = await request.json();
+    const { name, monthly_rate, location, capacity, image_url, amenities, house_rules, status } = body;
     
-    if (Object.keys(body).length === 1 && body.status) {
-      await pool.query('UPDATE rooms SET status = ? WHERE id = ?', [body.status, id]);
-    } else {
-      const { name, monthly_rate, location, capacity, image_url, amenities, house_rules } = body;
-      await pool.query(
-        `UPDATE rooms SET name=?, monthly_rate=?, location=?, capacity=?, image_url=?, amenities=?, house_rules=? WHERE id=?`,
-        [name, monthly_rate, location, capacity, image_url, amenities, house_rules, id]
-      );
-    }
+    await pool.query(
+      `UPDATE rooms SET name=?, monthly_rate=?, location=?, capacity=?, image_url=?, amenities=?, house_rules=?, status=? WHERE id=?`,
+      [name, monthly_rate, location, capacity, image_url, amenities, house_rules, status || 'available', id]
+    );
     return NextResponse.json({ message: "Update successful" });
   } catch (error) {
     return NextResponse.json({ error: "Update failed" }, { status: 500 });
   }
 }
 
-/**
- * DELETE /api/rooms/[id]
- */
 export async function DELETE(request, { params }) {
   try {
     const { id } = await params;

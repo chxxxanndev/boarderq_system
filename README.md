@@ -167,9 +167,12 @@ app/
 │
 ├── public/                  # Public / unauthenticated pages
 │   ├── rooms/
+│     ├── page.js
+│     └── [id]/
 │   ├── apply/
 │   ├── login/
 │   ├── register/
+│   ├── announcements/
 │   └── about/              
 │
 ├── tenant/                  # Tenant dashboard
@@ -180,7 +183,7 @@ app/
 │   └── announcements/
 │
 ├── api/                     # API routes
-│   ├── admins/
+│   ├── admin/
 │             ├── active-list/route.js
 │             ├── applications/route.js
 │             ├── dashboard/route.js
