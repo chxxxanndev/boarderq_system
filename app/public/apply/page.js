@@ -20,7 +20,7 @@ export default function RoomDetailPage() {
   const [result, setResult] = useState(null); // { type: 'success' | 'error', message }
 
   useEffect(() => {
-    fetch(`/api/rooms/${id}`)
+    fetch(`/api/public/rooms/${id}`)
       .then(r => r.json())
       .then(setRoom)
       .finally(() => setLoading(false));
@@ -76,7 +76,7 @@ export default function RoomDetailPage() {
             <div className="rounded-[2rem] overflow-hidden h-72 bg-[#E5E7EB]">
               {room.image_url
                 ? <img src={room.image_url} alt={room.name} className="w-full h-full object-cover" />
-                : <div className="w-full h-full flex items-center justify-center text-[#CBD5E1] text-8xl font-black">{room.name.charAt(0)}</div>
+                : <div className="w-full h-full flex items-center justify-center text-[#CBD5E1] text-8xl font-black">{room?.name?.charAt(0) || 'R'}</div>
               }
             </div>
 

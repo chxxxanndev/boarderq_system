@@ -88,9 +88,9 @@ export default function RoomDetailPage() {
     <div className="min-h-screen bg-[#F8FAFC] text-[#0B1F3B] font-sans">
       <div className="max-w-7xl mx-auto px-8 pt-12 pb-24">
 
-        <button onClick={() => router.back()} className="flex items-center gap-2 text-[#6B7280] hover:text-[#1E5EFF] text-[10px] font-black uppercase tracking-[0.2em] mb-12 transition-all group">
+        {/* <button onClick={() => router.back()} className="flex items-center gap-2 text-[#6B7280] hover:text-[#1E5EFF] text-[10px] font-black uppercase tracking-[0.2em] mb-12 transition-all group">
           <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> Back to System Inventory
-        </button>
+        </button> */}
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
 
@@ -184,9 +184,9 @@ export default function RoomDetailPage() {
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 {[
-                  { field: 'applicant_name', label: 'Full Legal Name', type: 'text', placeholder: 'e.g. Jane Doe' },
-                  { field: 'applicant_email', label: 'Transmission Email', type: 'email', placeholder: 'name@provider.com' },
-                  { field: 'applicant_phone', label: 'Contact Sequence', type: 'tel', placeholder: '09XX-XXX-XXXX' },
+                  { field: 'applicant_name', label: 'Full Name', type: 'text', placeholder: 'e.g. Sheila Lagpac' },
+                  { field: 'applicant_email', label: 'Email Address', type: 'email', placeholder: 'name@provider.com' },
+                  { field: 'applicant_phone', label: 'Contact Number', type: 'tel', placeholder: '09XX-XXX-XXXX' },
                 ].map(({ field, label, type, placeholder }) => (
                   <div key={field}>
                     <label className="block text-[9px] font-black uppercase tracking-[0.4em] text-white/30 mb-2 ml-1">{label}</label>
