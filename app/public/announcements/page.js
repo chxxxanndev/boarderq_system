@@ -1,15 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link'; // Add this to your imports
+import Link from 'next/link';
 import {
   Activity, Zap, CheckCircle2, Megaphone, Clock, BedDouble, TrendingUp, Wrench,
-  Globe, Mail, Phone, ExternalLink, ShieldCheckm, MapPin // Replaced Facebook with Globe
-} from 'lucide-react';import { motion } from 'framer-motion';
+  Globe, Mail, Phone, ExternalLink, ShieldCheckm, MapPin, Search, ArrowLeft, SearchX 
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AnnouncementsPage() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState(""); // TWEAK: Search state
 
   useEffect(() => {
     fetch('/api/public/announcements')
@@ -22,48 +24,99 @@ export default function AnnouncementsPage() {
     year: 'numeric', month: 'long', day: 'numeric'
   });
 
-  return (
-    <div className="min-h-screen bg-[#F8FAFC] text-[#0B1F3B]">
-      <div className="max-w-4xl mx-auto px-8 pt-16 pb-24">
+  // TWEAK: Filter items based on search
+  const filteredItems = items.filter(item => 
+    item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    item.body.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-        <div className="mb-12">
-          <h1 className="text-5xl font-black uppercase tracking-tight mb-3">
-            ANNOUNCE<span className="text-[#1E5EFF]">MENTS</span>
-          </h1>
-          <p className="text-[#6B7280] text-sm font-bold uppercase tracking-widest">
-            Property updates and notices from management
-          </p>
+  return (
+    <div className="min-h-screen bg-[#F8FAFC] text-[#0B1F3B] selection:bg-[#1E5EFF] selection:text-white">
+      <div className="max-w-4xl mx-auto px-8 pt-12 pb-24">
+        
+        {/* TWEAK: Breadcrumb Navigation */}
+        <Link href="/" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#6B7280] hover:text-[#1E5EFF] transition-all mb-8 group">
+          <ArrowLeft size={12} className="group-hover:-translate-x-1 transition-transform"/> Back to Home
+        </Link>
+
+        <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <h1 className="text-5xl font-black uppercase tracking-tight mb-3">
+              ANNOUNCE<span className="text-[#1E5EFF]">MENTS</span>
+            </h1>
+            <p className="text-[#6B7280] text-sm font-bold uppercase tracking-widest">
+              Property updates and notices from management
+            </p>
+          </div>
+
+          {/* TWEAK: Search Bar */}
+          <div className="relative group min-w-[280px]">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#CBD5E1] group-focus-within:text-[#1E5EFF] transition-colors" size={16} />
+            <input 
+              type="text" 
+              placeholder="SEARCH NOTICES..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-white border-2 border-[#E5E7EB] rounded-2xl py-3 pl-11 pr-4 text-[10px] font-black tracking-widest focus:outline-none focus:border-[#1E5EFF] transition-all shadow-sm"
+            />
+          </div>
         </div>
 
         {loading ? (
-          <div className="text-center py-24 text-[#6B7280] font-bold uppercase text-xs tracking-widest">Loading...</div>
-        ) : items.length === 0 ? (
-          <div className="text-center py-24 text-[#6B7280] font-bold uppercase text-xs tracking-widest">No announcements yet.</div>
+          <div className="text-center py-24">
+            <div className="inline-block animate-spin mb-4 text-[#1E5EFF]"><Activity size={24}/></div>
+            <div className="text-[#6B7280] font-bold uppercase text-xs tracking-widest">Synchronizing Feed...</div>
+          </div>
+        ) : filteredItems.length === 0 ? (
+          // TWEAK: Enhanced Empty State
+          <div className="text-center py-24 bg-white rounded-[2rem] border-2 border-dashed border-[#E5E7EB]">
+            <SearchX size={40} className="mx-auto text-[#CBD5E1] mb-4" />
+            <div className="text-[#6B7280] font-bold uppercase text-xs tracking-[0.3em]">
+              {searchQuery ? "No matching notices found" : "No announcements yet."}
+            </div>
+          </div>
         ) : (
           <div className="space-y-6">
-            {items.map((item, i) => (
-              <motion.div
-                key={item.id}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.06 }}
-                className="bg-white border border-[#E5E7EB] rounded-[2rem] p-8 hover:border-[#1E5EFF] transition-all group"
-              >
-                <div className="flex items-start gap-5">
-                  <div className="p-3 bg-[#1E5EFF]/5 rounded-2xl border border-[#1E5EFF]/10 text-[#1E5EFF] flex-shrink-0 group-hover:bg-[#1E5EFF] group-hover:text-white transition-all">
-                    <Megaphone size={22} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h2 className="text-xl font-black uppercase tracking-tight text-[#0B1F3B] mb-2">{item.title}</h2>
-                    <p className="text-sm text-[#6B7280] font-bold leading-relaxed mb-4 whitespace-pre-line">{item.body}</p>
-                    <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-[#6B7280]">
-                      <span className="flex items-center gap-1.5"><Clock size={11} />{formatDate(item.created_at)}</span>
-                      <span className="text-[#1E5EFF]">By {item.author}</span>
+            <AnimatePresence mode="popLayout">
+              {filteredItems.map((item, i) => (
+                <motion.div
+                  key={item.id}
+                  layout
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                  className="bg-white border border-[#E5E7EB] rounded-[2rem] p-8 hover:border-[#1E5EFF] hover:shadow-xl hover:shadow-[#1E5EFF]/5 transition-all group relative overflow-hidden"
+                >
+                  {/* TWEAK: Decorative Side Accent */}
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#1E5EFF] opacity-0 group-hover:opacity-100 transition-opacity" />
+                  
+                  <div className="flex items-start gap-6">
+                    <div className="p-4 bg-[#1E5EFF]/5 rounded-2xl border border-[#1E5EFF]/10 text-[#1E5EFF] flex-shrink-0 group-hover:bg-[#1E5EFF] group-hover:text-white transition-all shadow-sm">
+                      <Megaphone size={24} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-start mb-2">
+                        <h2 className="text-2xl font-black uppercase tracking-tight text-[#0B1F3B] leading-tight">
+                          {item.title}
+                        </h2>
+                      </div>
+                      <p className="text-[13px] text-[#6B7280] font-bold leading-relaxed mb-6 whitespace-pre-line opacity-90">
+                        {item.body}
+                      </p>
+                      <div className="flex items-center gap-6 text-[10px] font-black uppercase tracking-widest">
+                        <span className="flex items-center gap-2 text-[#6B7280] bg-[#F8FAFC] px-3 py-1.5 rounded-full border border-[#E5E7EB]">
+                          <Clock size={12} className="text-[#1E5EFF]" /> {formatDate(item.created_at)}
+                        </span>
+                        <span className="text-[#1E5EFF] flex items-center gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#1E5EFF]" />
+                          By {item.author}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
         )}
       </div>
@@ -166,7 +219,6 @@ export default function AnnouncementsPage() {
             <span className="text-[9px] font-black text-[#CBD5E1] uppercase tracking-[0.4em]">
               BOARDER-Q ADMIN CONSOLE © 2026
             </span>
-            {/* ADDED: Link to login for tenants/admin who find themselves at the bottom */}
             <Link href="/public/login" className="text-[9px] font-black text-[#1E5EFF] uppercase tracking-widest hover:underline">
               System Login
             </Link>
