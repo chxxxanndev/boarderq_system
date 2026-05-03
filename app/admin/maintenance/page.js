@@ -1,161 +1,342 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import { 
   Wrench, CheckCircle2, Clock, AlertTriangle, Hammer,
-  Search, ChevronRight, HelpCircle, Plus, Filter, Activity, Settings2
+  Search, ChevronRight, HelpCircle, Plus, Filter, Activity, Settings2, Loader2, X, MapPin, User
 } from 'lucide-react';
-import { mockMaintenance } from '@/lib/constants';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '@/components/Button';
+import AdminFooter from '@/components/AdminFooter'; 
 
 export default function LandlordMaintenance() {
-  const [mounted, setMounted] = useState(false);
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filterStatus, setFilterStatus] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedRequest, setSelectedRequest] = useState(null);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    fetchRequests();
   }, []);
 
-  // Stats updated to your high-end brand hierarchy
+// ... inside LandlordMaintenance.js ...
+
+  const fetchRequests = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      setLoading(true);
+      // CHANGED: Ensure Auth header is sent so API knows you are Admin
+      const res = await fetch('/api/maintenance', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      setRequests(data);
+    } catch (err) {
+      console.error("Failed to fetch:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateStatus = async (id, newStatus) => {
+    const token = localStorage.getItem('token');
+    setIsUpdating(true);
+    try {
+      // CHANGED: Unified API URL
+      const res = await fetch('/api/maintenance', {
+        method: 'PATCH',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` // Critical for security
+        },
+        body: JSON.stringify({ id, status: newStatus })
+      });
+      if (res.ok) {
+        fetchRequests();
+        setSelectedRequest(prev => ({ ...prev, status: newStatus }));
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  // const updateStatus = async (id, newStatus) => {
+  //   setIsUpdating(true);
+  //   try {
+  //     const res = await fetch('/api/maintenance', {
+  //       method: 'PATCH',
+  //       body: JSON.stringify({ id, status: newStatus }),
+  //       headers: { 'Content-Type': 'application/json' }
+  //     });
+  //     if (res.ok) {
+  //       fetchRequests();
+  //       // Update local state for the modal view
+  //       setSelectedRequest(prev => ({ ...prev, status: newStatus }));
+  //     }
+  //   } catch (err) {
+  //     console.error(err);
+  //   } finally {
+  //     setIsUpdating(false);
+  //   }
+  // };
+
   const stats = [
-    { label: 'Total Requests', value: '08', icon: Wrench, bgColor: 'bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF]', textColor: 'text-white' },
-    { label: 'Pending Tasks', value: '03', icon: Clock, bgColor: 'bg-white', textColor: 'text-[#0B1F3B]' },
-    { label: 'In Progress', value: '02', icon: Hammer, bgColor: 'bg-[#0B1F3B]', textColor: 'text-white' },
-    { label: 'Resolved Today', value: '03', icon: CheckCircle2, bgColor: 'bg-white', textColor: 'text-[#0B1F3B]' },
+    { label: 'Total Logs', value: requests.length, bgColor: 'bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF]', textColor: 'text-white' },
+    { label: 'Pending', value: requests.filter(r => r.status === 'pending').length, bgColor: 'bg-white', textColor: 'text-[#0B1F3B]' },
+    { label: 'In Progress', value: requests.filter(r => r.status === 'in_progress').length, bgColor: 'bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF]', textColor: 'text-white' },
+    { label: 'Resolved', value: requests.filter(r => r.status === 'resolved').length, bgColor: 'bg-white', textColor: 'text-[#0B1F3B]' },
   ];
+
+  const filteredRequests = requests.filter(req => {
+    const matchesSearch = (req.title?.toLowerCase() || "").includes(searchTerm.toLowerCase()) || 
+                          (req.room_name?.toLowerCase() || "").includes(searchTerm.toLowerCase());
+    const matchesFilter = filterStatus === 'all' || req.status === filterStatus;
+    return matchesSearch && matchesFilter;
+  });
 
   return (
     <div className="flex min-h-screen bg-[#F8FAFC] font-sans text-[#0B1F3B]">     
-      <main className="flex-1 p-8 lg:p-12">
+      <main className="flex-1 p-4 md:p-8 lg:p-12 max-w-7xl mx-auto overflow-x-hidden">
         
         {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
-            <h1 className="text-4xl font-black tracking-tight uppercase leading-none text-[#0B1F3B]">
+            <h1 className="text-3xl md:text-4xl font-black tracking-tight uppercase leading-none text-[#0B1F3B]">
               MAINTENANCE <span className="text-[#1E5EFF]">LOGS</span>
             </h1>
-            <p className="text-[#6B7280] text-[10px] font-black tracking-[0.3em] uppercase mt-2">Facility Service & Repair Module</p>
+            <p className="text-[#6B7280] text-[10px] font-black tracking-[0.3em] uppercase mt-2">Facility Service & Control Panel</p>
           </div>
-          <div className="bg-white border border-[#E5E7EB] px-4 py-2 rounded-xl flex items-center gap-2 shadow-sm">
-            <Activity className="w-4 h-4 text-[#22D3EE]" />
-            <span className="text-[#0B1F3B] text-[10px] font-black uppercase tracking-widest">Technician Feed: Active</span>
+          <div className="bg-white border border-[#E5E7EB] px-5 py-3 rounded-2xl flex items-center gap-3 shadow-sm">
+            <Activity className="w-4 h-4 text-[#22D3EE] animate-pulse" />
+            <span className="text-[#0B1F3B] text-[10px] font-black uppercase tracking-widest">System Feed: Online</span>
           </div>
         </div>
 
-        {/* Maintenance Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-10">
           {stats.map((stat, i) => (
-            <div key={i} className={`${stat.bgColor} p-6 rounded-2xl flex flex-col justify-between h-44 shadow-sm border border-[#E5E7EB]/50 relative overflow-hidden group hover:shadow-md transition-all`}>
-              <div className="z-10">
-                <h2 className={`text-[11px] font-black uppercase tracking-widest mb-1 ${stat.textColor === 'text-white' ? 'opacity-70' : 'text-[#6B7280]'}`}>
-                  {stat.label}
-                </h2>
-                <p className={`text-4xl font-black tracking-tighter ${stat.textColor}`}>{stat.value}</p>
-              </div>
-              
-              <div className={`mt-2 text-[9px] font-black tracking-[0.1em] uppercase z-10 flex items-center gap-1.5 ${stat.textColor === 'text-white' ? 'opacity-50' : 'text-[#6B7280]'}`}>
-                 <stat.icon className="w-3 h-3" /> System Live Log
-              </div>
-              <stat.icon className={`absolute -right-4 -bottom-4 opacity-10 -rotate-12 transition-transform group-hover:rotate-0 ${stat.textColor === 'text-white' ? 'text-white' : 'text-[#0B1F3B]'}`} size={110} />
+            <div key={i} className={`${stat.bgColor} p-6 rounded-[32px] flex flex-col justify-center items-center h-32 md:h-40 shadow-sm border border-[#E5E7EB]/50 relative overflow-hidden transition-all`}>
+              <h2 className={`text-[9px] md:text-[11px] font-black uppercase tracking-widest mb-1 ${stat.textColor === 'text-white' ? 'opacity-70' : 'text-[#6B7280]'}`}>
+                {stat.label}
+              </h2>
+              <p className={`text-3xl md:text-5xl font-black tracking-tighter ${stat.textColor}`}>
+                {String(stat.value).padStart(2, '0')}
+              </p>
               {stat.bgColor === 'bg-white' && <div className="absolute top-0 left-0 w-full h-1.5 bg-[#22D3EE]"></div>}
             </div>
           ))}
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-          
-          {/* Main Maintenance List Area */}
-          <div className="xl:col-span-2 bg-white border border-[#E5E7EB] rounded-2xl p-8 flex flex-col shadow-sm relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-1.5 h-full bg-[#1E5EFF]"></div>
+        {/* Search & Filter Bar */}
+        <div className="flex flex-col md:flex-row gap-4 mb-8">
+          <div className="relative flex-1">
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280]" />
+            <input 
+              type="text" 
+              placeholder="SEARCH BY ROOM OR ISSUE..." 
+              className="w-full bg-white border border-[#E5E7EB] rounded-2xl py-4 pl-12 pr-6 text-[11px] font-bold uppercase tracking-widest focus:outline-none focus:ring-4 focus:ring-[#1E5EFF]/5"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <select 
+            className="bg-white border border-[#E5E7EB] rounded-2xl px-6 py-4 text-[11px] font-black uppercase tracking-widest outline-none cursor-pointer hover:bg-gray-50 transition-colors"
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+          >
+            <option value="all">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="received">Received</option>
+            <option value="in_progress">In Progress</option>
+            <option value="resolved">Resolved</option>
+          </select>
+        </div>
 
-            <div className="flex justify-between items-center mb-8 border-b border-[#E5E7EB] pb-5">
-              <h2 className="text-sm font-black text-[#0B1F3B] uppercase tracking-widest flex items-center gap-3">
-                <Settings2 className="text-[#1E5EFF] w-5 h-5" /> Active Service Tickets
-              </h2>
-              <button className="bg-[#F8FAFC] border border-[#E5E7EB] text-[#0B1F3B] text-[10px] font-black px-5 py-2 rounded-xl hover:bg-[#1E5EFF] hover:text-white transition-all uppercase tracking-widest flex items-center gap-2">
-                <Filter className="w-3 h-3" /> Filter Log
-              </button>
-            </div>
-            
-            <div className="space-y-4">
-              {mockMaintenance.length > 0 ? (
-                mockMaintenance.map((request, i) => (
-                  <div key={i} className="group bg-[#F8FAFC] hover:bg-white border border-transparent hover:border-[#1E5EFF] p-5 rounded-xl flex items-center justify-between shadow-sm transition-all cursor-pointer">
-                    <div className="flex items-center gap-6">
-                      <div className="w-14 h-14 bg-white border border-[#E5E7EB] rounded-xl flex items-center justify-center text-[#1E5EFF] group-hover:bg-[#1E5EFF] group-hover:text-white transition-all shadow-sm">
-                        <Wrench size={22} />
-                      </div>
-                      <div>
-                        <h4 className="font-black text-[#0B1F3B] uppercase text-lg leading-none mb-1 group-hover:text-[#1E5EFF] transition-colors">
-                          {request.title || 'Service Request'}
-                        </h4>
-                        <div className="flex items-center gap-3 text-[10px] font-bold text-[#6B7280] tracking-widest uppercase">
-                          <span className="bg-[#E5E7EB] px-2 py-0.5 rounded text-[9px] text-[#0B1F3B]">Unit {request.unit || 'A1'}</span>
-                          <span>•</span>
-                          <span className="flex items-center gap-1.5 italic">
-                            ID: {String(request.id).slice(0, 8)}
-                          </span>
-                        </div>
-                      </div>
+        {/* List Area */}
+        <div className="bg-white border border-[#E5E7EB] rounded-[40px] p-6 md:p-10 shadow-sm relative min-h-[500px]">
+          <div className="absolute top-0 left-0 w-2 h-full bg-[#1E5EFF]"></div>
+
+          <div className="flex justify-between items-center mb-10 border-b border-gray-100 pb-6">
+            <h2 className="text-sm font-black text-[#0B1F3B] uppercase tracking-widest flex items-center gap-3">
+               <span className="w-3 h-3 bg-[#22D3EE] rounded-full animate-pulse"></span> Queue Management
+            </h2>
+          </div>
+          
+          <div className="space-y-4">
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-24 text-[#6B7280]">
+                <Loader2 className="w-10 h-10 animate-spin mb-4 text-[#1E5EFF]" />
+                <p className="text-[10px] font-black uppercase tracking-[0.2em]">Querying Database...</p>
+              </div>
+            ) : filteredRequests.length > 0 ? (
+              filteredRequests.map((request) => (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                  key={request.id} 
+                  onClick={() => setSelectedRequest(request)}
+                  className="group bg-[#F8FAFC] hover:bg-white border border-transparent hover:border-[#1E5EFF] p-6 rounded-3xl flex items-center justify-between shadow-sm transition-all cursor-pointer"
+                >
+                  <div className="flex items-center gap-6">
+                    <div className="w-14 h-14 bg-white border border-[#E5E7EB] rounded-2xl flex items-center justify-center text-[#0B1F3B] group-hover:bg-[#1E5EFF] group-hover:text-white transition-all">
+                      <Wrench size={24} />
                     </div>
-                    
-                    <div className="flex items-center gap-10">
-                      <div className="hidden lg:flex flex-col items-end">
-                        <div className="flex items-center gap-2 text-[10px] font-black text-[#0B1F3B] uppercase tracking-widest">
-                          {request.status === 'pending' ? <Clock className="w-3 h-3 text-amber-500" /> : <Hammer className="w-3 h-3 text-[#22D3EE]" />}
-                          {request.status?.toUpperCase() || 'PENDING'}
-                        </div>
-                        <span className={`text-[9px] font-black uppercase tracking-tighter mt-1 ${request.priority === 'urgent' ? 'text-rose-500' : 'text-[#6B7280]'}`}>
-                           Priority: {request.priority?.toUpperCase() || 'NORMAL'}
-                        </span>
+                    <div>
+                      <h4 className="font-black text-[#0B1F3B] uppercase text-lg leading-tight mb-1">
+                        {request.title}
+                      </h4>
+                      <div className="flex items-center gap-4 text-[10px] font-bold text-[#6B7280] tracking-widest uppercase">
+                        <span className="flex items-center gap-1.5"><User size={12}/> {request.tenant_name}</span>
+                        <span>•</span>
+                        <span className="flex items-center gap-1.5"><MapPin size={12}/> {request.room_name || `Unit ${request.room_id}`}</span>
                       </div>
-                      <ChevronRight className="text-[#E5E7EB] group-hover:text-[#1E5EFF] group-hover:translate-x-1 transition-all" />
                     </div>
                   </div>
-                ))
-              ) : (
-                <div className="py-24 text-center border-2 border-dashed border-[#E5E7EB] rounded-2xl bg-[#F8FAFC]">
-                  <AlertTriangle className="w-12 h-12 text-[#E5E7EB] mx-auto mb-4" />
-                  <p className="text-[#6B7280] font-black text-[11px] uppercase tracking-widest">No active service tickets found</p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Quick Actions Sidebar */}
-          <div className="space-y-6">
-            <div className="bg-[#0B1F3B] p-8 rounded-2xl shadow-xl border-l-4 border-[#22D3EE]">
-              <h3 className="text-sm font-black uppercase tracking-widest mb-6 text-white flex items-center gap-2">
-                 <Wrench className="text-[#22D3EE] w-4 h-4" /> Service Actions
-              </h3>
-              <div className="space-y-3">
-                <Button className="w-full justify-start rounded-xl text-[11px] h-14 shadow-lg shadow-blue-500/20">
-                  <Plus className="mr-3 w-5 h-5" /> Log Manual Issue
-                </Button>
-                <Button variant="outline" className="w-full justify-start rounded-xl border-white/20 text-white hover:bg-white/10 text-[11px] h-14">
-                  <Search className="mr-3 w-5 h-5" /> Search Service Logs
-                </Button>
+                  
+                  <div className="flex items-center gap-8">
+                    <div className="flex flex-col items-end">
+                      <StatusBadge status={request.status} />
+                      <span className="text-[9px] font-black uppercase tracking-widest mt-2 text-[#94A3B8] italic flex items-center gap-1">
+                        <Clock size={10} /> {new Date(request.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <ChevronRight className="text-[#E5E7EB] group-hover:text-[#1E5EFF] group-hover:translate-x-1 transition-all w-5 h-5" />
+                  </div>
+                </motion.div>
+              ))
+            ) : (
+              <div className="py-32 text-center border-2 border-dashed border-[#E5E7EB] rounded-[32px] bg-[#F8FAFC]">
+                <AlertTriangle className="w-16 h-16 text-[#E5E7EB] mx-auto mb-4" />
+                <p className="text-[#6B7280] font-black text-[11px] uppercase tracking-widest">No matching service tickets found</p>
               </div>
-            </div>
-
-            <div className="bg-white border border-[#E5E7EB] p-6 rounded-2xl shadow-sm">
-              <p className="text-[10px] font-black uppercase tracking-widest text-[#6B7280] mb-4">Performance KPI</p>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#14B8A6] animate-pulse"></div>
-                  <span className="text-[11px] font-black uppercase text-[#0B1F3B]">48hr avg. RESOLUTION</span>
-                </div>
-                <HelpCircle size={14} className="text-[#E5E7EB]" />
-              </div>
-            </div>
+            )}
           </div>
         </div>
 
-        {/* Footer */}
-        <footer className="mt-20 py-10 text-[#6B7280] text-[9px] tracking-[0.4em] font-bold uppercase border-t border-[#E5E7EB] w-full text-center">
-          Boarder-Q <span className="mx-2 text-[#22D3EE]">|</span> Technical Support <span className="mx-2 text-[#22D3EE]">|</span> V1.2.0
-        </footer>
+          {/* IMPORTANT: parent container should be relative */}
+            <AnimatePresence>
+              {selectedRequest && (
+                <div className="absolute inset-0 z-[100] flex items-center justify-center p-4">
+                  
+                  {/* Overlay */}
+                  <motion.div 
+                    initial={{ opacity: 0 }} 
+                    animate={{ opacity: 1 }} 
+                    exit={{ opacity: 0 }}
+                    onClick={() => setSelectedRequest(null)}
+                    className="absolute inset-0 bg-[#0B1F3B]/40 backdrop-blur-md"
+                  />
+
+                  {/* Modal */}
+                  <motion.div 
+                    initial={{ scale: 0.95, opacity: 0, y: 20 }} 
+                    animate={{ scale: 1, opacity: 1, y: 0 }} 
+                    exit={{ scale: 0.95, opacity: 0, y: 20 }}
+                    className="bg-white rounded-[32px] w-full max-w-2xl relative z-10 shadow-2xl max-h-[90vh] flex flex-col overflow-hidden"
+                  >
+
+                    {/* Header */}
+                    <div className="px-8 py-6 flex justify-between items-center border-b border-gray-100">
+                      <h3 className="font-black uppercase tracking-tight text-2xl text-[#0B1F3B]">
+                        TICKET <span className="text-[#1E5EFF]">DETAILS</span>
+                      </h3>
+
+                      <button 
+                        onClick={() => setSelectedRequest(null)} 
+                        className="text-[#0B1F3B]/30 hover:text-[#0B1F3B] transition-colors"
+                      >
+                        <X size={28} strokeWidth={2.5} />
+                      </button>
+                    </div>
+                    
+                    {/* Scrollable Content */}
+                    <div className="flex-1 overflow-y-auto p-8 space-y-8">
+
+                      {/* Description */}
+                      <div>
+                        <label className="text-[10px] font-black text-[#94A3B8] uppercase tracking-[0.2em] block mb-2">
+                          Issue Description
+                        </label>
+                        <p className="text-xl font-black text-[#0B1F3B] italic leading-tight">
+                          {selectedRequest.description}
+                        </p>
+                      </div>
+
+                      {/* Info Grid */}
+                      <div className="grid grid-cols-2 gap-6">
+                        <div>
+                          <label className="text-[10px] font-black text-[#94A3B8] uppercase tracking-[0.2em] block mb-1">
+                            Tenant
+                          </label>
+                          <p className="text-sm font-black text-[#0B1F3B] uppercase">
+                            {selectedRequest.tenant_name}
+                          </p>
+                        </div>
+
+                        <div>
+                          <label className="text-[10px] font-black text-[#94A3B8] uppercase tracking-[0.2em] block mb-1">
+                            Location
+                          </label>
+                          <p className="text-sm font-black text-[#0B1F3B] uppercase">
+                            {selectedRequest.room_name}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Status Controls */}
+                      <div>
+                        <label className="text-[10px] font-black text-[#94A3B8] uppercase tracking-[0.2em] block mb-3">
+                          Update Live Status
+                        </label>
+
+                        <div className="grid grid-cols-4 gap-2 bg-[#F8FAFC] p-2 rounded-xl">
+                          {['pending', 'received', 'in_progress', 'resolved'].map((s) => (
+                            <button 
+                              key={s}
+                              disabled={isUpdating}
+                              onClick={() => updateStatus(selectedRequest.id, s)}
+                              className={`py-3 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+                                selectedRequest.status === s 
+                                  ? 'bg-[#1E5EFF] text-white shadow-md' 
+                                  : 'text-[#6B7280] hover:bg-white hover:text-[#1E5EFF]'
+                              }`}
+                            >
+                              {isUpdating && selectedRequest.status === s 
+                                ? <Loader2 size={12} className="animate-spin mx-auto" /> 
+                                : s.replace('_', ' ')
+                              }
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                    </div>
+                  </motion.div>
+                </div>
+              )}
+            </AnimatePresence>
+
+      <AdminFooter />
+
       </main>
+    </div>
+  );
+}
+
+function StatusBadge({ status }) {
+  const styles = {
+    pending: 'bg-amber-50 text-amber-600 border-amber-200',
+    received: 'bg-blue-50 text-blue-600 border-blue-200',
+    in_progress: 'bg-cyan-50 text-cyan-600 border-cyan-200',
+    resolved: 'bg-emerald-50 text-emerald-600 border-emerald-200',
+  };
+
+  return (
+    <div className={`px-4 py-2 rounded-xl border text-[9px] font-black uppercase tracking-widest flex items-center gap-2 ${styles[status] || styles.pending}`}>
+      {status === 'resolved' ? <CheckCircle2 size={12} /> : <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />}
+      {status.replace('_', ' ')}
     </div>
   );
 }

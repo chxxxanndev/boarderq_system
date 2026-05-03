@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShieldCheck, UserPlus, UserCheck, X, Home, Mail, Loader2 } from 'lucide-react';
 import Button from '@/components/Button';
+import AdminFooter from '@/components/AdminFooter'; 
 
 export default function TenantAccessControl() {
   const [pendingUsers, setPendingUsers] = useState([]);
@@ -125,6 +126,10 @@ export default function TenantAccessControl() {
           )}
         </AnimatePresence>, document.body
       )}
+
+      <AdminFooter />
+
     </div>
+    
   );
 }

@@ -5,6 +5,7 @@ import {
   Loader2, Calendar, Bell
 } from 'lucide-react';
 import Button from '@/components/Button';
+import TenantFooter from '@/components/TenantFooter';
 
 export default function TenantDashboard() {
   const [data, setData] = useState(null);
@@ -186,6 +187,9 @@ export default function TenantDashboard() {
             </div>
           </div>
         </div>
+
+        <TenantFooter />
+        
       </main>
     </div>
   );

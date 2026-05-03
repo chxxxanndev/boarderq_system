@@ -47,6 +47,8 @@ export default function Sidebar() {
           ]
         },
         { id: 'payments', label: 'REPORTS', icon: FileText, href: '/admin/payments' },
+        // NEW: Added Announcements for Admin
+        { id: 'announcements', label: 'ANNOUNCEMENTS', icon: Megaphone, href: '/admin/announcements' },
         { id: 'maintenance', label: 'MAINTENANCE', icon: Wrench, href: '/admin/maintenance' },
       ];
     }
@@ -68,7 +70,6 @@ export default function Sidebar() {
         transition-all duration-300 border-r border-white/10 shadow-xl
       `}
     >
-      {/* BRANDING SECTION: MOVED FROM NAVBAR */}
       <div className={`h-[72px] flex items-center border-b border-white/10 ${isCollapsed ? 'justify-center' : 'px-6'}`}>
         <div className="flex items-center gap-2">
           <img src="/images/logo.png" alt="Logo" className="h-8 w-auto object-contain" />

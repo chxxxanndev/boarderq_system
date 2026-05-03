@@ -1,9 +1,8 @@
-// app/api/announcements/route.js
 import pool from '@/lib/db';
 import { NextResponse } from 'next/server';
+import { getCurrentUser } from '@/lib/auth';
 
-// ─── ADD THIS GET METHOD ───
-export async function GET() {
+export async function GET(req) {
   try {
     const [rows] = await pool.query(`
       SELECT 
@@ -12,23 +11,26 @@ export async function GET() {
       FROM announcements a
       JOIN users u ON a.created_by = u.id
       ORDER BY a.created_at DESC
-      LIMIT 10
     `);
     return NextResponse.json(rows);
   } catch (error) {
-    console.error("GET /announcements error:", error);
-    return NextResponse.json({ error: "Failed to fetch announcements" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch" }, { status: 500 });
   }
 }
 
-export async function POST(request) {
+export async function POST(req) {
+  const user = getCurrentUser(req);
+  if (!user || user.role !== 'admin') {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
-    const { title, body, created_by } = await request.json();
+    const { title, body } = await req.json();
     await pool.query(
       'INSERT INTO announcements (title, body, created_by) VALUES (?, ?, ?)',
-      [title, body, created_by || 1] 
+      [title, body, user.id]
     );
-    return NextResponse.json({ message: "Announcement broadcasted!" });
+    return NextResponse.json({ message: "Broadcasted!" });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

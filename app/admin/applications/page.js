@@ -9,6 +9,8 @@ import {
   Inbox, Clock, Loader2, User, Mail, Phone, MessageSquare, ChevronRight, Activity, Bell
 } from 'lucide-react';
 import Button from '@/components/Button';
+import AdminFooter from '@/components/AdminFooter'; 
+
 
 export default function LandlordApplications() {
   const [apps, setApps] = useState([]);
@@ -269,6 +271,9 @@ export default function LandlordApplications() {
           </AnimatePresence>,
           document.body
         )}
+
+      <AdminFooter />
+
       </main>
     </div>
   );

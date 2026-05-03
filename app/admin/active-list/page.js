@@ -7,6 +7,8 @@ import {
   LogOut, ChevronRight, Loader2, Search, Info 
 } from 'lucide-react';
 import Button from '@/components/Button';
+import AdminFooter from '@/components/AdminFooter'; 
+
 
 export default function ActiveList() {
   const [tenants, setTenants] = useState([]);
@@ -158,6 +160,9 @@ export default function ActiveList() {
             </div>
           )}
         </div>
+
+      <AdminFooter />
+  
       </main>
 
       {/* --- UNIFORM PORTAL CONFIRMATION MODAL --- */}

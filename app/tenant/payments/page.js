@@ -1,6 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import { Send, ShieldCheck, Loader2, QrCode, UploadCloud, FileCheck } from 'lucide-react';
+import TenantFooter from '@/components/TenantFooter';
 
 export default function TenantPayments() {
   const [loading, setLoading] = useState(false);
@@ -143,6 +144,9 @@ export default function TenantPayments() {
              </div>
           </div>
         </div>
+
+        <TenantFooter />
+        
       </main>
     </div>
   );

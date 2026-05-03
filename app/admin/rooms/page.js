@@ -7,6 +7,7 @@ import {
   Settings2, Upload, Loader2, Home, Archive, Activity, ImageIcon
 } from 'lucide-react';
 import Button from '@/components/Button';
+import AdminFooter from '@/components/AdminFooter'; 
 
 export default function LandlordRooms() {
   const [rooms, setRooms] = useState([]);
@@ -323,6 +324,8 @@ export default function LandlordRooms() {
           </AnimatePresence>,
           document.body
         )}
+
+      <AdminFooter />
 
       </main>
     </div>

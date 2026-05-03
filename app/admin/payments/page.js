@@ -7,6 +7,7 @@ import {
   Search, ShieldAlert, History, ArrowUpRight, Activity
 } from 'lucide-react';
 import Button from '@/components/Button';
+import AdminFooter from '@/components/AdminFooter'; 
 
 export default function AdminPayments() {
   const [payments, setPayments] = useState([]);
@@ -128,9 +129,8 @@ export default function AdminPayments() {
           </div>
         </div>
 
-        <footer className="mt-20 py-10 text-[#6B7280] text-[9px] tracking-[0.4em] font-bold uppercase border-t border-[#E5E7EB] w-full text-center">
-          Boarder-Q <span className="mx-2 text-[#22D3EE]">/</span> Fiscal Management <span className="mx-2 text-[#22D3EE]">/</span> Ledger v2.0
-        </footer>
+        <AdminFooter />
+
       </main>
 
       {/* --- CUSTOM PORTAL CONFIRMATION MODAL --- */}

@@ -191,6 +191,9 @@ app/
 │             └── users/route.js
 │   ├── announcements/
 │   ├── rooms/
+│             ├── [id]/route.js
+│             ├── upload/route.js
+│             └── route.js
 │   ├── applications/
 │   ├── auth/
 │             ├── approve-user/route.js
@@ -200,7 +203,10 @@ app/
 │             └── register/route.js
 │   ├── payments/
 │   ├── tenant/
-│   ├── users/
+│             ├── dashboard/route.js
+│             ├── maintenance/route.js
+│             └── notice/route.js
+│   ├── users/profile
 │   ├── notifications/
 │   └── maintenance/
 │
