@@ -75,7 +75,7 @@ export default function LandlordDashboard() {
   const stats = [
     { label: 'Total Tenants', value: data?.tenants ?? '0', icon: Users, bgColor: 'bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF]', textColor: 'text-white' },
     { label: 'Available Rooms', value: data?.available ?? '0', icon: Home, bgColor: 'bg-white', textColor: 'text-[#0B1F3B]' },
-    { label: 'Total Revenue', value: `₱${data?.revenue ? (data.revenue / 1000).toFixed(1) : '0'}K`, icon: CreditCard, bgColor: 'bg-[#0B1F3B]', textColor: 'text-white' },
+    { label: 'Total Revenue', value: `₱${data?.revenue ? (data.revenue / 1000).toFixed(1) : '0'}K`, icon: CreditCard, bgColor: 'bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF]', textColor: 'text-white' },
     { label: 'Maintenance', value: data?.maintenance ?? '0', icon: AlertCircle, bgColor: 'bg-white', textColor: 'text-[#0B1F3B]' },
   ];
 
@@ -94,7 +94,7 @@ export default function LandlordDashboard() {
             <h1 className="text-4xl font-black tracking-tight uppercase leading-none text-[#0B1F3B]">
               DASH<span className="text-[#1E5EFF]">BOARD</span>
             </h1>
-            <p className="text-[#6B7280] text-[10px] font-black tracking-[0.3em] uppercase mt-2">Administrative Node Oversight</p>
+            <p className="text-[#6B7280] text-[10px] font-black tracking-[0.3em] uppercase mt-2">Admin Management</p>
           </div>
         </div>
 

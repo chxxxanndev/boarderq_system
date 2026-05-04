@@ -64,7 +64,8 @@ export async function POST(request) {
       location,
       capacity,
       image_url,
-      amenities
+      amenities,
+      house_rules  // Added this      
     } = await request.json();
 
     if (!name || !monthly_rate || !capacity) {
@@ -76,15 +77,16 @@ export async function POST(request) {
 
     const [result] = await pool.query(
       `INSERT INTO rooms 
-        (name, monthly_rate, location, capacity, image_url, amenities, status) 
-       VALUES (?, ?, ?, ?, ?, ?, 'available')`,
+        (name, monthly_rate, location, capacity, image_url, amenities, house_rules, status) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, 'available')`,
       [
         name,
         monthly_rate,
         location || null,
         Number(capacity),
         image_url || null,
-        amenities || ''
+        amenities || '',
+        house_rules || '' // Added this
       ]
     );
 

@@ -160,6 +160,7 @@ app/
 │   ├── dashboard/
 │   ├── rooms/
 │   ├── applications/
+│   ├── announcements/
 │   ├── payments/
 │   ├── active-list/
 │   ├── tenants/
@@ -172,7 +173,6 @@ app/
 │   ├── apply/
 │   ├── login/
 │   ├── register/
-│   ├── announcements/
 │   └── about/              
 │
 ├── tenant/                  # Tenant dashboard
@@ -184,31 +184,30 @@ app/
 │
 ├── api/                     # API routes
 │   ├── admin/
-│             ├── active-list/route.js
-│             ├── applications/route.js
-│             ├── dashboard/route.js
-│             ├── payments/route.js
-│             └── users/route.js
-│   ├── announcements/
+│             ├── active-list/route.js (used by admin/active-list/page.js)
+│             ├── applications/route.js (used by admin/applications/page.js)
+│             ├── dashboard/route.js (used by admin/dashboard/page.js)
+│             ├── payments/route.js (used by admin/payments/page.js)
+│             └── users/route.js (used by admin/tenants/page.js)
+│   ├── announcements/ (used by admin/annoucements/page.js, admin/dashboard/page.js, tenant/announcements/page.js)
 │   ├── rooms/
-│             ├── [id]/route.js
-│             ├── upload/route.js
-│             └── route.js
-│   ├── applications/
+│             ├── [id]/route.js  (used by public/rooms/[id]/page.js)
+│             ├── upload/route.js (used by tenant/payments/page.js)
+│             └── route.js (used by admin/dashboard/page.js, admin/rooms/page.js, admin/tenants/page.js, public/rooms/page.js, app/page.js, public/rooms/page.js)
+│   ├── applications/ 
 │   ├── auth/
 │             ├── approve-user/route.js
 │             ├── hash/route.js
-│             ├── login/route.js
-│             ├── me/route.js
-│             └── register/route.js
-│   ├── payments/
+│             ├── login/route.js (used by public/login/page.js)
+│             ├── me/route.js (used by components/Navbar.js, context/AuthContext.js)
+│             └── register/route.js (used by public/register/page.js)
+│   ├── payments/ (used by tenant/payments/page.js)
 │   ├── tenant/
-│             ├── dashboard/route.js
-│             ├── maintenance/route.js
-│             └── notice/route.js
-│   ├── users/profile
-│   ├── notifications/
-│   └── maintenance/
+│             ├── dashboard/route.js ( used by tenant/dashboard/page.js)
+│             └── notice/route.js  ( used by tenant/dashboard/page.js)
+│   ├── users/profile (used by components/ProfileSettingsModal.js)
+│   ├── notifications/  (used by components/Navbar.js)
+│   └── maintenance/ (used by admin/maintenance/page.js, tenant/maintenance/page.js)
 │
 ├── components/                  
 │   ├── HelpSupport.js            
@@ -220,16 +219,18 @@ app/
 │   ├── PaymentCard.js            
 │   ├── MaintenanceCard.js  
 │   ├── ProfileSettingsModal.js
+│   ├── TenantFooter.js            
+│   ├── AdminFooter.js            
 │   ├── ThemeProvider.js        
 │   └── ApplicationCard.js       
 │
 ├── context/          
+│   ├── AuthContext.js        
 │   ├── HelpContext.js        
 │   ├── SidebarContext.js        
 │   └── ThemeContext.js   
 │
 ├── lib/                        
-│   ├── constants.js 
 │   ├── db.js                    
 │   └── auth.js      
 │           

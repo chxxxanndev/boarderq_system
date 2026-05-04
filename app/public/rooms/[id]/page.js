@@ -109,19 +109,19 @@ export default function RoomDetailPage() {
 
                 <div className="pt-8 border-t border-[#F8FAFC] flex items-end justify-between">
                     <div>
-                        <p className="text-[10px] font-black text-[#6B7280] uppercase tracking-widest mb-2">Required Monthly Logistics Fee</p>
+                        <p className="text-[10px] font-black text-[#6B7280] uppercase tracking-widest mb-2">Monthly Fee</p>
                         <p className="text-5xl font-black text-[#0B1F3B]">₱{Number(room.monthly_rate).toLocaleString()}</p>
                     </div>
-                    <div className="text-right hidden sm:block">
+                    {/* <div className="text-right hidden sm:block">
                         <Activity className="text-[#1E5EFF] ml-auto mb-2" size={24} />
                         <p className="text-[9px] font-black text-[#CBD5E1] uppercase tracking-[0.3em]">Hardware ID: {id.toString().padStart(4, '0')}</p>
-                    </div>
+                    </div> */}
                 </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-white border border-[#E5E7EB] rounded-[2.5rem] p-10">
-                    <h2 className="text-[11px] font-black uppercase tracking-[0.4em] text-[#6B7280] mb-8 flex items-center gap-2"><Zap size={14} className="text-[#1E5EFF]" /> Unit Amenities</h2>
+                    <h2 className="text-[11px] font-black uppercase tracking-[0.4em] text-[#6B7280] mb-8 flex items-center gap-2">Amenities</h2>
                     <div className="flex flex-wrap gap-3">
                         {amenitiesList.length > 0 ? amenitiesList.map((a, i) => (
                             <span key={i} className="flex items-center gap-2 text-[10px] font-black uppercase text-[#0B1F3B] bg-[#F8FAFC] border border-[#E5E7EB] px-5 py-3 rounded-2xl"><CheckCircle2 size={12} className="text-emerald-500" /> {a}</span>
@@ -129,7 +129,7 @@ export default function RoomDetailPage() {
                     </div>
                 </div>
                 <div className="bg-white border border-[#E5E7EB] rounded-[2.5rem] p-10">
-                    <h2 className="text-[11px] font-black uppercase tracking-[0.4em] text-[#6B7280] mb-8 flex items-center gap-2"><ShieldCheck size={14} className="text-[#1E5EFF]" /> House Protocols</h2>
+                    <h2 className="text-[11px] font-black uppercase tracking-[0.4em] text-[#6B7280] mb-8 flex items-center gap-2">House Rules</h2>
                     <ul className="space-y-4">
                         {rulesList.length > 0 ? rulesList.map((rule, i) => (
                             <li key={i} className="flex items-start gap-4 text-[11px] font-bold text-[#0B1F3B] uppercase tracking-wide">
@@ -145,8 +145,8 @@ export default function RoomDetailPage() {
           {/* RIGHT: Form */}
           <div className="lg:col-span-2">
             <div className="sticky top-24 bg-[#0B1F3B] rounded-[3rem] p-10 text-white shadow-2xl border border-white/5">
-              <h2 className="text-2xl font-black uppercase tracking-tight mb-2">Application <span className="text-[#1E5EFF]">Portal</span></h2>
-              <p className="text-white/40 text-[10px] font-black uppercase tracking-[0.3em] mb-10">No authentication required</p>
+              <h2 className="text-2xl font-black uppercase tracking-tight mb-2">Application <span className="text-[#1E5EFF]">Form</span></h2>
+              <p className="text-white/40 text-[10px] font-black tracking-[0.3em] mb-10">No authentication required</p>
 
               <AnimatePresence mode="wait">
                 {result && (
@@ -162,12 +162,12 @@ export default function RoomDetailPage() {
                 <div>
                     <label className="block text-[9px] font-black uppercase tracking-[0.4em] text-white/30 mb-2 ml-1">Full Name</label>
                     <input required type="text" value={form.applicant_name} onChange={e => setForm(f => ({ ...f, applicant_name: e.target.value }))}
-                      className="w-full bg-white/5 border border-white/10 text-white text-sm font-bold px-6 py-4 rounded-2xl focus:outline-none focus:border-[#1E5EFF] transition-all" placeholder="Juan Dela Cruz" />
+                      className="w-full bg-white/5 border border-white/10 text-white text-sm font-bold px-6 py-4 rounded-2xl focus:outline-none focus:border-[#1E5EFF] transition-all" placeholder="Sheila A. Lagpac" />
                 </div>
                 <div>
                     <label className="block text-[9px] font-black uppercase tracking-[0.4em] text-white/30 mb-2 ml-1">Email Address</label>
                     <input required type="email" value={form.applicant_email} onChange={e => setForm(f => ({ ...f, applicant_email: e.target.value }))}
-                      className="w-full bg-white/5 border border-white/10 text-white text-sm font-bold px-6 py-4 rounded-2xl focus:outline-none focus:border-[#1E5EFF] transition-all" placeholder="name@provider.com" />
+                      className="w-full bg-white/5 border border-white/10 text-white text-sm font-bold px-6 py-4 rounded-2xl focus:outline-none focus:border-[#1E5EFF] transition-all" placeholder="sheila@gmail.com" />
                 </div>
                 <div>
                     <label className="block text-[9px] font-black uppercase tracking-[0.4em] text-white/30 mb-2 ml-1">Contact Number</label>
@@ -183,12 +183,12 @@ export default function RoomDetailPage() {
                 <button
                   type="submit"
                   disabled={submitting || !canApply}
-                  className="w-full bg-gradient-to-r from-[#22D3EE] to-[#1E5EFF] text-white text-[11px] font-black uppercase tracking-[0.4em] py-5 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-30 disabled:grayscale"
+                  className="w-full bg-gradient-to-r from-[#22D3EE] to-[#1E5EFF] text-white text-[11px] font-black uppercase tracking-[0.1em] py-5 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-30 disabled:grayscale"
                 >
                   {submitting ? <Activity className="animate-spin" size={18} /> : 
                    isMaintenance ? 'MAINTENANCE MODE' : 
                    isFull ? 'NODE OCCUPIED' : 
-                   'INITIALIZE APPLICATION'} 
+                   'Initialize'} 
                   {!submitting && canApply && <Send size={14} />}
                 </button>
               </form>

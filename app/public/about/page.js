@@ -83,7 +83,7 @@ export default function AboutPage() {
             <div className="relative z-10">
               <div className="flex items-center gap-3 mb-8">
                 <div className="bg-[#1E5EFF] p-2.5 rounded-xl">
-                  <Zap className="text-white w-5 h-5" />
+                  {/* <Zap className="text-white w-5 h-5" /> */}
                 </div>
                 <h2 className="text-xl font-black text-[#0B1F3B] tracking-tight uppercase">Executive Summary</h2>
               </div>
@@ -95,7 +95,7 @@ export default function AboutPage() {
                 reduces payment disputes, and streamlines the tenant onboarding process.
               </p>
 
-              <div className="flex flex-wrap gap-3">
+              <div className="flex flex-wrap justify-center gap-3">
                 {['Next.js 14', 'Node.js', 'Vercel App', 'MySQL Engine', 'Railway', 'Tailwind CSS'].map((tech) => (
                   <span key={tech} className="bg-[#F8FAFC] border border-[#E5E7EB] px-4 py-2 text-[10px] font-black text-[#6B7280] uppercase tracking-widest rounded-lg">
                     {tech}
@@ -322,14 +322,14 @@ export default function AboutPage() {
           </div>
 
           {/* Bottom Section */}
-          <div className="pt-6 border-t border-[#F8FAFC] flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="pt-6 border-t border-[#F8FAFC] flex flex-col md:flex-row justify-center items-center gap-4">
             <span className="text-[9px] font-black text-[#CBD5E1] uppercase tracking-[0.4em]">
-              BOARDER-Q ADMIN CONSOLE © 2026
+              BOARDER-Q © 2026
             </span>
             {/* ADDED: Link to login for tenants/admin who find themselves at the bottom */}
-            <Link href="/public/login" className="text-[9px] font-black text-[#1E5EFF] uppercase tracking-widest hover:underline">
+            {/* <Link href="/public/login" className="text-[9px] font-black text-[#1E5EFF] uppercase tracking-widest hover:underline">
               System Login
-            </Link>
+            </Link> */}
           </div>
         </div>
       </footer>

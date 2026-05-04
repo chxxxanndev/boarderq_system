@@ -110,14 +110,14 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#0B1F3B] font-sans overflow-x-hidden">
 
-      {/* Decorative background grid */}
+      {/* Decorative background grid
       <div
         className="pointer-events-none fixed inset-0 z-0"
         style={{
           backgroundImage: 'linear-gradient(rgba(30,94,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(30,94,255,0.03) 1px, transparent 1px)',
           backgroundSize: '48px 48px',
         }}
-      />
+      /> */}
 
       <main className="relative z-10 max-w-7xl mx-auto px-6 md:px-8 pt-16 pb-24 space-y-24">
 
@@ -219,7 +219,7 @@ export default function LandingPage() {
 
         {/* ── LIVE STATS STRIP ── */}
         <section>
-          <RevealOnScroll>
+          {/* <RevealOnScroll>
             <div className="flex items-center justify-between mb-5 border-b border-[#E5E7EB] pb-4">
               <h2 className="text-[11px] font-black text-[#0B1F3B] tracking-[0.4em] uppercase flex items-center gap-2">
                 <Activity size={15} className="text-[#1E5EFF]" /> Live Property Status
@@ -229,9 +229,9 @@ export default function LandingPage() {
                 Live
               </span>
             </div>
-          </RevealOnScroll>
+          </RevealOnScroll> */}
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {/* <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
               { label: 'Total Units',    value: stats.total,       icon: BedDouble,    color: 'text-[#1E5EFF]',  bg: 'bg-[#1E5EFF]/5' },
               { label: 'Available',      value: stats.available,   icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50'  },
@@ -252,7 +252,7 @@ export default function LandingPage() {
                 </div>
               </RevealOnScroll>
             ))}
-          </div>
+          </div> */}
         </section>
 
         {/* ── AVAILABLE ROOMS PREVIEW ── */}
@@ -262,9 +262,9 @@ export default function LandingPage() {
               <h2 className="text-[11px] font-black text-[#0B1F3B] tracking-[0.4em] uppercase flex items-center gap-2">
                 <BedDouble size={15} className="text-[#1E5EFF]" /> Featured Vacancies
               </h2>
-              <Link href="/public/rooms" className="text-[10px] font-black text-[#1E5EFF] uppercase tracking-widest flex items-center gap-1 hover:gap-2 transition-all">
+              {/* <Link href="/public/rooms" className="text-[10px] font-black text-[#1E5EFF] uppercase tracking-widest flex items-center gap-1 hover:gap-2 transition-all">
                 Browse All Units <ArrowRight size={12} />
-              </Link>
+              </Link> */}
             </div>
           </RevealOnScroll>
 
@@ -314,7 +314,7 @@ export default function LandingPage() {
         <section>
           <RevealOnScroll>
             <div className="flex justify-between items-center mb-6 border-b border-[#E5E7EB] pb-4">
-              <h2 className="text-[11px] font-black text-[#0B1F3B] tracking-[0.4em] uppercase flex items-center gap-2">
+              <h2 className="text-[11px] font-black text-[#0B1F3B] tracking-[0.2em] uppercase flex items-center gap-2">
                 <FileText size={15} className="text-[#1E5EFF]" /> How It Works
               </h2>
               <span className="text-[10px] font-black text-[#6B7280] uppercase tracking-widest">3 Simple Steps</span>
@@ -422,7 +422,7 @@ export default function LandingPage() {
       </main>
 
       {/* ── FOOTER ── */}
-      <footer className="bg-white border-t border-[#E5E7EB] pt-12 pb-6">
+      <footer className="border-t border-[#E5E7EB] pt-12 pb-6">
         <div className="max-w-7xl mx-auto px-6 md:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
 
@@ -497,9 +497,9 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="pt-6 border-t border-[#F1F5F9] flex flex-col md:flex-row justify-between items-center gap-4">
-            <span className="text-[9px] font-black text-[#CBD5E1] uppercase tracking-[0.4em]">BOARDER-Q ADMIN CONSOLE © 2026</span>
-            <Link href="/public/login" className="text-[9px] font-black text-[#1E5EFF] uppercase tracking-widest hover:underline">System Login</Link>
+          <div className="pt-6 border-t border-[#F1F5F9] flex flex-col md:flex-row justify-center items-center gap-4">
+            <span className="text-[9px] font-black text-[#CBD5E1] uppercase tracking-[0.4em]">BOARDER-Q © 2026</span>
+            {/* <Link href="/public/login" className="text-[9px] font-black text-[#1E5EFF] uppercase tracking-widest hover:underline">System Login</Link> */}
           </div>
         </div>
       </footer>
