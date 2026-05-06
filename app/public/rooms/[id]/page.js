@@ -148,16 +148,6 @@ export default function RoomDetailPage() {
               <h2 className="text-2xl font-black uppercase tracking-tight mb-2">Application <span className="text-[#1E5EFF]">Form</span></h2>
               <p className="text-white/40 text-[10px] font-black tracking-[0.3em] mb-10">No authentication required</p>
 
-              <AnimatePresence mode="wait">
-                {result && (
-                    <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
-                        className={`flex items-start gap-4 p-5 rounded-2xl mb-8 text-[11px] font-black uppercase tracking-wider ${result.type === 'success' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}`}>
-                        {result.type === 'success' ? <CheckCircle2 size={18} className="shrink-0" /> : <AlertCircle size={18} className="shrink-0" />}
-                        {result.message}
-                    </motion.div>
-                )}
-              </AnimatePresence>
-
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                     <label className="block text-[9px] font-black uppercase tracking-[0.4em] text-white/30 mb-2 ml-1">Full Name</label>
@@ -191,6 +181,16 @@ export default function RoomDetailPage() {
                    'Initialize'} 
                   {!submitting && canApply && <Send size={14} />}
                 </button>
+
+                <AnimatePresence mode="wait">
+                {result && (
+                    <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }}
+                        className={`flex items-start gap-4 p-5 rounded-2xl mb-8 text-[11px] font-black uppercase tracking-wider ${result.type === 'success' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}`}>
+                        {result.type === 'success' ? <CheckCircle2 size={18} className="shrink-0" /> : <AlertCircle size={18} className="shrink-0" />}
+                        {result.message}
+                    </motion.div>
+                )}
+              </AnimatePresence>
               </form>
             </div>
           </div>

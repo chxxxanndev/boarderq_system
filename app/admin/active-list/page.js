@@ -3,18 +3,19 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Users, Mail, Home, Trash2, Calendar, ShieldCheck, 
-  LogOut, ChevronRight, Loader2, Search, Info 
+  Users, Mail, Home, Trash2, Calendar, 
+  LogOut, Loader2, Info, CheckCircle2, AlertTriangle 
 } from 'lucide-react';
 import Button from '@/components/Button';
 import AdminFooter from '@/components/AdminFooter'; 
-
 
 export default function ActiveList() {
   const [tenants, setTenants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
-  const [tenantToMoveOut, setTenantToMoveOut] = useState(null); // Custom modal state
+  const [tenantToMoveOut, setTenantToMoveOut] = useState(null);
+  const [processing, setProcessing] = useState(false);
+  const [notification, setNotification] = useState(null);
 
   const fetchData = async () => {
     try {
@@ -25,9 +26,9 @@ export default function ActiveList() {
           'Content-Type': 'application/json'
         }
       });
-
       if (res.ok) {
         const data = await res.json();
+        console.log("DEBUG: Received Tenants Data:", data);
         setTenants(Array.isArray(data) ? data : []);
       }
     } catch (err) {
@@ -42,8 +43,14 @@ export default function ActiveList() {
     fetchData(); 
   }, []);
 
+  const showNotify = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 4000);
+  };
+
   const confirmMoveOut = async () => {
     if (!tenantToMoveOut) return;
+    setProcessing(true);
     const token = localStorage.getItem('token');
 
     try {
@@ -57,10 +64,17 @@ export default function ActiveList() {
       });
       
       if (res.ok) {
+        showNotify(`Account for ${tenantToMoveOut.tenant_name} permanently deleted.`);
         setTenantToMoveOut(null);
-        fetchData();
+        fetchData(); 
+      } else {
+        showNotify("Failed to delete account", "error");
       }
-    } catch (err) { console.error(err); }
+    } catch (err) { 
+        showNotify("Server connection error", "error");
+    } finally {
+        setProcessing(false);
+    }
   };
 
   if (loading) return (
@@ -70,24 +84,33 @@ export default function ActiveList() {
   );
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] p-8 lg:p-12 font-sans text-[#0B1F3B]">
+    <div className="min-h-screen bg-[#F8FAFC] p-4 md:p-8 lg:p-12 font-sans text-[#0B1F3B]">
+      
+      <AnimatePresence>
+        {notification && (
+          <motion.div 
+            initial={{ y: -100, opacity: 0 }} animate={{ y: 20, opacity: 1 }} exit={{ y: -100, opacity: 0 }}
+            className={`fixed botton-5 left-1/2 -translate-x-1/2 z-[10001] px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 min-w-[300px] border ${
+              notification.type === 'error' ? 'bg-rose-500 border-rose-400 text-white' : 'bg-emerald-500 border-emerald-400 text-white'
+            }`}
+          >
+            {notification.type === 'error' ? <AlertTriangle size={20}/> : <CheckCircle2 size={20}/>}
+            <span className="text-xs font-black uppercase tracking-wider">{notification.message}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <main className="max-w-7xl mx-auto">
         
-        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
           <div>
-            <h1 className="text-4xl font-black tracking-tight uppercase leading-none">
+            <h1 className="text-3xl md:text-4xl font-black tracking-tight uppercase leading-none">
               ACTIVE <span className="text-[#1E5EFF]">RESIDENTS</span>
             </h1>
             <p className="text-[#6B7280] text-[10px] font-black tracking-[0.3em] uppercase mt-2">Occupancy & Lease Management</p>
           </div>
-          <div className="bg-white border border-[#E5E7EB] px-5 py-2 rounded-xl flex items-center gap-3 shadow-sm">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-            <span className="text-[#0B1F3B] text-[10px] font-black uppercase tracking-widest">Real-time Data Sync</span>
-          </div>
         </div>
 
-        {/* Summary Card - Standard Brand Card */}
         <div className="bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF] w-full max-w-sm p-8 rounded-2xl mb-10 shadow-lg shadow-blue-500/20 flex justify-between items-center relative overflow-hidden">
             <div className="z-10">
                 <p className="text-[11px] font-black uppercase text-white/70 mb-2 tracking-widest">Active Tenancies</p>
@@ -98,52 +121,45 @@ export default function ActiveList() {
             <Users size={64} className="text-white opacity-20 absolute -right-4 -bottom-4 -rotate-12" />
         </div>
 
-        {/* Resident Table Wrapper */}
         <div className="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-[#F8FAFC] border-b border-[#E5E7EB]">
-                  <th className="px-8 py-6 text-[11px] font-black uppercase text-[#6B7280] tracking-widest">Resident</th>
-                  <th className="px-8 py-6 text-[11px] font-black uppercase text-[#6B7280] tracking-widest">Unit Allocation</th>
-                  <th className="px-8 py-6 text-[11px] font-black uppercase text-[#6B7280] tracking-widest">Lease Timeline</th>
-                  <th className="px-8 py-6 text-right text-[11px] font-black uppercase text-[#6B7280] tracking-widest">Actions</th>
+                  <th className="px-6 py-6 text-[11px] font-black uppercase text-[#6B7280] tracking-widest">Resident</th>
+                  <th className="px-6 py-6 text-[11px] font-black uppercase text-[#6B7280] tracking-widest">Unit Allocation</th>
+                  <th className="px-6 py-6 text-[11px] font-black uppercase text-[#6B7280] tracking-widest">Lease Timeline</th>
+                  <th className="px-6 py-6 text-right text-[11px] font-black uppercase text-[#6B7280] tracking-widest">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#E5E7EB]">
                 {tenants.map((t) => (
                   <tr key={t.tenancy_id} className="hover:bg-[#F8FAFC] transition-all group">
-                    <td className="px-8 py-6">
-                      <p className="text-base font-black uppercase text-[#0B1F3B] tracking-tight group-hover:text-[#1E5EFF] transition-colors">{t.tenant_name}</p>
+                    <td className="px-6 py-6">
+                      <p className="text-base font-black uppercase text-[#0B1F3B] tracking-tight group-hover:text-[#1E5EFF] transition-colors">{t.tenant_name || 'Unknown User'}</p>
                       <div className="flex items-center gap-2 text-[10px] text-[#6B7280] font-bold uppercase mt-1">
                         <Mail size={12} className="text-[#1E5EFF]" /> {t.tenant_email}
                       </div>
                     </td>
-                    <td className="px-8 py-6">
+                    <td className="px-6 py-6">
                       <div className="flex items-center gap-4">
                           <div className="p-2 bg-[#1E5EFF]/10 rounded-lg text-[#1E5EFF]"><Home size={18} /></div>
                           <div>
-                              <p className="text-sm font-black uppercase text-[#0B1F3B]">{t.room_name}</p>
-                              <p className="text-[10px] text-[#6B7280] font-black">RATE: ₱{Number(t.monthly_rate).toLocaleString()}</p>
+                              <p className="text-sm font-black uppercase text-[#0B1F3B]">{t.room_name || 'Unassigned'}</p>
+                              <p className="text-[10px] text-[#6B7280] font-black uppercase tracking-tighter">₱{Number(t.monthly_rate || 0).toLocaleString()}</p>
                           </div>
                       </div>
                     </td>
-                    <td className="px-8 py-6">
-                      <div className="flex flex-col gap-2">
-                          <div className="flex items-center gap-2 text-[10px] font-black text-[#6B7280] uppercase">
-                              <Calendar size={12} className="text-[#1E5EFF]" /> In: {new Date(t.move_in_date).toLocaleDateString()}
-                          </div>
-                          {t.move_out_date && (
-                          <div className="flex items-center gap-2 text-[10px] font-black text-rose-500 uppercase bg-rose-50 w-fit px-2 py-0.5 rounded">
-                              <LogOut size={12} /> Scheduled: {new Date(t.move_out_date).toLocaleDateString()}
-                          </div>
-                          )}
+                    <td className="px-6 py-6 text-[10px] font-black uppercase text-[#6B7280]">
+                      <div className="space-y-1">
+                          <p><span className="text-[#1E5EFF]">IN:</span> {t.move_in_date ? new Date(t.move_in_date).toLocaleDateString() : 'N/A'}</p>
+                          {t.move_out_date && <p className="text-rose-500"><span className="underline">OUT:</span> {new Date(t.move_out_date).toLocaleDateString()}</p>}
                       </div>
                     </td>
-                    <td className="px-8 py-6 text-right">
+                    <td className="px-6 py-6 text-right">
                       <button 
                         onClick={() => setTenantToMoveOut(t)}
-                        className="bg-rose-50 hover:bg-rose-500 text-rose-600 hover:text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-sm flex items-center gap-2 ml-auto"
+                        className="bg-rose-50 hover:bg-rose-500 text-rose-600 hover:text-white px-4 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all shadow-sm flex items-center gap-2 ml-auto"
                       >
                         <Trash2 size={14} /> Process Move-out
                       </button>
@@ -162,49 +178,27 @@ export default function ActiveList() {
         </div>
 
       <AdminFooter />
-  
       </main>
 
-      {/* --- UNIFORM PORTAL CONFIRMATION MODAL --- */}
+      {/* --- MODAL PORTAL --- */}
       {mounted && createPortal(
         <AnimatePresence>
           {tenantToMoveOut && (
             <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
-              <motion.div 
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                onClick={() => setTenantToMoveOut(null)}
-                className="absolute inset-0 bg-[#0B1F3B]/80 backdrop-blur-md cursor-pointer" 
-              />
-              <motion.div 
-                initial={{ scale: 0.95, opacity: 0, y: 20 }} 
-                animate={{ scale: 1, opacity: 1, y: 0 }} 
-                exit={{ scale: 0.95, opacity: 0, y: 20 }}
-                onClick={e => e.stopPropagation()}
-                className="relative bg-white rounded-[2.5rem] w-full max-w-sm shadow-2xl border border-[#E5E7EB] p-10 text-center overflow-hidden"
-              >
-                {/* Brand Accent */}
-                <div className="absolute top-0 left-0 w-full h-1.5 bg-rose-500"></div>
-
-                <div className="w-20 h-20 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <LogOut size={36} />
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setTenantToMoveOut(null)} className="absolute inset-0 bg-[#0B1F3B]/80 backdrop-blur-md cursor-pointer" />
+              <motion.div initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }} onClick={e => e.stopPropagation()} className="relative bg-white rounded-[2.5rem] w-full max-w-sm shadow-2xl border border-[#E5E7EB] p-10 text-center overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1.5 bg-rose-600"></div>
+                <div className="w-20 h-20 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Trash2 size={36} />
                 </div>
-                <h2 className="text-2xl font-black text-[#0B1F3B] uppercase tracking-tight mb-2">Process Move-out?</h2>
+                <h2 className="text-2xl font-black text-[#0B1F3B] uppercase tracking-tight mb-2">Terminate Resident?</h2>
                 <p className="text-xs text-[#6B7280] font-bold uppercase tracking-widest leading-relaxed mb-10">
-                  Confirm immediate departure for <span className="text-[#0B1F3B] underline">{tenantToMoveOut.tenant_name}</span> from <span className="text-[#1E5EFF]">{tenantToMoveOut.room_name}</span>.
+                    Are you sure you want to <span className="text-rose-600 underline">permanently delete</span> the account of <span className="text-[#0B1F3B]">{tenantToMoveOut.tenant_name}</span>? This cannot be undone.
                 </p>
-                
                 <div className="flex gap-4">
-                  <button 
-                    onClick={() => setTenantToMoveOut(null)}
-                    className="flex-1 py-4 bg-[#F8FAFC] text-[#6B7280] rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-[#E5E7EB] transition-all"
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    onClick={confirmMoveOut}
-                    className="flex-1 py-4 bg-rose-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-600 shadow-lg shadow-rose-500/20 transition-all"
-                  >
-                    Confirm
+                  <button disabled={processing} onClick={() => setTenantToMoveOut(null)} className="flex-1 py-4 bg-[#F8FAFC] text-[#6B7280] rounded-xl text-[10px] font-black uppercase hover:bg-[#E5E7EB]">Cancel</button>
+                  <button disabled={processing} onClick={confirmMoveOut} className="flex-1 py-4 bg-rose-600 text-white rounded-xl text-[10px] font-black uppercase shadow-lg shadow-rose-600/20 flex items-center justify-center gap-2">
+                    {processing ? <Loader2 size={16} className="animate-spin" /> : "Delete Account"}
                   </button>
                 </div>
               </motion.div>

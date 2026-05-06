@@ -20,9 +20,9 @@ export default function TenantAnnouncements() {
   }, []);
 
   const stats = [
-    { label: 'Total Broadcasts', value: announcements.length.toString().padStart(2, '0'), bgColor: 'bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF]', textColor: 'text-white' },
-    { label: 'System Status', value: 'ONLINE', bgColor: 'bg-white', textColor: 'text-[#0B1F3B]' },
-    { label: 'Priority Level', value: 'STABLE', bgColor: 'bg-[#0B1F3B]', textColor: 'text-white' },
+    // { label: 'Total Broadcasts', value: announcements.length.toString().padStart(2, '0'), bgColor: 'bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF]', textColor: 'text-white' },
+    // { label: 'System Status', value: 'ONLINE', bgColor: 'bg-white', textColor: 'text-[#0B1F3B]' },
+    // { label: 'Priority Level', value: 'STABLE', bgColor: 'bg-[#0B1F3B]', textColor: 'text-white' },
   ];
 
   return (
@@ -37,10 +37,7 @@ export default function TenantAnnouncements() {
               <span className="text-[#1E5EFF]">BROADCASTS</span>
             </h1>
             <div className="flex items-center gap-3 mt-3">
-              <div className="bg-[#1E5EFF]/10 border border-[#1E5EFF]/20 px-3 py-1 rounded-md">
-                <span className="text-[#1E5EFF] text-[10px] font-black tracking-widest uppercase">Official Feed</span>
-              </div>
-              <p className="text-[#6B7280] text-[10px] font-bold tracking-widest uppercase italic">Status: Verified Transmission</p>
+              <p className="text-[#6B7280] text-[10px] font-bold tracking-widest uppercase">View Announcements</p>
             </div>
           </div>
           <div className="flex-1 h-[2px] bg-[#E5E7EB] mb-2 hidden md:block"></div>
@@ -55,17 +52,6 @@ export default function TenantAnnouncements() {
               {stat.bgColor === 'bg-white' && <div className="absolute bottom-0 left-0 w-full h-1.5 bg-[#22D3EE]"></div>}
             </div>
           ))}
-        </div>
-
-        {/* Live Status Indicator */}
-        <div className="mb-10 flex items-center gap-3 bg-white w-fit px-5 py-3 rounded-xl border border-[#E5E7EB] shadow-sm">
-          <div className="relative flex h-3 w-3">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-          </div>
-          <p className="text-[#6B7280] text-[11px] font-bold tracking-widest uppercase">
-            LIVE SYSTEM: <span className="text-[#1E5EFF]">SYNCHRONIZED WITH MANAGEMENT NODE</span>
-          </p>
         </div>
 
         {/* Announcement List */}

@@ -205,7 +205,7 @@ export default function LandlordRooms() {
                 className="w-full bg-white border border-[#E5E7EB] rounded-xl py-4 px-12 focus:outline-none focus:border-[#1E5EFF] text-xs font-bold uppercase shadow-sm"
               />
             </div>
-            <Button onClick={openAddModal} className="h-14 px-8 rounded-xl bg-[#00BCD4] hover:bg-[#00ACC1] text-white italic font-black shadow-lg shadow-cyan-500/20 w-full sm:w-auto">
+            <Button onClick={openAddModal} className="rounded-xl h-14 px-10 shadow-lg shadow-blue-500/20">
               <Plus className="w-5 h-5 mr-2 not-italic" /> REGISTER UNIT
             </Button>
           </div>

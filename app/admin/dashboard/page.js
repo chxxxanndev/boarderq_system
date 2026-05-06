@@ -1,82 +1,216 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { createPortal } from 'react-dom'; 
-import { motion, AnimatePresence } from 'framer-motion'; 
-import { 
-  Users, Home, CreditCard, AlertCircle, Plus, Megaphone, Activity, X, 
-  ChevronRight, Cpu, Loader2, CheckCircle2, Zap, LayoutDashboard, FileText, Wrench
+import {
+  Users, Home, CreditCard, AlertCircle, Activity,
+  ChevronRight, FileText, Wrench, Clock, TrendingUp
 } from 'lucide-react';
-import Button from '@/components/Button';
-import Link from 'next/link';
-import AdminFooter from '@/components/AdminFooter'; 
+import AdminFooter from '@/components/AdminFooter';
 
+// --- Helpers ---
+function timeAgo(timestamp) {
+  const diff = Date.now() - new Date(timestamp).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+}
+
+const STATUS_STYLES = {
+  pending:     'bg-amber-100 text-amber-700',
+  approved:    'bg-emerald-100 text-emerald-700',
+  rejected:    'bg-red-100 text-red-700',
+  confirmed:   'bg-emerald-100 text-emerald-700',
+  flagged:     'bg-red-100 text-red-700',
+  in_progress: 'bg-blue-100 text-blue-700',
+  resolved:    'bg-emerald-100 text-emerald-700',
+  received:    'bg-sky-100 text-sky-700',
+};
+
+const TYPE_CONFIG = {
+  application: {
+    icon: FileText,
+    color: 'bg-[#1E5EFF]',
+    label: 'Application',
+    description: (item) => `Applied for ${item.room_name}`,
+  },
+  payment: {
+    icon: CreditCard,
+    color: 'bg-emerald-500',
+    label: 'Payment',
+    description: (item) => `₱${Number(item.amount).toLocaleString()} via ${item.method?.toUpperCase()} — ${item.room_name}`,
+  },
+  maintenance: {
+    icon: Wrench,
+    color: 'bg-amber-500',
+    label: 'Maintenance',
+    description: (item) => `"${item.title}" — ${item.room_name}`,
+  },
+};
+
+// --- Activity Item ---
+function ActivityItem({ item }) {
+  const config = TYPE_CONFIG[item.type];
+  if (!config) return null;
+  const Icon = config.icon;
+  const statusStyle = STATUS_STYLES[item.status] ?? 'bg-gray-100 text-gray-600';
+
+  return (
+    <div className="flex items-start gap-4 p-4 rounded-xl bg-[#F8FAFC] hover:bg-[#EEF2FF] border border-transparent hover:border-[#1E5EFF]/20 transition-all cursor-pointer">
+      <div className={`${config.color} w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm`}>
+        <Icon size={16} className="text-white" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="font-bold text-[#0B1F3B] text-sm truncate">{item.actor}</span>
+          <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${statusStyle}`}>
+            {item.status?.replace('_', ' ')}
+          </span>
+        </div>
+        <p className="text-xs text-[#6B7280] mt-0.5 truncate">{config.description(item)}</p>
+      </div>
+      <div className="flex flex-col items-end gap-1 flex-shrink-0">
+        <span className="text-[10px] text-[#9CA3AF] flex items-center gap-1">
+          <Clock size={10} /> {timeAgo(item.timestamp)}
+        </span>
+        <span className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wide">{config.label}</span>
+      </div>
+    </div>
+  );
+}
+
+// --- Snapshot Sidebar ---
+function SnapshotSidebar({ data, activity }) {
+  const occupancyPct = data?.occupancy?.total > 0
+    ? Math.round((data.occupancy.occupied / data.occupancy.total) * 100)
+    : 0;
+
+  return (
+    <div className="bg-white border border-[#E5E7EB] rounded-2xl p-8 shadow-sm flex flex-col gap-6">
+      <h2 className="text-sm font-black text-[#0B1F3B] uppercase tracking-widest pb-4 border-b border-[#E5E7EB]">
+        Snapshot
+      </h2>
+
+      {/* Occupancy Rate */}
+      <div>
+        <div className="flex justify-between items-center mb-2">
+          <p className="text-[10px] font-black uppercase tracking-widest text-[#6B7280]">Occupancy Rate</p>
+          <span className="text-sm font-black text-[#0B1F3B]">{occupancyPct}%</span>
+        </div>
+        <div className="w-full h-2 bg-[#F3F4F6] rounded-full overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-[#22D3EE] to-[#1E5EFF] rounded-full transition-all duration-700"
+            style={{ width: `${occupancyPct}%` }}
+          />
+        </div>
+        <p className="text-[10px] text-[#9CA3AF] mt-1">
+          {data?.occupancy?.occupied ?? 0} of {data?.occupancy?.total ?? 0} rooms occupied
+        </p>
+      </div>
+
+      <div className="border-t border-[#F3F4F6]" />
+
+      {/* Pending Payments */}
+      <div className="flex items-center gap-4">
+        <div className="bg-amber-500 w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0">
+          <CreditCard size={18} className="text-white" />
+        </div>
+        <div className="flex-1">
+          <p className="text-[10px] font-black uppercase tracking-widest text-[#6B7280]">Pending Payments</p>
+          <p className="text-2xl font-black text-[#0B1F3B] leading-tight">{data?.pendingPayments ?? 0}</p>
+        </div>
+        {data?.pendingPayments > 0 && (
+          <span className="text-[10px] font-black bg-amber-100 text-amber-700 px-2 py-1 rounded-full uppercase tracking-wide">
+            Action Needed
+          </span>
+        )}
+      </div>
+
+      <div className="border-t border-[#F3F4F6]" />
+
+      {/* Activity Breakdown */}
+      <div>
+        <p className="text-[10px] font-black uppercase tracking-widest text-[#6B7280] mb-3">Activity Breakdown</p>
+        <div className="space-y-3">
+          {Object.entries(TYPE_CONFIG).map(([key, cfg]) => {
+            const count = activity.filter(a => a.type === key).length;
+            const Icon = cfg.icon;
+            return (
+              <div key={key} className="flex items-center gap-3">
+                <div className={`${cfg.color} w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0`}>
+                  <Icon size={13} className="text-white" />
+                </div>
+                <p className="text-xs font-bold text-[#6B7280] flex-1">{cfg.label}s</p>
+                <span className="text-sm font-black text-[#0B1F3B]">{count}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="border-t border-[#F3F4F6]" />
+
+      {/* Newest Tenant */}
+      {data?.newestTenant && (
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-widest text-[#6B7280] mb-3">Newest Tenant</p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF] flex items-center justify-center flex-shrink-0">
+              <span className="text-white font-black text-sm">
+                {data.newestTenant.name.charAt(0).toUpperCase()}
+              </span>
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-black text-[#0B1F3B] truncate">{data.newestTenant.name}</p>
+              <p className="text-[10px] text-[#9CA3AF] truncate">{data.newestTenant.room_name}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Top Revenue Room */}
+      {data?.topRoom && (
+        <>
+          <div className="border-t border-[#F3F4F6]" />
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-widest text-[#6B7280] mb-3">Top Revenue Room</p>
+            <div className="bg-[#F8FAFC] rounded-xl p-4 border border-[#E5E7EB]">
+              <div className="flex items-center gap-2 mb-1">
+                <TrendingUp size={14} className="text-[#1E5EFF]" />
+                <p className="text-sm font-black text-[#0B1F3B]">{data.topRoom.name}</p>
+              </div>
+              <p className="text-xl font-black text-[#1E5EFF]">
+                ₱{Number(data.topRoom.total).toLocaleString()}
+              </p>
+              <p className="text-[10px] text-[#9CA3AF]">total confirmed revenue</p>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// --- Main Dashboard ---
 export default function LandlordDashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [mounted, setMounted] = useState(false); 
-  
-  const [showRoomModal, setShowRoomModal] = useState(false);
-  const [showAnnounceModal, setShowAnnounceModal] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-  
-  const [roomForm, setRoomForm] = useState({ name: '', monthly_rate: '', amenities: '', image_url: '' });
-  const [announceForm, setAnnounceForm] = useState({ title: '', body: '' });
 
   useEffect(() => {
-    setMounted(true); 
-    fetchDashboardData();
-  }, []);
-
-  const fetchDashboardData = () => {
     fetch('/api/admin/dashboard')
       .then(res => res.json())
       .then(resData => {
         setData(resData);
         setLoading(false);
       });
-  };
-
-  const handleAddRoom = async (e) => {
-    e.preventDefault();
-    const res = await fetch('/api/rooms', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(roomForm),
-    });
-    if (res.ok) {
-      setShowRoomModal(false);
-      fetchDashboardData();
-    }
-  };
-
-  const handleAnnounce = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    const res = await fetch('/api/announcements', {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      },
-      body: JSON.stringify(announceForm),
-    });
-    if (res.ok) {
-      setShowSuccess(true);
-      setAnnounceForm({ title: '', body: '' });
-      setTimeout(() => {
-        setShowAnnounceModal(false);
-        setShowSuccess(false);
-      }, 3000);
-    }
-    setIsSubmitting(false);
-  };
+  }, []);
 
   const stats = [
-    { label: 'Total Tenants', value: data?.tenants ?? '0', icon: Users, bgColor: 'bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF]', textColor: 'text-white' },
-    { label: 'Available Rooms', value: data?.available ?? '0', icon: Home, bgColor: 'bg-white', textColor: 'text-[#0B1F3B]' },
-    { label: 'Total Revenue', value: `₱${data?.revenue ? (data.revenue / 1000).toFixed(1) : '0'}K`, icon: CreditCard, bgColor: 'bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF]', textColor: 'text-white' },
-    { label: 'Maintenance', value: data?.maintenance ?? '0', icon: AlertCircle, bgColor: 'bg-white', textColor: 'text-[#0B1F3B]' },
+    { label: 'Total Tenants',   value: data?.tenants ?? '0',   icon: Users,       bgColor: 'bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF]', textColor: 'text-white' },
+    { label: 'Available Rooms', value: data?.available ?? '0', icon: Home,        bgColor: 'bg-white', textColor: 'text-[#0B1F3B]' },
+    { label: 'Total Revenue',   value: `₱${data?.revenue ? (data.revenue / 1000).toFixed(1) : '0'}K`, icon: CreditCard, bgColor: 'bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF]', textColor: 'text-white' },
+    { label: 'Maintenance',     value: data?.maintenance ?? '0', icon: AlertCircle, bgColor: 'bg-white', textColor: 'text-[#0B1F3B]' },
   ];
 
   if (loading) return (
@@ -85,114 +219,70 @@ export default function LandlordDashboard() {
     </div>
   );
 
+  const activity = data?.activity ?? [];
+
   return (
-    <div className="flex min-h-screen bg-[#F8FAFC] font-sans text-[#0B1F3B]">     
+    <div className="flex min-h-screen bg-[#F8FAFC] font-sans text-[#0B1F3B]">
       <main className="flex-1 p-8 lg:p-12 flex flex-col">
-        
+
+        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
           <div>
             <h1 className="text-4xl font-black tracking-tight uppercase leading-none text-[#0B1F3B]">
               DASH<span className="text-[#1E5EFF]">BOARD</span>
             </h1>
-            <p className="text-[#6B7280] text-[10px] font-black tracking-[0.3em] uppercase mt-2">Admin Management</p>
+            <p className="text-[#6B7280] text-[10px] font-black tracking-[0.3em] uppercase mt-2">
+              Admin Management
+            </p>
           </div>
         </div>
 
+        {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           {stats.map((stat, i) => (
-            <div key={i} className={`${stat.bgColor} p-6 rounded-2xl flex flex-col justify-between h-44 shadow-sm border border-[#E5E7EB]/50 relative overflow-hidden group`}>
-              <div className="z-10">
-                <h2 className={`text-[11px] font-black uppercase tracking-widest mb-1 ${stat.textColor === 'text-white' ? 'opacity-70' : 'text-[#6B7280]'}`}>{stat.label}</h2>
+            <div key={i} className={`${stat.bgColor} p-6 rounded-2xl flex flex-col justify-between h-44 shadow-sm border border-[#E5E7EB]/50 relative overflow-hidden`}>
+              <div>
+                <h2 className={`text-[11px] font-black uppercase tracking-widest mb-1 ${stat.textColor === 'text-white' ? 'opacity-70' : 'text-[#6B7280]'}`}>
+                  {stat.label}
+                </h2>
                 <p className={`text-4xl font-black tracking-tighter ${stat.textColor}`}>{stat.value}</p>
               </div>
               <stat.icon className={`absolute -right-4 -bottom-4 opacity-10 -rotate-12 ${stat.textColor === 'text-white' ? 'text-white' : 'text-[#0B1F3B]'}`} size={120} />
-              {stat.bgColor === 'bg-white' && <div className="absolute top-0 left-0 w-full h-1.5 bg-[#22D3EE]"></div>}
+              {stat.bgColor === 'bg-white' && <div className="absolute top-0 left-0 w-full h-1.5 bg-[#22D3EE]" />}
             </div>
           ))}
         </div>
 
+        {/* Activity + Sidebar */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+
+          {/* Recent Activity Feed */}
           <div className="xl:col-span-2 bg-white border border-[#E5E7EB] rounded-2xl p-8 shadow-sm">
-            <h2 className="text-sm font-black text-[#0B1F3B] uppercase tracking-widest mb-6 pb-4 border-b border-[#E5E7EB]">Recent Activity</h2>
-            <div className="space-y-4">
-              {data?.applications?.map((app, i) => (
-                <div key={i} className="bg-[#F8FAFC] p-4 rounded-xl flex items-center justify-between border border-transparent hover:border-[#1E5EFF] transition-all cursor-pointer">
-                  <span className="font-bold text-[#0B1F3B]">{app.applicant_name}</span>
-                  <ChevronRight size={18} className="text-[#6B7280]" />
-                </div>
-              ))}
+            <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#E5E7EB]">
+              <h2 className="text-sm font-black text-[#0B1F3B] uppercase tracking-widest">Recent Activity</h2>
+              <div className="flex items-center gap-3">
+                {Object.entries(TYPE_CONFIG).map(([key, cfg]) => (
+                  <span key={key} className="flex items-center gap-1.5 text-[10px] font-bold text-[#6B7280] uppercase tracking-wide">
+                    <span className={`w-2 h-2 rounded-full ${cfg.color}`} />
+                    {cfg.label}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div className="space-y-3">
+              {activity.length === 0 ? (
+                <p className="text-sm text-[#9CA3AF] text-center py-8">No recent activity.</p>
+              ) : (
+                activity.map((item, i) => (
+                  <ActivityItem key={`${item.type}-${item.id}-${i}`} item={item} />
+                ))
+              )}
             </div>
           </div>
 
-          <div className="space-y-6">
-            <div className="bg-[#0B1F3B] p-8 rounded-2xl shadow-xl">
-              <h3 className="text-sm font-black uppercase tracking-widest mb-6 text-white border-l-4 border-[#22D3EE] pl-4">Actions</h3>
-              <div className="space-y-3">
-                <Button onClick={() => setShowRoomModal(true)} className="w-full justify-start rounded-xl h-14">
-                  <Plus className="mr-3 w-5 h-5" /> Add Property Unit
-                </Button>
-                <Button onClick={() => { setShowSuccess(false); setShowAnnounceModal(true); }} variant="outline" className="w-full justify-start rounded-xl border-white/20 text-white h-14 hover:bg-white/10">
-                  <Megaphone className="mr-3 w-5 h-5" /> System Broadcast
-                </Button>
-              </div>
-            </div>
-          </div>
+          {/* Snapshot Sidebar */}
+          <SnapshotSidebar data={data} activity={activity} />
         </div>
-
-        {/* --- DASHBOARD PORTAL MODAL --- */}
-        {mounted && createPortal(
-          <AnimatePresence>
-            {(showRoomModal || showAnnounceModal) && (
-              <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => { setShowRoomModal(false); setShowAnnounceModal(false); }} className="absolute inset-0 bg-[#0B1F3B]/80 backdrop-blur-md cursor-pointer" />
-                <motion.div initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }} onClick={(e) => e.stopPropagation()} className="relative bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col">
-                  <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-                    <h2 className="text-2xl font-black uppercase tracking-tight text-[#0B1F3B]">
-                      {showRoomModal ? <>ADD <span className="text-blue-600">ROOM</span></> : <>NEW <span className="text-blue-600">BROADCAST</span></>}
-                    </h2>
-                    <button onClick={() => { setShowRoomModal(false); setShowAnnounceModal(false); }}><X size={20} className="text-gray-400" /></button>
-                  </div>
-                  <div className="p-8">
-                    {showAnnounceModal && showSuccess && (
-                      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6 p-4 bg-[#011B27] border border-[#00FFA3] rounded-xl flex items-center gap-3">
-                         <CheckCircle2 size={16} className="text-[#00FFA3]" />
-                         <p className="text-[#00FFA3] text-[10px] font-black uppercase tracking-widest">Broadcast Transmitted Successfully</p>
-                      </motion.div>
-                    )}
-                    {showRoomModal ? (
-                      <form onSubmit={handleAddRoom} className="space-y-5">
-                        <div>
-                          <label className="text-[10px] font-black text-[#6B7280] uppercase block mb-2">Room Designation</label>
-                          <input required type="text" placeholder="e.g. Unit 302" className="w-full bg-[#F8FAFC] border-none rounded-xl p-4 text-sm font-bold focus:ring-0 outline-none" onChange={(e) => setRoomForm({...roomForm, name: e.target.value})} />
-                        </div>
-                        <div>
-                          <label className="text-[10px] font-black text-[#6B7280] uppercase block mb-2">Monthly Rate (PHP)</label>
-                          <input required type="number" placeholder="4500" className="w-full bg-[#F8FAFC] border-none rounded-xl p-4 text-sm font-bold focus:ring-0 outline-none" onChange={(e) => setRoomForm({...roomForm, monthly_rate: e.target.value})} />
-                        </div>
-                        <button type="submit" className="w-full h-14 bg-[#00CFE8] text-[#0B1F3B] italic font-black uppercase tracking-widest rounded-xl shadow-lg">Initialize Room Node</button>
-                      </form>
-                    ) : (
-                      <form onSubmit={handleAnnounce} className="space-y-6">
-                        <div>
-                          <label className="text-[10px] font-black text-[#6B7280] uppercase block mb-2 tracking-widest">Title</label>
-                          <input required type="text" placeholder="URGENT UPDATE" className="w-full bg-[#F8FAFC] border-none rounded-xl p-4 text-sm font-black focus:ring-0 outline-none" onChange={(e) => setAnnounceForm({...announceForm, title: e.target.value})} />
-                        </div>
-                        <div>
-                          <label className="text-[10px] font-black text-[#6B7280] uppercase block mb-2 tracking-widest">Message</label>
-                          <textarea required placeholder="Message content..." className="w-full bg-[#F8FAFC] border-none rounded-xl p-4 text-sm font-bold h-40 focus:ring-0 outline-none resize-none" onChange={(e) => setAnnounceForm({...announceForm, body: e.target.value})} />
-                        </div>
-                        <button disabled={isSubmitting || showSuccess} type="submit" className="w-full h-14 bg-[#00CFE8] text-[#0B1F3B] italic font-black uppercase tracking-widest rounded-xl shadow-lg">
-                          {isSubmitting ? <Loader2 className="animate-spin mx-auto" /> : "EXECUTE BROADCAST"}
-                        </button>
-                      </form>
-                    )}
-                  </div>
-                </motion.div>
-              </div>
-            )}
-          </AnimatePresence>,
-          document.body
-        )}
 
         <AdminFooter />
       </main>

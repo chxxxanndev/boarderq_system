@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  ClipboardList, CheckCircle2, XCircle, Search, 
+  ClipboardList, CheckCircle2, XCircle, 
   Inbox, Clock, Loader2, User, Mail, Phone, MessageSquare, ChevronRight, Activity, Bell
 } from 'lucide-react';
 import Button from '@/components/Button';
@@ -91,10 +91,6 @@ export default function LandlordApplications() {
             </h1>
             <p className="text-[#6B7280] text-[10px] font-black tracking-[0.3em] uppercase mt-2">Applicant Record Management</p>
           </div>
-          <div className="flex items-center gap-2 bg-white border border-[#E5E7EB] px-4 py-2 rounded-xl shadow-sm">
-            <Activity className="w-4 h-4 text-emerald-500" />
-            <span className="text-[#0B1F3B] text-[10px] font-black uppercase tracking-widest italic">Live Feed Status: Syncing</span>
-          </div>
         </div>
 
         {/* Stats Blocks */}
@@ -160,23 +156,6 @@ export default function LandlordApplications() {
             </div>
           </div>
 
-          {/* Quick Actions Sidebar */}
-          <div className="space-y-6">
-            <div className="bg-[#0B1F3B] p-8 rounded-2xl shadow-xl border-l-4 border-[#22D3EE]">
-              <h3 className="text-sm font-black uppercase tracking-widest mb-6 text-white flex items-center gap-2">
-                <Search className="text-[#22D3EE] w-4 h-4" /> Search Tools
-              </h3>
-              <div className="space-y-3">
-                <div className="relative mb-4">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 w-4 h-4" />
-                  <input type="text" placeholder="ID OR NAME..." className="w-full bg-white/5 border border-white/10 p-3 pl-12 rounded-xl text-white text-xs outline-none focus:border-[#22D3EE]" />
-                </div>
-                <Button variant="outline" className="w-full justify-start rounded-xl border-white/20 text-white hover:bg-white/10 text-[11px] h-14">
-                  <Inbox className="mr-3 w-5 h-5" /> View History Log
-                </Button>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* --- UNIFORM PORTAL MODALS --- */}

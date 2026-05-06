@@ -83,10 +83,6 @@ export default function TenantDashboard() {
             </h1>
             <p className="text-[#6B7280] text-xs font-bold mt-2 uppercase tracking-widest">Resident Dashboard Oversight</p>
           </div>
-          <div className="flex items-center gap-2 bg-[#E5E7EB]/50 border border-[#E5E7EB] px-4 py-2 rounded-lg">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-            <span className="text-[#0B1F3B] text-[10px] font-bold tracking-wider uppercase">Node Status: Active</span>
-          </div>
         </div>
 
         {/* Stats Grid - Using the requested Blue/Cyan Gradient */}
@@ -141,17 +137,6 @@ export default function TenantDashboard() {
 
           {/* Sidebar Area */}
           <div className="space-y-6">
-            <div className="bg-[#0B1F3B] p-8 shadow-xl rounded-2xl">
-              <h3 className="text-sm font-black uppercase tracking-widest mb-6 text-white border-l-4 border-[#22D3EE] pl-4">Quick Actions</h3>
-              <div className="space-y-3">
-                <Button className="w-full justify-start rounded-xl">
-                  <CreditCard className="mr-3 w-4 h-4" /> Initialize Payment
-                </Button>
-                <Button variant="outline" className="w-full justify-start rounded-xl border-white/20 text-white hover:bg-white/10">
-                  <Wrench className="mr-3 w-4 h-4" /> Repair Request
-                </Button>
-              </div>
-            </div>
 
             <div className="bg-white border border-[#E5E7EB] p-6 rounded-2xl shadow-sm">
               <span className="text-[10px] font-black uppercase tracking-widest text-[#6B7280]">Upcoming Obligation:</span>

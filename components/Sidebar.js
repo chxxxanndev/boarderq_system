@@ -23,7 +23,6 @@ export default function Sidebar() {
         toggleSidebar();
       }
     };
-
     checkMobile();
   }, []); 
 
@@ -67,7 +66,6 @@ export default function Sidebar() {
     ];
   };
 
-  // Determine where the logo should lead based on role
   const dashboardLink = role === 'admin' ? '/admin/dashboard' : '/tenant/dashboard';
 
   return (
@@ -84,13 +82,15 @@ export default function Sidebar() {
         className={`
           fixed inset-y-0 left-0 h-screen z-[150] 
           md:sticky md:top-0 flex flex-col
-          bg-[#0B1F3B] text-white border-r border-white/5 shadow-2xl
+          /* RESTORED GRADIENT COLOR */
+          bg-gradient-to-b from-[#0B1F3B] via-[#102A5C] to-[#1E5EFF]
+          text-white border-r border-white/5 shadow-2xl
           transition-all duration-300 ease-in-out
           ${isCollapsed ? '-translate-x-full md:translate-x-0' : 'translate-x-0'}
           ${isCollapsed ? 'md:w-20 w-64' : 'w-64'} 
         `}
       >
-        {/* HEADER: LOGO IS NOW CLICKABLE */}
+        {/* HEADER: LOGO */}
         <div className={`h-[72px] flex items-center justify-between px-6 border-b border-white/10 shrink-0`}>
           <Link 
             href={dashboardLink}
@@ -106,7 +106,6 @@ export default function Sidebar() {
             )}
           </Link>
           
-          {/* Close button for mobile only */}
           <button onClick={toggleSidebar} className="md:hidden p-1.5 hover:bg-white/10 rounded-lg text-white/70">
             <X size={20} />
           </button>
@@ -123,13 +122,13 @@ export default function Sidebar() {
                   <button 
                     onClick={item.toggle} 
                     className={`w-full flex items-center gap-4 px-6 py-4 transition-all ${
-                      isChildActive || item.isOpen ? 'text-[#22D3EE] bg-white/5' : 'text-white/50 hover:text-white hover:bg-white/5'
+                      isChildActive || item.isOpen ? 'text-white bg-white/10' : 'text-white/50 hover:text-white hover:bg-white/5'
                     }`}
                   >
-                    <item.icon size={18} className="shrink-0" />
+                    <item.icon size={20} className="shrink-0" />
                     {(!isCollapsed || (typeof window !== 'undefined' && window.innerWidth < 768)) && (
                       <>
-                        <span className="text-[10px] font-black tracking-[0.15em] flex-1 text-left uppercase">{item.label}</span>
+                        <span className="text-[11px] font-black tracking-widest flex-1 text-left uppercase">{item.label}</span>
                         {item.isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                       </>
                     )}
@@ -137,23 +136,26 @@ export default function Sidebar() {
                   
                   {(!isCollapsed || (typeof window !== 'undefined' && window.innerWidth < 768)) && item.isOpen && (
                     <div className="bg-black/20 py-1">
-                      {item.subItems.map((sub, idx) => (
-                        <Link 
-                          key={idx} 
-                          href={sub.href} 
-                          onClick={() => { if(window.innerWidth < 768) toggleSidebar(); }}
-                          className={`flex items-center gap-4 px-6 py-3 relative transition-all ${
-                            pathname === sub.href ? 'text-white bg-white/5' : 'text-white/30 hover:text-white'
-                          }`}
-                        >
-                          {pathname === sub.href && (
-                            <div className="absolute left-0 w-1 h-full bg-[#22D3EE]"></div>
-                          )}
-                          <span className={`ml-8 text-[9px] font-black tracking-widest uppercase truncate ${pathname === sub.href ? 'text-[#22D3EE]' : ''}`}>
-                            {sub.label}
-                          </span>
-                        </Link>
-                      ))}
+                      {item.subItems.map((sub, idx) => {
+                        const isSubActive = pathname === sub.href;
+                        return (
+                          <Link 
+                            key={idx} 
+                            href={sub.href} 
+                            onClick={() => { if(window.innerWidth < 768) toggleSidebar(); }}
+                            className={`flex items-center gap-4 px-6 py-3.5 relative transition-all ${
+                              isSubActive ? 'bg-white/10 text-white' : 'text-white/30 hover:text-white'
+                            }`}
+                          >
+                            {isSubActive && (
+                              <div className="absolute left-0 w-1 h-full bg-[#22D3EE]"></div>
+                            )}
+                            <span className={`ml-9 text-[10px] font-black tracking-widest uppercase truncate ${isSubActive ? 'text-[#22D3EE]' : ''}`}>
+                              {sub.label}
+                            </span>
+                          </Link>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -167,15 +169,16 @@ export default function Sidebar() {
                 href={item.href} 
                 onClick={() => { if(window.innerWidth < 768) toggleSidebar(); }}
                 className={`flex items-center gap-4 px-6 py-4 relative transition-all ${
-                  isActive ? 'bg-[#1E5EFF]/10 text-[#22D3EE]' : 'text-white/50 hover:text-white hover:bg-white/5'
+                  isActive ? 'bg-white/20 text-white shadow-inner' : 'text-white/50 hover:text-white hover:bg-white/5'
                 }`}
               >
                 {isActive && (
-                  <div className="absolute left-0 w-1 h-full bg-[#22D3EE]"></div>
+                  /* THE CYAN LEFT BORDER FROM SCREENSHOT */
+                  <div className="absolute left-0 w-[4px] h-full bg-[#22D3EE] shadow-[0_0_15px_rgba(34,211,238,0.5)]"></div>
                 )}
-                <item.icon size={18} className="shrink-0" />
+                <item.icon size={20} className={`shrink-0 transition-colors ${isActive ? 'text-[#22D3EE]' : ''}`} />
                 {(!isCollapsed || (typeof window !== 'undefined' && window.innerWidth < 768)) && (
-                  <span className="text-[10px] font-black tracking-[0.15em] uppercase">
+                  <span className="text-[11px] font-black tracking-widest uppercase">
                     {item.label}
                   </span>
                 )}
@@ -183,16 +186,6 @@ export default function Sidebar() {
             );
           })}
         </nav>
-
-        {/* FOOTER
-        <div className="mt-auto p-6 bg-gradient-to-t from-[#1E5EFF]/20 to-transparent border-t border-white/5">
-           <div className="flex items-center justify-center gap-2 opacity-30">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#22D3EE] animate-pulse"></div>
-              <p className="text-[8px] font-black text-white uppercase tracking-[0.3em]">
-                System Active
-              </p>
-           </div>
-        </div> */}
       </aside>
     </>
   );

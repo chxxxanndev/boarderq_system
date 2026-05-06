@@ -1,8 +1,9 @@
 'use client';
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom'; // Added this
 import { 
   Wrench, CheckCircle2, Clock, AlertTriangle, Hammer,
-  Search, ChevronRight, HelpCircle, Plus, Filter, Activity, Settings2, Loader2, X, MapPin, User
+  Search, ChevronRight, HelpCircle, Plus, Filter, Activity, Settings2, Loader2, X, MapPin, User, ImageIcon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '@/components/Button';
@@ -15,18 +16,17 @@ export default function LandlordMaintenance() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [mounted, setMounted] = useState(false); // Added for portal safety
 
   useEffect(() => {
+    setMounted(true); // Added for portal safety
     fetchRequests();
   }, []);
-
-// ... inside LandlordMaintenance.js ...
 
   const fetchRequests = async () => {
     const token = localStorage.getItem('token');
     try {
       setLoading(true);
-      // CHANGED: Ensure Auth header is sent so API knows you are Admin
       const res = await fetch('/api/maintenance', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -43,12 +43,11 @@ export default function LandlordMaintenance() {
     const token = localStorage.getItem('token');
     setIsUpdating(true);
     try {
-      // CHANGED: Unified API URL
       const res = await fetch('/api/maintenance', {
         method: 'PATCH',
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // Critical for security
+          'Authorization': `Bearer ${token}` 
         },
         body: JSON.stringify({ id, status: newStatus })
       });
@@ -62,26 +61,6 @@ export default function LandlordMaintenance() {
       setIsUpdating(false);
     }
   };
-
-  // const updateStatus = async (id, newStatus) => {
-  //   setIsUpdating(true);
-  //   try {
-  //     const res = await fetch('/api/maintenance', {
-  //       method: 'PATCH',
-  //       body: JSON.stringify({ id, status: newStatus }),
-  //       headers: { 'Content-Type': 'application/json' }
-  //     });
-  //     if (res.ok) {
-  //       fetchRequests();
-  //       // Update local state for the modal view
-  //       setSelectedRequest(prev => ({ ...prev, status: newStatus }));
-  //     }
-  //   } catch (err) {
-  //     console.error(err);
-  //   } finally {
-  //     setIsUpdating(false);
-  //   }
-  // };
 
   const stats = [
     { label: 'Total Logs', value: requests.length, bgColor: 'bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF]', textColor: 'text-white' },
@@ -108,10 +87,6 @@ export default function LandlordMaintenance() {
               MAINTENANCE <span className="text-[#1E5EFF]">LOGS</span>
             </h1>
             <p className="text-[#6B7280] text-[10px] font-black tracking-[0.3em] uppercase mt-2">Facility Service & Control Panel</p>
-          </div>
-          <div className="bg-white border border-[#E5E7EB] px-5 py-3 rounded-2xl flex items-center gap-3 shadow-sm">
-            <Activity className="w-4 h-4 text-[#22D3EE] animate-pulse" />
-            <span className="text-[#0B1F3B] text-[10px] font-black uppercase tracking-widest">System Feed: Online</span>
           </div>
         </div>
 
@@ -215,110 +190,135 @@ export default function LandlordMaintenance() {
           </div>
         </div>
 
-          {/* IMPORTANT: parent container should be relative */}
-            <AnimatePresence>
-              {selectedRequest && (
-                <div className="absolute inset-0 z-[100] flex items-center justify-center p-4">
+        {/* MODAL PORTAL: WRAPPED IN PORTAL TO PREVENT CUTOFF */}
+        {mounted && createPortal(
+          <AnimatePresence>
+            {selectedRequest && (
+              <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+                
+                {/* Overlay */}
+                <motion.div 
+                  initial={{ opacity: 0 }} 
+                  animate={{ opacity: 1 }} 
+                  exit={{ opacity: 0 }}
+                  onClick={() => setSelectedRequest(null)}
+                  className="absolute inset-0 bg-[#0B1F3B]/80 backdrop-blur-md cursor-pointer"
+                />
+
+                {/* Modal */}
+                <motion.div 
+                  initial={{ scale: 0.95, opacity: 0, y: 20 }} 
+                  animate={{ scale: 1, opacity: 1, y: 0 }} 
+                  exit={{ scale: 0.95, opacity: 0, y: 20 }}
+                  onClick={e => e.stopPropagation()}
+                  className="bg-white rounded-[32px] w-full max-w-2xl relative z-10 shadow-2xl max-h-[90vh] flex flex-col overflow-hidden"
+                >
+
+                  {/* Header */}
+                  <div className="px-8 py-6 flex justify-between items-center border-b border-gray-100 bg-[#F8FAFC]">
+                    <h3 className="font-black uppercase tracking-tight text-2xl text-[#0B1F3B]">
+                      TICKET <span className="text-[#1E5EFF]">DETAILS</span>
+                    </h3>
+
+                    <button 
+                      onClick={() => setSelectedRequest(null)} 
+                      className="text-[#0B1F3B]/30 hover:text-[#0B1F3B] transition-colors"
+                    >
+                      <X size={28} strokeWidth={2.5} />
+                    </button>
+                  </div>
                   
-                  {/* Overlay */}
-                  <motion.div 
-                    initial={{ opacity: 0 }} 
-                    animate={{ opacity: 1 }} 
-                    exit={{ opacity: 0 }}
-                    onClick={() => setSelectedRequest(null)}
-                    className="absolute inset-0 bg-[#0B1F3B]/40 backdrop-blur-md"
-                  />
+                  {/* Scrollable Content */}
+                  <div className="flex-1 overflow-y-auto p-8 space-y-8">
 
-                  {/* Modal */}
-                  <motion.div 
-                    initial={{ scale: 0.95, opacity: 0, y: 20 }} 
-                    animate={{ scale: 1, opacity: 1, y: 0 }} 
-                    exit={{ scale: 0.95, opacity: 0, y: 20 }}
-                    className="bg-white rounded-[32px] w-full max-w-2xl relative z-10 shadow-2xl max-h-[90vh] flex flex-col overflow-hidden"
-                  >
-
-                    {/* Header */}
-                    <div className="px-8 py-6 flex justify-between items-center border-b border-gray-100">
-                      <h3 className="font-black uppercase tracking-tight text-2xl text-[#0B1F3B]">
-                        TICKET <span className="text-[#1E5EFF]">DETAILS</span>
-                      </h3>
-
-                      <button 
-                        onClick={() => setSelectedRequest(null)} 
-                        className="text-[#0B1F3B]/30 hover:text-[#0B1F3B] transition-colors"
-                      >
-                        <X size={28} strokeWidth={2.5} />
-                      </button>
+                    {/* Photo View */}
+                    <div>
+                      <label className="text-[10px] font-black text-[#94A3B8] uppercase tracking-[0.2em] block mb-3">
+                        Resident Evidence Attachment
+                      </label>
+                      {selectedRequest.photo_url ? (
+                        <div className="rounded-2xl overflow-hidden border border-[#E5E7EB] shadow-sm bg-gray-50">
+                          <img 
+                            src={selectedRequest.photo_url} 
+                            alt="Evidence" 
+                            className="w-full h-auto object-cover max-h-[350px]" 
+                          />
+                        </div>
+                      ) : (
+                        <div className="p-10 border-2 border-dashed border-gray-100 rounded-2xl flex flex-col items-center justify-center text-[#94A3B8] bg-gray-50/50">
+                          <ImageIcon size={40} className="mb-2 opacity-20" />
+                          <span className="text-[9px] font-black uppercase tracking-widest">No Visual Assets Logged</span>
+                        </div>
+                      )}
                     </div>
-                    
-                    {/* Scrollable Content */}
-                    <div className="flex-1 overflow-y-auto p-8 space-y-8">
 
-                      {/* Description */}
-                      <div>
-                        <label className="text-[10px] font-black text-[#94A3B8] uppercase tracking-[0.2em] block mb-2">
-                          Issue Description
+                    {/* Description */}
+                    <div>
+                      <label className="text-[10px] font-black text-[#94A3B8] uppercase tracking-[0.2em] block mb-2">
+                        Issue Description
+                      </label>
+                      <p className="text-xl font-black text-[#0B1F3B] italic leading-tight bg-[#F8FAFC] p-6 rounded-2xl border border-gray-100">
+                        {selectedRequest.description}
+                      </p>
+                    </div>
+
+                    {/* Info Grid */}
+                    <div className="grid grid-cols-2 gap-6">
+                      <div className="p-4 bg-[#F8FAFC] rounded-xl border border-gray-100">
+                        <label className="text-[10px] font-black text-[#94A3B8] uppercase tracking-[0.2em] block mb-1">
+                          Tenant
                         </label>
-                        <p className="text-xl font-black text-[#0B1F3B] italic leading-tight">
-                          {selectedRequest.description}
+                        <p className="text-sm font-black text-[#0B1F3B] uppercase">
+                          {selectedRequest.tenant_name}
                         </p>
                       </div>
 
-                      {/* Info Grid */}
-                      <div className="grid grid-cols-2 gap-6">
-                        <div>
-                          <label className="text-[10px] font-black text-[#94A3B8] uppercase tracking-[0.2em] block mb-1">
-                            Tenant
-                          </label>
-                          <p className="text-sm font-black text-[#0B1F3B] uppercase">
-                            {selectedRequest.tenant_name}
-                          </p>
-                        </div>
-
-                        <div>
-                          <label className="text-[10px] font-black text-[#94A3B8] uppercase tracking-[0.2em] block mb-1">
-                            Location
-                          </label>
-                          <p className="text-sm font-black text-[#0B1F3B] uppercase">
-                            {selectedRequest.room_name}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Status Controls */}
-                      <div>
-                        <label className="text-[10px] font-black text-[#94A3B8] uppercase tracking-[0.2em] block mb-3">
-                          Update Live Status
+                      <div className="p-4 bg-[#F8FAFC] rounded-xl border border-gray-100">
+                        <label className="text-[10px] font-black text-[#94A3B8] uppercase tracking-[0.2em] block mb-1">
+                          Location
                         </label>
-
-                        <div className="grid grid-cols-4 gap-2 bg-[#F8FAFC] p-2 rounded-xl">
-                          {['pending', 'received', 'in_progress', 'resolved'].map((s) => (
-                            <button 
-                              key={s}
-                              disabled={isUpdating}
-                              onClick={() => updateStatus(selectedRequest.id, s)}
-                              className={`py-3 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
-                                selectedRequest.status === s 
-                                  ? 'bg-[#1E5EFF] text-white shadow-md' 
-                                  : 'text-[#6B7280] hover:bg-white hover:text-[#1E5EFF]'
-                              }`}
-                            >
-                              {isUpdating && selectedRequest.status === s 
-                                ? <Loader2 size={12} className="animate-spin mx-auto" /> 
-                                : s.replace('_', ' ')
-                              }
-                            </button>
-                          ))}
-                        </div>
+                        <p className="text-sm font-black text-[#0B1F3B] uppercase">
+                          {selectedRequest.room_name}
+                        </p>
                       </div>
-
                     </div>
-                  </motion.div>
-                </div>
-              )}
-            </AnimatePresence>
 
-      <AdminFooter />
+                    {/* Status Controls */}
+                    <div>
+                      <label className="text-[10px] font-black text-[#6B7280] uppercase block mb-4 tracking-widest text-center">
+                        UPDATE STATUS
+                      </label>
+
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-[#F8FAFC] p-2 rounded-2xl border border-gray-100">
+                        {['pending', 'received', 'in_progress', 'resolved'].map((s) => (
+                          <button 
+                            key={s}
+                            disabled={isUpdating}
+                            onClick={() => updateStatus(selectedRequest.id, s)}
+                            className={`py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${
+                              selectedRequest.status === s 
+                                ? 'bg-[#1E5EFF] text-white shadow-lg scale-105' 
+                                : 'text-[#6B7280] hover:bg-white hover:text-[#1E5EFF]'
+                            }`}
+                          >
+                            {isUpdating && selectedRequest.status === s 
+                              ? <Loader2 size={12} className="animate-spin mx-auto" /> 
+                              : s.replace('_', ' ')
+                            }
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                  </div>
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>,
+          document.body
+        )}
+
+        <AdminFooter />
 
       </main>
     </div>

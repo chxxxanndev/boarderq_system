@@ -271,13 +271,13 @@ CREATE TABLE rooms (
   house_rules   TEXT,
   image_url     VARCHAR(500) DEFAULT NULL,
   location      VARCHAR(255) DEFAULT NULL,
-  capacity      VARCHAR(100) DEFAULT NULL,
-  status        ENUM('available', 'occupied', 'maintenance') NOT NULL DEFAULT 'available',
+  capacity      INT NOT NULL DEFAULT 1, 
+  status        ENUM('available', 'maintenance') NOT NULL DEFAULT 'available',
   updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 2. USERS (AUTHENTICATION)
+-- 2. USERS
 CREATE TABLE users (
   id            INT AUTO_INCREMENT PRIMARY KEY,
   name          VARCHAR(100) NOT NULL,
@@ -290,7 +290,7 @@ CREATE TABLE users (
   created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 3. ROOM TENANTS (RELATIONSHIP)
+-- 3. ROOM TENANTS (This is your "Source of Truth" for occupancy)
 CREATE TABLE room_tenants (
   id INT AUTO_INCREMENT PRIMARY KEY,
   room_id INT NOT NULL,
@@ -369,3 +369,51 @@ CREATE TABLE announcements (
 );
 
 
+
+## 🚀 Unified Deployment Workflow (The "Golden Thread")
+
+BoarderQ uses a "Golden Thread" logic to connect tenant identities, room preferences, and legal assignments using the **Email Address** as the unique identifier.
+
+### 🏠 Core Philosophy
+Unlike traditional systems that use manual "Occupied" toggles, BoarderQ uses **Calculated Occupancy**:
+- **Room Status:** Strictly indicates business state (`available` or `maintenance`).
+- **Real-time Availability:** Calculated live via `Capacity - Current Tenants = Remaining Slots`.
+- **Security:** User accounts remain in a "Pending" state until an Admin verifies payment and officially "Deploys" the tenant.
+
+---
+
+### 🛠 Operational Workflows
+
+#### Scenario A: Sequential Deployment (The Standard Path)
+*Use case: User expresses interest before creating an account.*
+1.  **Application:** Guest submits a public application for a specific unit (e.g., Unit 2). Status: `Pending`.
+2.  **Verification:** Admin reviews the application and confirms payment/deposit externally. Admin clicks **Approve**. Application Status: `Approved`.
+3.  **Identity:** User registers an account using the **exact same email**. User Status: `Pending`.
+4.  **Deployment:** Admin visits the **Access Control** page. The system "looks ahead" via the Golden Thread, identifies the approved application, and auto-fills the room assignment.
+5.  **Finalize:** Admin clicks **Confirm Assignment & Deploy**. User becomes `Active`, and a `room_tenants` record is created.
+
+#### Scenario B: Accelerated Deployment (The "Smart Approve" Path)
+*Use case: User registers and applies simultaneously.*
+1.  **Concurrent Submission:** User submits an application and registers an account.
+2.  **Smart Approval:** Admin clicks **Approve** on the Applications Page. 
+3.  **Automation:** The system detects the existing user account and automatically:
+    - Sets User to `Active`.
+    - Creates the `room_tenants` assignment.
+    - Marks Application as `Approved`.
+    *Result: Full deployment in a single click.*
+
+---
+
+### 📂 Database & Logic Structure
+
+| Action | `applications` table | `users` table | `room_tenants` table |
+|        :--- | :--- | :--- | :--- |
+| **Submission** | `status: pending` | `status: pending` | *No record* |
+| **Admin Approval** | `status: approved` | *No change* | *No change* |
+| **Final Deployment** | `status: approved` | `status: active` | **New Record Created** |
+
+---
+
+### ☁️ Integrated Services
+- **Cloudinary:** Used for high-speed delivery of room images and secure storage of payment screenshots (Proof of Payment).
+- **MySQL (Railway):** Relational data management ensuring referential integrity between rooms, tenants, and financial logs.

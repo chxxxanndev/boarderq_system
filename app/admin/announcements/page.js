@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom'; // Added Portal
 import { Megaphone, Plus, X, Radio, Loader2, Calendar, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '@/components/Button';
@@ -12,13 +13,17 @@ export default function AdminAnnouncements() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [form, setForm] = useState({ title: '', body: '' });
+  const [mounted, setMounted] = useState(false); // Added for Portal safety
 
-  useEffect(() => { fetchLogs(); }, []);
+  useEffect(() => { 
+    setMounted(true); // Set mounted to true on load
+    fetchLogs(); 
+  }, []);
 
   const fetchLogs = () => {
     setLoading(true);
     fetch('/api/announcements')
-      .then(res => res.json())
+      .then(res => res.ok ? res.json() : [])
       .then(data => { setAnnouncements(Array.isArray(data) ? data : []); setLoading(false); });
   };
 
@@ -50,7 +55,7 @@ export default function AdminAnnouncements() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
             <h1 className="text-4xl font-black tracking-tight uppercase leading-none">
-              BROADCAST <span className="text-[#1E5EFF]">NODE</span>
+              BROADCAST <span className="text-[#1E5EFF]">CENTER</span>
             </h1>
             <p className="text-[#6B7280] text-[10px] font-black uppercase tracking-[0.2em] mt-2">Global System Announcements</p>
           </div>
@@ -82,49 +87,83 @@ export default function AdminAnnouncements() {
           </div>
         </div>
 
-        {/* --- MODAL (SYNCED TO ORIGINAL DASHBOARD STYLE) --- */}
-        <AnimatePresence>
-          {showModal && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowModal(false)} className="absolute inset-0 bg-[#0B1F3B]/80 backdrop-blur-md cursor-pointer" />
-              
-              <motion.div initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }} className="bg-white rounded-3xl w-full max-w-lg relative z-10 overflow-hidden shadow-2xl">
+        {/* --- MODAL PORTAL (MATCHES DASHBOARD EXACTLY) --- */}
+        {mounted && createPortal(
+          <AnimatePresence>
+            {showModal && (
+              <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+                {/* Backdrop with Blur */}
+                <motion.div 
+                  initial={{ opacity: 0 }} 
+                  animate={{ opacity: 1 }} 
+                  exit={{ opacity: 0 }} 
+                  onClick={() => setShowModal(false)} 
+                  className="absolute inset-0 bg-[#0B1F3B]/80 backdrop-blur-md cursor-pointer" 
+                />
                 
-                {/* Modal Header: Clean Style */}
-                <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-                  <h3 className="text-2xl font-black uppercase tracking-tight text-[#0B1F3B]">NEW <span className="text-blue-600">BROADCAST</span></h3>
-                  <button onClick={() => setShowModal(false)}><X size={20} className="text-gray-400" /></button>
-                </div>
-
-                <div className="p-8">
-                  {showSuccess && (
-                    <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6 p-4 bg-[#011B27] border border-[#00FFA3] rounded-xl flex items-center gap-3">
-                       <CheckCircle2 size={16} className="text-[#00FFA3]" />
-                       <p className="text-[#00FFA3] text-[10px] font-black uppercase tracking-widest">Broadcast Transmitted Successfully</p>
-                    </motion.div>
-                  )}
-
-                  <form onSubmit={handleBroadcast} className="space-y-6">
-                    <div>
-                      <label className="text-[10px] font-black text-[#6B7280] uppercase block mb-2 tracking-widest">Transmission Title</label>
-                      <input required placeholder="URGENT UPDATE" className="w-full bg-[#F8FAFC] border-none rounded-xl p-4 text-sm font-black focus:ring-0 outline-none" onChange={e => setForm({...form, title: e.target.value})} />
-                    </div>
-                    <div>
-                      <label className="text-[10px] font-black text-[#6B7280] uppercase block mb-2 tracking-widest">Message Content</label>
-                      <textarea required rows={5} placeholder="Enter message content..." className="w-full bg-[#F8FAFC] border-none rounded-xl p-4 text-sm font-bold focus:ring-0 outline-none resize-none h-40" onChange={e => setForm({...form, body: e.target.value})} />
-                    </div>
-                    <button disabled={isSubmitting || showSuccess} type="submit" className="w-full h-14 bg-[#00CFE8] text-[#0B1F3B] italic font-black uppercase tracking-widest rounded-xl shadow-lg">
-                      {isSubmitting ? <Loader2 className="animate-spin mx-auto" /> : "EXECUTE BROADCAST"}
+                {/* Modal Container */}
+                <motion.div 
+                  initial={{ scale: 0.95, opacity: 0, y: 20 }} 
+                  animate={{ scale: 1, opacity: 1, y: 0 }} 
+                  exit={{ scale: 0.95, opacity: 0, y: 20 }} 
+                  onClick={(e) => e.stopPropagation()}
+                  className="relative bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col"
+                >
+                  
+                  {/* Modal Header */}
+                  <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+                    <h2 className="text-2xl font-black uppercase tracking-tight text-[#0B1F3B]">
+                      NEW <span className="text-blue-600">BROADCAST</span>
+                    </h2>
+                    <button onClick={() => setShowModal(false)}>
+                      <X size={20} className="text-gray-400" />
                     </button>
-                  </form>
-                </div>
-              </motion.div>
-            </div>
-          )}
-        </AnimatePresence>
+                  </div>
 
-          <AdminFooter />
+                  <div className="p-8">
+                    {showSuccess && (
+                      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6 p-4 bg-[#011B27] border border-[#00FFA3] rounded-xl flex items-center gap-3">
+                         <CheckCircle2 size={16} className="text-[#00FFA3]" />
+                         <p className="text-[#00FFA3] text-[10px] font-black uppercase tracking-widest">Broadcast Transmitted Successfully</p>
+                      </motion.div>
+                    )}
 
+                    <form onSubmit={handleBroadcast} className="space-y-6">
+                      <div>
+                        <label className="text-[10px] font-black text-[#6B7280] uppercase block mb-2 tracking-widest">Transmission Title</label>
+                        <input 
+                          required 
+                          placeholder="URGENT UPDATE" 
+                          className="w-full bg-[#F8FAFC] border-none rounded-xl p-4 text-sm font-black focus:ring-0 outline-none" 
+                          onChange={e => setForm({...form, title: e.target.value})} 
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-black text-[#6B7280] uppercase block mb-2 tracking-widest">Message Content</label>
+                        <textarea 
+                          required 
+                          placeholder="Enter message content..." 
+                          className="w-full bg-[#F8FAFC] border-none rounded-xl p-4 text-sm font-bold h-40 focus:ring-0 outline-none resize-none" 
+                          onChange={e => setForm({...form, body: e.target.value})} 
+                        />
+                      </div>
+                      <button 
+                        disabled={isSubmitting || showSuccess} 
+                        type="submit" 
+                        className="w-full h-14 bg-[#00CFE8] text-[#0B1F3B] italic font-black uppercase tracking-widest rounded-xl shadow-lg active:scale-95 transition-all"
+                      >
+                        {isSubmitting ? <Loader2 className="animate-spin mx-auto" /> : "EXECUTE BROADCAST"}
+                      </button>
+                    </form>
+                  </div>
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>,
+          document.body // This pushes the modal to the top level
+        )}
+
+        <AdminFooter />
       </main>
     </div>
   );

@@ -6,22 +6,65 @@ export async function GET(req) {
   try {
     const user = getCurrentUser(req);
     if (!user || user.role !== 'admin') {
-      // Always return JSON
       return NextResponse.json({ error: "Unauthorized Admin" }, { status: 401 });
     }
 
     const [rows] = await pool.query(`
-      SELECT rt.id as tenancy_id, u.name as tenant_name, u.email as tenant_email,
-             r.name as room_name, r.monthly_rate, rt.move_in_date, rt.move_out_date
+      SELECT 
+        rt.id as tenancy_id, 
+        u.name as tenant_name, 
+        u.email as tenant_email,
+        r.name as room_name, 
+        r.monthly_rate, 
+        rt.move_in_date, 
+        rt.move_out_date
       FROM room_tenants rt
-      JOIN users u ON rt.user_id = u.id
-      JOIN rooms r ON rt.room_id = r.id
-      ORDER BY rt.move_out_date ASC, rt.move_in_date DESC
+      LEFT JOIN users u ON rt.user_id = u.id
+      LEFT JOIN rooms r ON rt.room_id = r.id
+      ORDER BY rt.created_at DESC
     `);
 
     return NextResponse.json(rows);
   } catch (error) {
-    console.error("Active List API Error:", error.message);
+    console.error("Active List GET Error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}
+
+export async function PATCH(req) {
+  const connection = await pool.getConnection(); 
+  try {
+    const user = getCurrentUser(req);
+    if (!user || user.role !== 'admin') return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const { id } = await req.json(); // tenancy_id
+
+    await connection.beginTransaction();
+
+    // 1. Get the user_id linked to this tenancy
+    const [tenancy] = await connection.query('SELECT user_id FROM room_tenants WHERE id = ?', [id]);
+    
+    if (tenancy.length === 0) {
+        await connection.rollback();
+        return NextResponse.json({ error: "Record not found" }, { status: 404 });
+    }
+
+    const userId = tenancy[0].user_id;
+
+    // 2. Delete from room_tenants (Frees up the room)
+    await connection.query('DELETE FROM room_tenants WHERE id = ?', [id]);
+
+    // 3. Delete from users (Permanent account removal)
+    await connection.query('DELETE FROM users WHERE id = ?', [userId]);
+
+    await connection.commit();
+    return NextResponse.json({ message: "Resident account and tenancy deleted" });
+
+  } catch (error) {
+    await connection.rollback();
+    console.error("Move-out Deletion Error:", error);
+    return NextResponse.json({ error: "Failed to delete account" }, { status: 500 });
+  } finally {
+    connection.release();
   }
 }
