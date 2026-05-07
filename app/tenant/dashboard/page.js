@@ -1,16 +1,97 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { 
-  Home, CreditCard, Wrench, ChevronRight, Zap, ShieldCheck, 
-  Loader2, Calendar, Bell
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Home, CreditCard, Wrench, ChevronRight, Zap, ShieldCheck,
+  Loader2, Calendar, Clock, CheckCircle2, AlertTriangle,
+  Receipt, Activity, KeyRound, CalendarDays, TrendingUp,
+  FileText, LogOut
 } from 'lucide-react';
-import Button from '@/components/Button';
 import TenantFooter from '@/components/TenantFooter';
+
+// --- Helpers ---
+function timeAgo(timestamp) {
+  const diff = Date.now() - new Date(timestamp).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+}
+
+const PAYMENT_STATUS = {
+  confirmed: { text: 'PAID',      color: 'bg-emerald-100 text-emerald-700' },
+  pending:   { text: 'VERIFYING', color: 'bg-amber-100 text-amber-700' },
+  flagged:   { text: 'FLAGGED',   color: 'bg-red-100 text-red-700' },
+  unpaid:    { text: 'UNPAID',    color: 'bg-rose-100 text-rose-700' },
+};
+
+const MAINTENANCE_STATUS = {
+  pending:     { color: 'bg-amber-100 text-amber-700',    label: 'Pending' },
+  received:    { color: 'bg-sky-100 text-sky-700',        label: 'Received' },
+  in_progress: { color: 'bg-blue-100 text-blue-700',      label: 'In Progress' },
+  resolved:    { color: 'bg-emerald-100 text-emerald-700', label: 'Resolved' },
+};
+
+const ACTIVITY_CONFIG = {
+  payment: {
+    icon: CreditCard,
+    color: 'bg-emerald-500',
+    getMessage: (item) => item.title,
+  },
+  maintenance: {
+    icon: Wrench,
+    color: 'bg-amber-500',
+    getMessage: (item) => item.title,
+  },
+};
+
+function StatusBadge({ status, map }) {
+  const cfg = map[status] ?? { color: 'bg-gray-100 text-gray-600', label: status };
+  return (
+    <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full ${cfg.color}`}>
+      {cfg.label ?? cfg.text}
+    </span>
+  );
+}
+
+function ActivityItem({ item }) {
+  const config = ACTIVITY_CONFIG[item.type];
+  if (!config) return null;
+  const Icon = config.icon;
+  const statusMap = item.type === 'payment' ? PAYMENT_STATUS : MAINTENANCE_STATUS;
+  const statusCfg = statusMap[item.status] ?? { color: 'bg-gray-100 text-gray-600', label: item.status };
+
+  return (
+    <div className="flex items-center gap-4 p-4 rounded-xl bg-[#F8FAFC] hover:bg-[#EEF2FF] border border-transparent hover:border-[#1E5EFF]/20 transition-all">
+      <div className={`${config.color} w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0`}>
+        <Icon size={15} className="text-white" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-xs font-black uppercase text-[#0B1F3B] truncate">{config.getMessage(item)}</p>
+        <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${statusCfg.color}`}>
+          {statusCfg.label ?? statusCfg.text}
+        </span>
+      </div>
+      <span className="text-[9px] text-[#9CA3AF] flex items-center gap-1 flex-shrink-0">
+        <Clock size={9} /> {timeAgo(item.date)}
+      </span>
+    </div>
+  );
+}
 
 export default function TenantDashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [noticeDate, setNoticeDate] = useState("");
+  const [noticeDate, setNoticeDate] = useState('');
+  const [notification, setNotification] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const showNotify = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 4000);
+  };
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -19,10 +100,9 @@ export default function TenantDashboard() {
         const res = await fetch('/api/tenant/dashboard', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
-        const result = await res.json();
-        setData(result);
+        setData(await res.json());
       } catch (err) {
-        console.error("Fetch error");
+        console.error("Fetch error", err);
       } finally {
         setLoading(false);
       }
@@ -31,150 +111,357 @@ export default function TenantDashboard() {
   }, []);
 
   const handleScheduleMoveOut = async () => {
-    if (!noticeDate) return alert("Please select a date first.");
+    if (!noticeDate) {
+      showNotify('Please select a date first.', 'error');
+      return;
+    }
+    setSubmitting(true);
     try {
       const res = await fetch('/api/tenant/notice', {
         method: 'PATCH',
-        headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}` 
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify({ date: noticeDate })
       });
       if (res.ok) {
-        alert("Notice submitted successfully.");
-        window.location.reload();
+        showNotify('Move-out notice submitted successfully.');
+        setTimeout(() => window.location.reload(), 1500);
+      } else {
+        showNotify('Failed to submit notice.', 'error');
       }
-    } catch (err) {
-      console.error(err);
+    } catch {
+      showNotify('Server connection error.', 'error');
+    } finally {
+      setSubmitting(false);
     }
   };
 
   if (loading) return (
-    <div className="h-screen w-full flex items-center justify-center bg-white font-sans text-[#1E5EFF]">
+    <div className="h-screen w-full flex items-center justify-center bg-[#F8FAFC] font-sans text-[#1E5EFF]">
       <Loader2 className="animate-spin mr-2" /> SYNCHRONIZING...
     </div>
   );
 
-  const getPaymentTrend = () => {
-    const status = data?.paymentStatus;
-    if (status === 'confirmed') return { text: 'PAID', color: 'text-emerald-500' };
-    if (status === 'pending') return { text: 'VERIFYING', color: 'text-amber-500' };
-    return { text: 'UNPAID', color: 'text-rose-500' };
-  };
-
-  const paymentTrend = getPaymentTrend();
+  const paymentStatus = PAYMENT_STATUS[data?.paymentStatus] ?? PAYMENT_STATUS.unpaid;
 
   const stats = [
-    { label: 'Room Assignment', value: data?.user?.room_name || 'PENDING', icon: Home, trend: 'Floor 1' },
-    { label: 'Monthly Rent', value: `₱${data?.user?.monthly_rate || '0'}`, icon: CreditCard, trend: paymentTrend.text, trendColor: paymentTrend.color },
-    { label: 'Utility Balance', value: '₱0.00', icon: Zap, trend: 'Current' },
-    { label: 'Account Status', value: 'ACTIVE', icon: ShieldCheck, trend: 'Verified' },
+    {
+      label: 'Room Assignment',
+      value: data?.user?.room_name || 'PENDING',
+      icon: Home,
+      badge: data?.user?.location || 'N/A',
+      gradient: true,
+    },
+    {
+      label: 'Monthly Rent',
+      value: `₱${Number(data?.user?.monthly_rate || 0).toLocaleString()}`,
+      icon: CreditCard,
+      badge: paymentStatus.text,
+      badgeColor: paymentStatus.color,
+      gradient: false,
+    },
+    {
+      label: 'Total Paid',
+      value: `₱${Number(data?.totalPaid || 0).toLocaleString()}`,
+      icon: TrendingUp,
+      badge: 'Confirmed',
+      gradient: true,
+    },
+    {
+      label: 'Account Status',
+      value: data?.user?.status?.toUpperCase() || 'ACTIVE',
+      icon: ShieldCheck,
+      badge: 'Verified',
+      gradient: false,
+    },
   ];
 
   return (
-    <div className="flex min-h-screen bg-[#F8FAFC] font-sans text-[#0B1F3B]">     
+    <div className="flex min-h-screen bg-[#F8FAFC] font-sans text-[#0B1F3B]">
+
+      {/* Toast */}
+      <AnimatePresence>
+        {notification && (
+          <motion.div
+            initial={{ y: -100, opacity: 0 }} animate={{ y: 20, opacity: 1 }} exit={{ y: -100, opacity: 0 }}
+            className={`fixed top-0 left-1/2 -translate-x-1/2 z-[10001] px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 min-w-[300px] border ${
+              notification.type === 'error'
+                ? 'bg-rose-500 border-rose-400 text-white'
+                : 'bg-emerald-500 border-emerald-400 text-white'
+            }`}
+          >
+            {notification.type === 'error' ? <AlertTriangle size={20} /> : <CheckCircle2 size={20} />}
+            <span className="text-xs font-black uppercase tracking-wider">{notification.message}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <main className="flex-1 p-8 lg:p-12">
-        {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-12">
+
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
           <div>
-            <h1 className="text-3xl font-black tracking-tight uppercase leading-none">
-              Welcome back, <span className="text-[#1E5EFF]">{data?.user?.name ? data.user.name.split(' ')[0] : 'RESIDENT'}</span>          
+            <h1 className="text-3xl md:text-4xl font-black tracking-tight uppercase leading-none">
+              Welcome back, <span className="text-[#1E5EFF]">{data?.user?.name?.split(' ')[0] ?? 'RESIDENT'}</span>
             </h1>
-            <p className="text-[#6B7280] text-xs font-bold mt-2 uppercase tracking-widest">Resident Dashboard Oversight</p>
+            <p className="text-[#6B7280] text-[10px] font-black tracking-[0.3em] uppercase mt-2">Resident Dashboard Oversight</p>
           </div>
+          {data?.daysSinceMoveIn > 0 && (
+            <div className="bg-white border border-[#E5E7EB] px-5 py-2 rounded-xl flex items-center gap-3 shadow-sm">
+              <CalendarDays size={14} className="text-[#1E5EFF]" />
+              <span className="text-[10px] font-black uppercase tracking-widest text-[#0B1F3B]">
+                Day {data.daysSinceMoveIn} of tenancy
+              </span>
+            </div>
+          )}
         </div>
 
-        {/* Stats Grid - Using the requested Blue/Cyan Gradient */}
+        {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           {stats.map((stat, i) => (
-            <div key={i} className="bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF] p-6 rounded-2xl flex flex-col justify-between h-44 shadow-lg shadow-blue-500/10 relative overflow-hidden transition-transform hover:scale-[1.02]">
+            <div key={i} className={`p-6 rounded-2xl flex flex-col justify-between h-44 shadow-sm relative overflow-hidden transition-transform hover:scale-[1.02] ${
+              stat.gradient
+                ? 'bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF]'
+                : 'bg-white border border-[#E5E7EB]/50'
+            }`}>
+              {!stat.gradient && <div className="absolute top-0 left-0 w-full h-1.5 bg-[#22D3EE]" />}
               <div className="flex justify-between items-start z-10">
-                <div className="p-2 bg-white/20 rounded-lg">
-                  <stat.icon className="w-5 h-5 text-white" />
+                <div className={`p-2 rounded-lg ${stat.gradient ? 'bg-white/20' : 'bg-[#1E5EFF]/10'}`}>
+                  <stat.icon className={`w-5 h-5 ${stat.gradient ? 'text-white' : 'text-[#1E5EFF]'}`} />
                 </div>
-                <span className={`text-[10px] font-black px-2 py-1 bg-white/20 rounded text-white`}>
-                  {stat.trend.toUpperCase()}
+                <span className={`text-[9px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest ${
+                  stat.badgeColor
+                    ? stat.badgeColor
+                    : stat.gradient
+                      ? 'bg-white/20 text-white'
+                      : 'bg-[#F3F4F6] text-[#6B7280]'
+                }`}>
+                  {stat.badge}
                 </span>
               </div>
               <div className="z-10">
-                <h2 className="text-xs font-bold text-white/80 uppercase mb-1">{stat.label}</h2>
-                <p className="text-2xl font-black text-white tracking-tight">{stat.value}</p>
+                <h2 className={`text-[10px] font-black uppercase tracking-widest mb-1 ${stat.gradient ? 'text-white/70' : 'text-[#6B7280]'}`}>
+                  {stat.label}
+                </h2>
+                <p className={`text-2xl font-black tracking-tight ${stat.gradient ? 'text-white' : 'text-[#0B1F3B]'}`}>
+                  {stat.value}
+                </p>
               </div>
-              {/* Decorative background icon */}
-              <stat.icon className="absolute -right-4 -bottom-4 w-24 h-24 text-white/10 -rotate-12" />
+              <stat.icon className={`absolute -right-4 -bottom-4 w-28 h-28 -rotate-12 opacity-10 ${stat.gradient ? 'text-white' : 'text-[#0B1F3B]'}`} />
             </div>
           ))}
         </div>
 
+        {/* Main Grid */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-          {/* Main Content Area */}
-          <div className="xl:col-span-2 bg-white border border-[#E5E7EB] rounded-2xl p-8 shadow-sm">
-            <div className="flex justify-between items-center mb-8 border-b border-[#E5E7EB] pb-5">
-              <div className="flex items-center gap-3">
-                <Bell className="w-5 h-5 text-[#2563EB]" />
-                <h2 className="text-sm font-black text-[#0B1F3B] uppercase tracking-widest">Announcements</h2>
-              </div>
-              <div className="bg-[#1E5EFF]/10 px-3 py-1 rounded text-[10px] font-black text-[#1E5EFF]">
-                {data?.announcements?.length.toString().padStart(2, '0')} RECENT
-              </div>
-            </div>
-            
-            <div className="space-y-4">
-              {data?.announcements?.map((ann, i) => (
-                <div key={i} className="group bg-[#F8FAFC] hover:bg-white border border-[#E5E7EB] hover:border-[#1E5EFF] p-5 rounded-xl flex items-center justify-between transition-all cursor-pointer shadow-sm">
-                  <div>
-                    <h4 className="font-bold text-[#0B1F3B] uppercase text-base group-hover:text-[#1E5EFF] transition-colors">{ann.title}</h4>
-                    <p className="text-[10px] font-bold text-[#6B7280] mt-1 flex items-center gap-2 italic">
-                      <Calendar className="w-3 h-3" /> {new Date(ann.created_at).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-[#E5E7EB] group-hover:text-[#1E5EFF] group-hover:translate-x-1 transition-all" />
+
+          {/* Left: Recent Activity + Maintenance */}
+          <div className="xl:col-span-2 space-y-8">
+
+            {/* Recent Activity */}
+            <div className="bg-white border border-[#E5E7EB] rounded-2xl shadow-sm overflow-hidden">
+              <div className="px-8 py-6 border-b border-[#E5E7EB] bg-[#F8FAFC] flex items-center gap-4">
+                <div className="w-9 h-9 bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF] rounded-xl flex items-center justify-center">
+                  <Activity size={16} className="text-white" />
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Sidebar Area */}
-          <div className="space-y-6">
-
-            <div className="bg-white border border-[#E5E7EB] p-6 rounded-2xl shadow-sm">
-              <span className="text-[10px] font-black uppercase tracking-widest text-[#6B7280]">Upcoming Obligation:</span>
-              <p className="text-[#0B1F3B] font-black text-lg mt-1 uppercase border-b-2 border-[#22D3EE] inline-block">{data?.nextDueDate || '---'}</p>
-            </div>
-
-            <div className="bg-white border border-[#E5E7EB] p-6 rounded-2xl shadow-sm">
-              <div className="flex items-center gap-2 mb-4">
-                <ShieldCheck className="w-4 h-4 text-[#14B8A6]" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-[#6B7280]">Lease Status:</span>
+                <div>
+                  <h2 className="text-sm font-black uppercase tracking-widest text-[#0B1F3B]">Recent Activity</h2>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-[#6B7280] mt-0.5">Your latest payments & requests</p>
+                </div>
               </div>
-              <p className="text-[#0B1F3B] font-black uppercase text-xs mb-4">
-                {data?.user?.move_out_date 
-                  ? `Move-out scheduled: ${new Date(data.user.move_out_date).toLocaleDateString()}` 
-                  : 'Active Contract'}
-              </p>
-              
-              {!data?.user?.move_out_date && (
-                <div className="pt-4 border-t border-[#E5E7EB]">
-                  <p className="text-[9px] font-bold text-[#6B7280] uppercase mb-2">Notice of Intent to Vacate</p>
-                  <div className="flex flex-col gap-2">
-                    <input 
-                      type="date" 
-                      className="bg-[#F8FAFC] border border-[#E5E7EB] text-[10px] p-2 rounded-lg text-[#0B1F3B] outline-none focus:border-[#1E5EFF]" 
-                      onChange={(e) => setNoticeDate(e.target.value)}
-                    />
-                    <button onClick={handleScheduleMoveOut} className="bg-[#E5E7EB] hover:bg-rose-500 hover:text-white text-[#0B1F3B] px-3 py-2 text-[10px] font-black uppercase rounded-lg transition-all">
-                      Submit Notice
-                    </button>
+              <div className="p-6 space-y-3">
+                {data?.recentActivity?.length > 0 ? (
+                  data.recentActivity.map((item, i) => (
+                    <ActivityItem key={`${item.type}-${item.id}-${i}`} item={item} />
+                  ))
+                ) : (
+                  <div className="py-12 text-center">
+                    <Activity className="mx-auto text-[#E5E7EB] mb-3" size={36} />
+                    <p className="text-[10px] font-black uppercase tracking-widest text-[#9CA3AF]">No activity yet</p>
                   </div>
+                )}
+              </div>
+            </div>
+
+            {/* Maintenance Requests */}
+            <div className="bg-white border border-[#E5E7EB] rounded-2xl shadow-sm overflow-hidden">
+              <div className="px-8 py-6 border-b border-[#E5E7EB] bg-[#F8FAFC] flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-9 h-9 bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF] rounded-xl flex items-center justify-center">
+                    <Wrench size={16} className="text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-sm font-black uppercase tracking-widest text-[#0B1F3B]">Maintenance Requests</h2>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-[#6B7280] mt-0.5">Your submitted requests</p>
+                  </div>
+                </div>
+                {data?.maintenance?.length > 0 && (
+                  <span className="text-[9px] font-black bg-amber-100 text-amber-700 px-3 py-1.5 rounded-full uppercase tracking-widest">
+                    {data.maintenance.filter(m => m.status !== 'resolved').length} Active
+                  </span>
+                )}
+              </div>
+
+              {data?.maintenance?.length === 0 ? (
+                <div className="py-12 text-center">
+                  <Wrench className="mx-auto text-[#E5E7EB] mb-3" size={36} />
+                  <p className="text-[10px] font-black uppercase tracking-widest text-[#9CA3AF]">No maintenance requests</p>
+                </div>
+              ) : (
+                <div className="divide-y divide-[#E5E7EB]">
+                  {data.maintenance.map((m) => {
+                    const cfg = MAINTENANCE_STATUS[m.status] ?? { color: 'bg-gray-100 text-gray-600', label: m.status };
+                    return (
+                      <div key={m.id} className="px-8 py-4 flex items-center justify-between hover:bg-[#F8FAFC] transition-all">
+                        <div className="flex items-center gap-4">
+                          <div className="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <Wrench size={14} className="text-amber-500" />
+                          </div>
+                          <div>
+                            <p className="text-xs font-black uppercase text-[#0B1F3B]">{m.title}</p>
+                            <p className="text-[9px] text-[#9CA3AF] mt-0.5 flex items-center gap-1">
+                              <Clock size={9} /> {timeAgo(m.created_at)}
+                            </p>
+                          </div>
+                        </div>
+                        <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full ${cfg.color}`}>
+                          {cfg.label}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
           </div>
+
+          {/* Right Sidebar */}
+          <div className="space-y-6">
+
+            {/* Payment Summary */}
+            <div className="bg-white border border-[#E5E7EB] rounded-2xl shadow-sm overflow-hidden">
+              <div className="px-6 py-5 border-b border-[#E5E7EB] bg-[#F8FAFC]">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF] rounded-xl flex items-center justify-center">
+                    <Receipt size={16} className="text-white" />
+                  </div>
+                  <h3 className="text-sm font-black uppercase tracking-widest text-[#0B1F3B]">Payment Summary</h3>
+                </div>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-[#6B7280]">Latest Status</span>
+                  <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full ${paymentStatus.color}`}>
+                    {paymentStatus.text}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-[#6B7280]">Pending</span>
+                  <span className="text-sm font-black text-[#0B1F3B]">{data?.pendingPayments ?? 0}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-[#6B7280]">Total Confirmed</span>
+                  <span className="text-sm font-black text-emerald-600">₱{Number(data?.totalPaid ?? 0).toLocaleString()}</span>
+                </div>
+                <div className="border-t border-[#E5E7EB] pt-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[#6B7280]">Next Due</span>
+                    <span className="text-[10px] font-black text-[#0B1F3B]">{data?.nextDueDate}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Room Info */}
+            {data?.user?.amenities && (
+              <div className="bg-white border border-[#E5E7EB] rounded-2xl shadow-sm overflow-hidden">
+                <div className="px-6 py-5 border-b border-[#E5E7EB] bg-[#F8FAFC]">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF] rounded-xl flex items-center justify-center">
+                      <Home size={16} className="text-white" />
+                    </div>
+                    <h3 className="text-sm font-black uppercase tracking-widest text-[#0B1F3B]">Room Info</h3>
+                  </div>
+                </div>
+                <div className="p-6 space-y-3">
+                  {data?.user?.location && (
+                    <div className="flex justify-between">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-[#6B7280]">Location</span>
+                      <span className="text-[10px] font-black text-[#0B1F3B]">{data.user.location}</span>
+                    </div>
+                  )}
+                  {data?.user?.move_in_date && (
+                    <div className="flex justify-between">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-[#6B7280]">Move-in</span>
+                      <span className="text-[10px] font-black text-[#0B1F3B]">
+                        {new Date(data.user.move_in_date).toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </span>
+                    </div>
+                  )}
+                  <div className="pt-2 border-t border-[#E5E7EB]">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-[#6B7280] mb-2">Amenities</p>
+                    <p className="text-[10px] font-bold text-[#0B1F3B] leading-relaxed">{data.user.amenities}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Lease & Move-out Notice */}
+            <div className="bg-white border border-[#E5E7EB] rounded-2xl shadow-sm overflow-hidden">
+              <div className="px-6 py-5 border-b border-[#E5E7EB] bg-[#F8FAFC]">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF] rounded-xl flex items-center justify-center">
+                    <KeyRound size={16} className="text-white" />
+                  </div>
+                  <h3 className="text-sm font-black uppercase tracking-widest text-[#0B1F3B]">Lease Status</h3>
+                </div>
+              </div>
+              <div className="p-6">
+                {data?.user?.move_out_date ? (
+                  <div className="flex items-start gap-3 bg-rose-50 border border-rose-100 rounded-xl p-4">
+                    <LogOut size={16} className="text-rose-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-rose-600">Move-out Scheduled</p>
+                      <p className="text-sm font-black text-rose-700 mt-1">
+                        {new Date(data.user.move_out_date).toLocaleDateString('en-PH', { month: 'long', day: 'numeric', year: 'numeric' })}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 size={14} className="text-emerald-500" />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Active Contract</span>
+                    </div>
+                    <div className="border-t border-[#E5E7EB] pt-4">
+                      <p className="text-[9px] font-black uppercase tracking-widest text-[#6B7280] mb-3">Notice of Intent to Vacate</p>
+                      <div className="flex flex-col gap-2">
+                        <input
+                          type="date"
+                          className="bg-[#F8FAFC] border border-[#E5E7EB] text-[10px] p-3 rounded-xl text-[#0B1F3B] outline-none focus:border-[#1E5EFF]"
+                          onChange={(e) => setNoticeDate(e.target.value)}
+                        />
+                        <button
+                          onClick={handleScheduleMoveOut}
+                          disabled={submitting}
+                          className="bg-[#F3F4F6] hover:bg-rose-500 hover:text-white text-[#0B1F3B] px-3 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                        >
+                          {submitting ? <Loader2 size={13} className="animate-spin" /> : <LogOut size={13} />}
+                          Submit Notice
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+          </div>
         </div>
 
         <TenantFooter />
-        
       </main>
     </div>
   );
