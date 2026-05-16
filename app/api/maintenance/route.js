@@ -2,14 +2,12 @@ import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth';
 
-// --- GET: Fetch requests based on role ---
 export async function GET(req) {
   const user = getCurrentUser(req);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
     if (user.role === 'admin') {
-      // ADMIN: Fetch everything with tenant names and room names
       const [rows] = await db.execute(`
         SELECT mr.*, u.name as tenant_name, r.name as room_name 
         FROM maintenance_requests mr
@@ -19,7 +17,6 @@ export async function GET(req) {
       `);
       return NextResponse.json(rows);
     } else {
-      // TENANT: Fetch ONLY their own requests
       const [rows] = await db.execute(`
         SELECT mr.*, r.name as room_name 
         FROM maintenance_requests mr
@@ -34,7 +31,6 @@ export async function GET(req) {
   }
 }
 
-// --- POST: Create a new request (Tenants only) ---
 export async function POST(req) {
   const user = getCurrentUser(req);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -42,7 +38,6 @@ export async function POST(req) {
   try {
     const { title, description } = await req.json();
 
-    // Automatically find the tenant's room
     const [tenancy] = await db.execute(
       'SELECT room_id FROM room_tenants WHERE user_id = ? LIMIT 1',
       [user.id]
@@ -65,11 +60,9 @@ export async function POST(req) {
   }
 }
 
-// --- PATCH: Update status (Admins only) ---
 export async function PATCH(req) {
   const user = getCurrentUser(req);
   
-  // Security: Only admins can change the status
   if (!user || user.role !== 'admin') {
     return NextResponse.json({ error: "Forbidden: Admins only" }, { status: 403 });
   }

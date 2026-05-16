@@ -6,7 +6,6 @@ export async function GET(request, { params }) {
   try {
     const { id } = await params;
     
-    // We join with room_tenants to see how many people are actually inside
     const query = `
       SELECT 
         r.*, 
@@ -23,11 +22,9 @@ export async function GET(request, { params }) {
 
     const room = rows[0];
     
-    // Ensure capacity is treated as a number for math
     const capacityNum = parseInt(room.capacity) || 1;
     const occupantsNum = parseInt(room.current_occupants) || 0;
 
-    // Add calculated fields for the frontend
     room.slots_left = capacityNum - occupantsNum;
     room.is_full = occupantsNum >= capacityNum;
 

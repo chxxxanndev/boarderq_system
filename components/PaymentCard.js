@@ -18,7 +18,6 @@ export default function PaymentCard({ payment }) {
           {isPaid ? <CheckCircle className="w-6 h-6" /> : <Clock className="w-6 h-6" />}
         </div>
 
-        {/* RIGHT SECTION: Amount, Status, Chevron */}
         <div className="flex flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto border-t border-slate-800/50 md:border-0 pt-4 md:pt-0">
           <div className="flex items-center gap-2">
             <span className="text-slate-500 font-mono text-xs">PHP</span>
@@ -37,7 +36,6 @@ export default function PaymentCard({ payment }) {
               {payment.status}
             </div>
 
-            {/* Chevron toggle indicator */}
             <ChevronDown
               className={`w-4 h-4 text-slate-500 transition-transform duration-300 ${isOpen ? 'rotate-180 text-cyan-400' : ''}`}
             />
@@ -64,7 +62,6 @@ export default function PaymentCard({ payment }) {
         </div>
       </div>
 
-      {/* Divider */}
       <div className="h-px bg-slate-800/60 w-full" />
     </div>
   );

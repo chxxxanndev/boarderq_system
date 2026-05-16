@@ -2,10 +2,6 @@
 import pool from '@/lib/db';
 import { NextResponse } from 'next/server';
 
-/**
- * GET /api/rooms
- * Returns rooms with computed occupancy data
- */
 export async function GET() {
   try {
     const [rows] = await pool.query(`
@@ -18,7 +14,6 @@ export async function GET() {
       ORDER BY r.created_at DESC
     `);
 
-    // compute status dynamically
     const formatted = rows.map(room => {
       const capacity = Number(room.capacity || 0);
       const current = Number(room.current_tenants || 0);
@@ -52,10 +47,6 @@ export async function GET() {
   }
 }
 
-/**
- * POST /api/rooms
- * Create new room (bedspace aware)
- */
 export async function POST(request) {
   try {
     const {
@@ -65,7 +56,7 @@ export async function POST(request) {
       capacity,
       image_url,
       amenities,
-      house_rules  // Added this      
+      house_rules    
     } = await request.json();
 
     if (!name || !monthly_rate || !capacity) {
@@ -86,7 +77,7 @@ export async function POST(request) {
         Number(capacity),
         image_url || null,
         amenities || '',
-        house_rules || '' // Added this
+        house_rules || '' 
       ]
     );
 

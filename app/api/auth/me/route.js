@@ -11,10 +11,9 @@ export async function GET(request) {
 
     const decoded = verify(token, process.env.JWT_SECRET);
     
-    // We join with room_tenants to get the move_out_date for the new feature
     const [rows] = await pool.query(`
-      SELECT u.id, u.name, u.email, u.role, u.status, 
-             r.name as room_name, r.monthly_rate, rt.move_out_date
+      SELECT u.id, u.name, u.email, u.role, u.status, u.avatar_url,
+            r.name as room_name, r.monthly_rate, rt.move_out_date
       FROM users u
       LEFT JOIN room_tenants rt ON u.id = rt.user_id
       LEFT JOIN rooms r ON rt.room_id = r.id
@@ -25,7 +24,6 @@ export async function GET(request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // THE FIX: Return rows[0] instead of 'user'
     return NextResponse.json(rows[0]);
 
   } catch (error) {

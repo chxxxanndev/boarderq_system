@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link'; // Add this to your imports
+import Link from 'next/link'; 
 import Image from 'next/image';
 import { 
   Target, Users, Shield, Zap, Database, 
@@ -10,7 +10,7 @@ import {
 
 import {
   Activity, CheckCircle2, MapPin, Megaphone, Clock, BedDouble, TrendingUp, Wrench,
-  Globe, Mail, Phone, ExternalLink, ShieldCheck // Replaced Facebook with Globe
+  Globe, Mail, Phone, ExternalLink, ShieldCheck
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -45,7 +45,6 @@ export default function AboutPage() {
     <div className="min-h-screen bg-[#F8FAFC] text-[#0B1F3B] font-sans overflow-x-hidden">
       <main className="max-w-7xl mx-auto px-6 md:px-8 pt-16 pb-24 space-y-20">
         
-        {/* ── HERO SECTION ── */}
         <section>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -68,7 +67,6 @@ export default function AboutPage() {
           </motion.div>
         </section>
 
-        {/* ── EXECUTIVE SUMMARY ── */}
         <motion.section 
           variants={itemVariants}
           initial="hidden"
@@ -76,14 +74,10 @@ export default function AboutPage() {
           viewport={{ once: true }}
         >
           <div className="bg-white border border-[#E5E7EB] rounded-3xl p-8 md:p-12 relative overflow-hidden shadow-sm hover:border-[#1E5EFF]/30 transition-all duration-500">
-            {/* <div className="absolute -top-10 -right-10 opacity-[0.03] pointer-events-none">
-              <Database size={300} className="text-[#0B1F3B]" />
-            </div> */}
-            
+ 
             <div className="relative z-10">
               <div className="flex items-center gap-3 mb-8">
                 <div className="bg-[#1E5EFF] p-2.5 rounded-xl">
-                  {/* <Zap className="text-white w-5 h-5" /> */}
                 </div>
                 <h2 className="text-xl font-black text-[#0B1F3B] tracking-tight uppercase">Executive Summary</h2>
               </div>
@@ -106,7 +100,6 @@ export default function AboutPage() {
           </div>
         </motion.section>
 
-        {/* ── SYSTEM PILLARS ── */}
         <section>
           <div className="flex items-center justify-between mb-6 border-b border-[#E5E7EB] pb-4">
             <h2 className="text-[11px] font-black text-[#0B1F3B] tracking-[0.4em] uppercase flex items-center gap-2">
@@ -139,7 +132,6 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* ── PROJECT PROPONENTS (LARGE IMAGE CARDS) ── */}
         <section>
           <div className="flex items-center justify-between mb-10 border-b border-[#E5E7EB] pb-4">
             <h2 className="text-[11px] font-black text-[#0B1F3B] tracking-[0.4em] uppercase flex items-center gap-2">
@@ -161,7 +153,6 @@ export default function AboutPage() {
                 transition={{ delay: i * 0.15 }}
                 className="group relative bg-white border border-[#E5E7EB] rounded-[2rem] overflow-hidden shadow-sm transition-all duration-500"
               >
-                {/* Large Portrait Image */}
                 <div className="relative aspect-[4/5] overflow-hidden">
                   <Image 
                     src={member.image} 
@@ -169,10 +160,7 @@ export default function AboutPage() {
                     fill 
                     className="object-cover group-hover:scale-105 transition-all duration-500"
                   />
-                  {/* Gradient Overlay
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0B1F3B] via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity" /> */}
-                  
-                  {/* Role Badge on Image */}
+
                   <div className="absolute bottom-6 left-6 right-6">
                     <span className="inline-block bg-[#1E5EFF] text-white text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-md mb-2">
                       {member.focus}
@@ -184,23 +172,17 @@ export default function AboutPage() {
                   </div>
                 </div>
 
-                {/* Info Box */}
                 <div className="p-6 bg-white">
                   <div className="flex items-center justify-between">
                     <div>
-                      {/* <p className="text-[10px] font-black text-[#6B7280] uppercase tracking-widest">Designation</p> */}
                       <p className="text-xs font-bold text-[#0B1F3B] uppercase mt-1">{member.role}</p>
                     </div>
-                    {/* <div className="w-8 h-8 rounded-full border border-[#E5E7EB] flex items-center justify-center group-hover:bg-[#1E5EFF] group-hover:border-[#1E5EFF] transition-all">
-                      <ArrowRight size={14} className="text-[#CBD5E1] group-hover:text-white" />
-                    </div> */}
                   </div>
                 </div>
               </motion.div>
             ))}
           </div>
           
-          {/* Academic Footer for Proponents */}
           <div className="mt-12 flex flex-col md:flex-row items-center justify-center gap-6 p-8 border border-dashed border-[#CBD5E1] rounded-3xl bg-white/50">
             <Shield className="text-[#1E5EFF] w-8 h-8" />
             <div className="text-center md:text-left">
@@ -215,7 +197,6 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* ── VISION FOOTER ── */}
         <motion.section 
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -228,12 +209,10 @@ export default function AboutPage() {
         </motion.section>
       </main>
 
-      {/* ── INFORMATIVE FOOTER ── */}
       <footer className="bg-white border-t border-[#E5E7EB] pt-12 pb-6">
         <div className="max-w-7xl mx-auto px-6 md:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
 
-            {/* Brand Section */}
             <div className="space-y-4">
               <Link href="/">
                 <h3 className="text-2xl font-black tracking-tighter uppercase leading-none text-[#0B1F3B] cursor-pointer">
@@ -253,7 +232,6 @@ export default function AboutPage() {
               </div>
             </div>
 
-            {/* FIXED: ECOSYSTEM LINKS */}
             <div>
               <h4 className="text-[10px] font-black text-[#0B1F3B] uppercase tracking-[0.4em] mb-6">Ecosystem</h4>
               <ul className="space-y-3">
@@ -276,7 +254,6 @@ export default function AboutPage() {
               </ul>
             </div>
 
-            {/* Landlord Connect */}
             <div>
               <h4 className="text-[10px] font-black text-[#0B1F3B] uppercase tracking-[0.4em] mb-6">Landlord Connect</h4>
               <div className="space-y-4">
@@ -306,7 +283,6 @@ export default function AboutPage() {
               </div>
             </div>
 
-            {/* Property Hub */}
             <div>
               <h4 className="text-[10px] font-black text-[#0B1F3B] uppercase tracking-[0.4em] mb-6">Property Hub</h4>
               <div className="bg-[#F8FAFC] border border-[#E5E7EB] rounded-2xl p-4">
@@ -321,15 +297,10 @@ export default function AboutPage() {
 
           </div>
 
-          {/* Bottom Section */}
           <div className="pt-6 border-t border-[#F8FAFC] flex flex-col md:flex-row justify-center items-center gap-4">
             <span className="text-[9px] font-black text-[#CBD5E1] uppercase tracking-[0.4em]">
               BOARDER-Q © 2026
             </span>
-            {/* ADDED: Link to login for tenants/admin who find themselves at the bottom */}
-            {/* <Link href="/public/login" className="text-[9px] font-black text-[#1E5EFF] uppercase tracking-widest hover:underline">
-              System Login
-            </Link> */}
           </div>
         </div>
       </footer>

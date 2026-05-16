@@ -60,14 +60,14 @@ export default function RoomDetailPage() {
   if (loading) return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center text-[#1E5EFF]">
         <Activity className="animate-spin mb-4" size={32} />
-        <p className="text-[10px] font-black uppercase tracking-[0.4em]">Initializing Room Node...</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.4em]">Initializing Room...</p>
     </div>
   );
 
   if (!room) return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center text-rose-500">
         <AlertCircle size={40} className="mb-4" />
-        <p className="text-[10px] font-black uppercase tracking-[0.4em]">Room Node Not Found</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.4em]">Room Not Found</p>
         <button onClick={() => router.push('/')} className="mt-6 text-[10px] font-black uppercase tracking-widest text-[#6B7280]">Return</button>
     </div>
   );
@@ -75,7 +75,6 @@ export default function RoomDetailPage() {
   const amenitiesList = room.amenities ? room.amenities.split(/,|\n/).map(item => item.trim()).filter(Boolean) : [];
   const rulesList = room.house_rules ? room.house_rules.split(/,|\n/).map(item => item.trim()).filter(Boolean) : [];
 
-  // LOGIC: Check if applicant can apply
   const isMaintenance = room.status === 'maintenance';
   const isFull = room.is_full; 
   const canApply = !isMaintenance && !isFull;
@@ -86,7 +85,6 @@ export default function RoomDetailPage() {
         
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
 
-          {/* LEFT: Info */}
           <div className="lg:col-span-3 space-y-8">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="rounded-[3rem] overflow-hidden h-[450px] bg-white border border-[#E5E7EB] shadow-2xl relative">
               {room.image_url
@@ -112,10 +110,6 @@ export default function RoomDetailPage() {
                         <p className="text-[10px] font-black text-[#6B7280] uppercase tracking-widest mb-2">Monthly Fee</p>
                         <p className="text-5xl font-black text-[#0B1F3B]">₱{Number(room.monthly_rate).toLocaleString()}</p>
                     </div>
-                    {/* <div className="text-right hidden sm:block">
-                        <Activity className="text-[#1E5EFF] ml-auto mb-2" size={24} />
-                        <p className="text-[9px] font-black text-[#CBD5E1] uppercase tracking-[0.3em]">Hardware ID: {id.toString().padStart(4, '0')}</p>
-                    </div> */}
                 </div>
             </div>
 
@@ -142,7 +136,6 @@ export default function RoomDetailPage() {
             </div>
           </div>
 
-          {/* RIGHT: Form */}
           <div className="lg:col-span-2">
             <div className="sticky top-24 bg-[#0B1F3B] rounded-[3rem] p-10 text-white shadow-2xl border border-white/5">
               <h2 className="text-2xl font-black uppercase tracking-tight mb-2">Application <span className="text-[#1E5EFF]">Form</span></h2>
@@ -177,7 +170,7 @@ export default function RoomDetailPage() {
                 >
                   {submitting ? <Activity className="animate-spin" size={18} /> : 
                    isMaintenance ? 'MAINTENANCE MODE' : 
-                   isFull ? 'NODE OCCUPIED' : 
+                   isFull ? 'ROOM OCCUPIED' : 
                    'Initialize'} 
                   {!submitting && canApply && <Send size={14} />}
                 </button>

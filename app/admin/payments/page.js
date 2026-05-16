@@ -70,7 +70,6 @@ export default function AdminPayments() {
     }
   };
 
-  // Stats
   const total      = payments.length;
   const confirmed  = payments.filter(p => p.status === 'confirmed');
   const pending    = payments.filter(p => p.status === 'pending');
@@ -86,10 +85,9 @@ export default function AdminPayments() {
   );
 
   return (
-    <div className="flex min-h-screen bg-[#F8FAFC] font-sans text-[#0B1F3B]">
-      <main className="flex-1 p-8 lg:p-12">
+    <div className="flex min-h-screen bg-[#F8FAFC] font-sans text-[#0B1F3B] overflow-hidden">
+      <main className="flex-1 p-4 sm:p-8 lg:p-12 min-w-0">
 
-        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
           <div>
             <h1 className="text-4xl font-black tracking-tight uppercase leading-none">
@@ -99,51 +97,40 @@ export default function AdminPayments() {
           </div>
         </div>
 
-{/* Stats Cards */}
-<div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-10">
-  {/* Total Revenue */}
-  <div className="bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF] p-6 rounded-2xl flex flex-col justify-between h-44 shadow-sm relative overflow-hidden">
-    <div>
-      <h2 className="text-[11px] font-black uppercase tracking-widest mb-1 opacity-70 text-white">Total Revenue</h2>
-      <p className="text-4xl font-black tracking-tighter text-white">₱{totalRev.toLocaleString()}</p>
-    </div>
-    <TrendingUp className="absolute -right-4 -bottom-4 opacity-10 -rotate-12 text-white" size={120} />
-  </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+          <div className="bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF] p-6 rounded-2xl flex flex-col justify-between h- shadow-sm relative overflow-hidden">
+            <div>
+              <h2 className="text-[11px] font-black uppercase tracking-widest mb-1 opacity-70 text-white">Total Revenue</h2>
+              <p className="text-4xl font-black tracking-tighter text-white">₱{totalRev.toLocaleString()}</p>
+            </div>
+          </div>
 
-  {/* Pending */}
-  <div className="bg-white p-6 rounded-2xl flex flex-col justify-between h-44 shadow-sm border border-[#E5E7EB]/50 relative overflow-hidden">
-    <div className="absolute top-0 left-0 w-full h-1.5 bg-[#22D3EE]" />
-    <div>
-      <h2 className="text-[11px] font-black uppercase tracking-widest mb-1 text-[#6B7280]">Pending Review</h2>
-      <p className="text-4xl font-black tracking-tighter text-[#0B1F3B]">{pending.length}</p>
-    </div>
-    <Clock className="absolute -right-4 -bottom-4 opacity-10 -rotate-12 text-[#0B1F3B]" size={120} />
-  </div>
+        <div className="bg-white p-6 rounded-2xl flex flex-col justify-between h-36 shadow-sm border border-[#E5E7EB]/50 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1.5" />
+          <div>
+            <h2 className="text-[11px] font-black uppercase tracking-widest mb-1 text-[#6B7280]">Pending Review</h2>
+            <p className="text-4xl font-black tracking-tighter text-[#0B1F3B]">{pending.length}</p>
+          </div>
+        </div>
 
-  {/* Confirmed */}
-  <div className="bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF] p-6 rounded-2xl flex flex-col justify-between h-44 shadow-sm relative overflow-hidden">
-    <div>
-      <h2 className="text-[11px] font-black uppercase tracking-widest mb-1 opacity-70 text-white">Confirmed</h2>
-      <p className="text-4xl font-black tracking-tighter text-white">{confirmed.length}</p>
-    </div>
-    <CheckCircle2 className="absolute -right-4 -bottom-4 opacity-10 -rotate-12 text-white" size={120} />
-  </div>
+        <div className="bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF] p-6 rounded-2xl flex flex-col justify-between h-36 shadow-sm relative overflow-hidden">
+          <div>
+            <h2 className="text-[11px] font-black uppercase tracking-widest mb-1 opacity-70 text-white">Confirmed</h2>
+            <p className="text-4xl font-black tracking-tighter text-white">{confirmed.length}</p>
+          </div>
+        </div>
 
-  {/* Flagged */}
-  <div className="bg-white p-6 rounded-2xl flex flex-col justify-between h-44 shadow-sm border border-[#E5E7EB]/50 relative overflow-hidden">
-    <div className="absolute top-0 left-0 w-full h-1.5 bg-[#22D3EE]" />
-    <div>
-      <h2 className="text-[11px] font-black uppercase tracking-widest mb-1 text-[#6B7280]">Flagged</h2>
-      <p className="text-4xl font-black tracking-tighter text-[#0B1F3B]">{flagged.length}</p>
-    </div>
-    <AlertTriangle className="absolute -right-4 -bottom-4 opacity-10 -rotate-12 text-[#0B1F3B]" size={120} />
-  </div>
-</div>
+        <div className="bg-white p-6 rounded-2xl flex flex-col justify-between h-36 shadow-sm border border-[#E5E7EB]/50 relative overflow-hidden">
+          <div className="absolute top-100 left-0 w-full h-1.5" />
+          <div>
+            <h2 className="text-[11px] font-black uppercase tracking-widest mb-1 text-[#6B7280]">Flagged</h2>
+            <p className="text-4xl font-black tracking-tighter text-[#0B1F3B]">{flagged.length}</p>
+          </div>
+        </div>
+      </div>
 
-        {/* Main Table Card */}
         <div className="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden shadow-sm mb-10">
 
-          {/* Table Header + Tabs */}
           <div className="px-8 py-6 border-b border-[#E5E7EB] bg-[#F8FAFC] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <div className="w-9 h-9 bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF] rounded-xl flex items-center justify-center">
@@ -155,8 +142,7 @@ export default function AdminPayments() {
               </div>
             </div>
 
-            {/* Tabs */}
-            <div className="flex items-center gap-1 bg-[#F3F4F6] p-1 rounded-xl">
+            <div className="flex items-center gap-1 bg-[#F3F4F6] p-1 rounded-xl overflow-x-auto">
               {TABS.map(tab => (
                 <button
                   key={tab}
@@ -180,15 +166,14 @@ export default function AdminPayments() {
             </div>
           </div>
 
-          {/* Table */}
           {filtered.length === 0 ? (
             <div className="py-24 text-center">
               <ClipboardList className="mx-auto mb-4 text-[#E5E7EB]" size={48} />
               <p className="text-[#6B7280] font-black text-xs uppercase tracking-widest">No {activeTab} payments found</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
+            <div className="overflow-x-auto -mx-1 px-1">
+              <table className="w-full text-left min-w-[700px]">
                 <thead>
                   <tr className="bg-[#F8FAFC] border-b border-[#E5E7EB]">
                     <th className="px-6 py-4 text-[10px] font-black uppercase text-[#6B7280] tracking-widest">Tenant</th>
@@ -205,18 +190,15 @@ export default function AdminPayments() {
                   {filtered.map((pay) => (
                     <tr key={pay.id} className="hover:bg-[#F8FAFC] transition-all group">
 
-                      {/* Tenant */}
                       <td className="px-6 py-5">
                         <p className="text-sm font-black uppercase text-[#0B1F3B] group-hover:text-[#1E5EFF] transition-colors">{pay.tenant_name}</p>
                         <p className="text-[10px] font-bold text-[#6B7280] uppercase mt-0.5">{pay.room_name}</p>
                       </td>
 
-                      {/* Amount */}
                       <td className="px-6 py-5">
                         <span className="text-sm font-black text-[#0B1F3B]">₱{Number(pay.amount).toLocaleString()}</span>
                       </td>
 
-                      {/* Method */}
                       <td className="px-6 py-5">
                         <span className={`inline-flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full ${
                           pay.method === 'gcash' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'
@@ -226,7 +208,6 @@ export default function AdminPayments() {
                         </span>
                       </td>
 
-                      {/* Month Covered */}
                       <td className="px-6 py-5">
                         <div className="flex items-center gap-2">
                           <CalendarDays size={13} className="text-[#1E5EFF]" />
@@ -236,12 +217,10 @@ export default function AdminPayments() {
                         </div>
                       </td>
 
-                      {/* Ref */}
                       <td className="px-6 py-5">
                         <span className="text-[10px] font-mono font-bold text-[#6B7280]">{pay.reference_number ?? '—'}</span>
                       </td>
 
-                      {/* Status */}
                       <td className="px-6 py-5">
                         <StatusBadge status={pay.status} />
                         {pay.status === 'flagged' && pay.notes && (
@@ -249,7 +228,6 @@ export default function AdminPayments() {
                         )}
                       </td>
 
-                      {/* Proof */}
                       <td className="px-6 py-5">
                         {pay.proof_url ? (
                           <button
@@ -263,7 +241,6 @@ export default function AdminPayments() {
                         )}
                       </td>
 
-                      {/* Actions */}
                       <td className="px-6 py-5 text-right">
                         {pay.status === 'pending' && (
                           <div className="flex items-center gap-2 justify-end">
@@ -299,7 +276,6 @@ export default function AdminPayments() {
         <AdminFooter />
       </main>
 
-      {/* Proof of Payment Modal */}
       {mounted && createPortal(
         <AnimatePresence>
           {proofModal && (
@@ -350,7 +326,6 @@ export default function AdminPayments() {
         document.body
       )}
 
-      {/* Flag Confirmation Modal */}
       {mounted && createPortal(
         <AnimatePresence>
           {paymentToFlag && (
@@ -365,7 +340,7 @@ export default function AdminPayments() {
                 onClick={e => e.stopPropagation()}
                 className="relative bg-white rounded-[2.5rem] w-full max-w-sm shadow-2xl border border-[#E5E7EB] p-10 text-center overflow-hidden"
               >
-                <div className="absolute top-0 left-0 w-full h-1.5 bg-rose-500" />
+                <div className="absolute top-100 left-0 w-full h-1.5 bg-rose-500" />
                 <div className="w-20 h-20 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mx-auto mb-6">
                   <ShieldAlert size={36} />
                 </div>
@@ -374,7 +349,6 @@ export default function AdminPayments() {
                   Flagging ₱<span className="text-rose-500">{Number(paymentToFlag.amount).toLocaleString()}</span> from <span className="text-[#0B1F3B]">{paymentToFlag.tenant_name}</span>
                 </p>
 
-                {/* Flag reason input */}
                 <textarea
                   value={flagNote}
                   onChange={e => setFlagNote(e.target.value)}

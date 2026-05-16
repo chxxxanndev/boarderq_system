@@ -14,9 +14,8 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [showSuccessModal, setShowSuccessModal] = useState(false); // New Modal State
+  const [showSuccessModal, setShowSuccessModal] = useState(false); 
   
-  // Updated state to include confirmPassword
   const [formData, setFormData] = useState({ 
     name: '', 
     email: '', 
@@ -32,7 +31,6 @@ export default function RegisterPage() {
   const handleRegister = async (e) => {
     e.preventDefault();
     
-    // 1. Password Confirmation Check
     if (formData.password !== formData.confirmPassword) {
       setError("PASSWORDS DO NOT MATCH");
       return;
@@ -58,7 +56,6 @@ export default function RegisterPage() {
         throw new Error(data.error || 'Registration failed');
       }
 
-      // 2. Show Custom Modal instead of Alert
       setShowSuccessModal(true);
 
     } catch (err) {
@@ -81,7 +78,6 @@ export default function RegisterPage() {
   return (
     <div className="h-[calc(100vh-72px)] w-full flex flex-col lg:flex-row bg-white overflow-hidden font-sans">
       
-      {/* LEFT SECTION: BRANDING */}
       <div className="hidden lg:flex flex-1 relative bg-[#F8FAFC] items-center justify-center border-r border-[#E5E7EB]">
         <motion.div 
           animate={{ y: [0, -10, 0] }}
@@ -106,7 +102,6 @@ export default function RegisterPage() {
         </div>
       </div>
 
-      {/* RIGHT SECTION: FORM AREA */}
       <div className="flex-1 flex flex-col justify-start items-center pt-16 p-8 md:p-1 relative bg-white overflow-y-auto">
         <motion.div
           className="absolute inset-0 pointer-events-none opacity-40"
@@ -137,7 +132,6 @@ export default function RegisterPage() {
 
           <motion.form variants={itemVariants} onSubmit={handleRegister} className="space-y-4">
             
-            {/* Error Message */}
             <AnimatePresence mode="wait">
               {error && (
                 <motion.div 
@@ -173,7 +167,6 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            {/* Password Row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
                     <label className="text-[10px] font-black uppercase text-[#6B7280] ml-1 tracking-widest">Password</label>
@@ -228,7 +221,6 @@ export default function RegisterPage() {
         </motion.div>
       </div>
 
-      {/* BRANDED SUCCESS MODAL */}
       <AnimatePresence>
         {showSuccessModal && (
           <div className="fixed inset-0 z-[999] flex items-center justify-center p-6">

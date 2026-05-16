@@ -8,10 +8,8 @@ const AdminFooter = () => {
     <footer className="border-t border-[#E5E7EB] pt-8 md:pt-12 pb-8 mt-12 md:mt-24">
       <div className="max-w-7xl mx-auto px-6 md:px-8">
         
-        {/* Main Footer Content Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-12 mb-10 md:mb-12">
           
-          {/* Section 1: Admin Branding */}
           <div className="flex flex-col items-center md:items-start text-center md:text-left space-y-4">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 bg-[#0B1F3B] rounded flex items-center justify-center shrink-0">
@@ -28,7 +26,6 @@ const AdminFooter = () => {
             </p>
           </div>
 
-          {/* Section 2: Management Links */}
           <div className="flex flex-col items-center md:items-start">
             <h4 className="text-[10px] font-black text-[#0B1F3B]/40 uppercase tracking-[0.3em] mb-6">Management</h4>
             <div className="grid grid-cols-2 gap-x-8 gap-y-4 w-full max-w-[320px] md:max-w-none">
@@ -52,7 +49,6 @@ const AdminFooter = () => {
             </div>
           </div>
 
-          {/* Section 3: System Status Node */}
           <div className="flex flex-col items-center md:items-end">
             <h4 className="text-[10px] font-black text-[#0B1F3B]/40 uppercase tracking-[0.3em] mb-6 md:text-right">System Metrics</h4>
             <div className="space-y-3 w-full max-w-[260px]">
@@ -75,13 +71,12 @@ const AdminFooter = () => {
 
         </div>
 
-        {/* Bottom Strip: Copyright & Node Info */}
         <div className="pt-8 border-t border-[#F1F5F9] flex flex-col md:flex-row justify-between items-center gap-6 md:gap-4">
           <p className="text-[8px] md:text-[9px] font-black text-[#CBD5E1] tracking-[0.3em] md:tracking-[0.5em] text-center md:text-left">
             BOARDER-Q ADMIN CONSOLE // © 2025 // v1.0
           </p>
           <div className="flex flex-wrap justify-center gap-4 md:gap-8">
-             <span className="text-[9px] font-black text-[#0B1F3B] uppercase tracking-widest opacity-20">Encrypted Node</span>
+             <span className="text-[9px] font-black text-[#0B1F3B] uppercase tracking-widest opacity-20">Secure Endpoint</span>
              <span className="text-[9px] font-black text-[#0B1F3B] uppercase tracking-widest opacity-20">DAPITAN_ST_01</span>
           </div>
         </div>

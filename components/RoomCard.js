@@ -1,5 +1,5 @@
 // components/RoomCard.js
-'use client'; // Add this to ensure event handlers work correctly
+'use client'; 
 
 import { User, MapPin, ArrowRight, ImageOff } from 'lucide-react';
 import Link from 'next/link';
@@ -10,7 +10,6 @@ export default function RoomCard({ room }) {
   
   const isAvailable = room.status?.toLowerCase() === 'available';
 
-  // Standardize the URL: replace spaces with %20 for the browser
   const getDefaultImage = (id) => {
     const imgNumber = (id % 5) + 1;
     return `/images/Image%20(${imgNumber}).jpg`; 
@@ -27,7 +26,7 @@ export default function RoomCard({ room }) {
             src={imagePath} 
             alt={room.name}
             className="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700 grayscale-[30%] group-hover:grayscale-0"
-            onError={() => setImageError(true)} // Set state to true once, prevents loop
+            onError={() => setImageError(true)} 
           />
         ) : (
           <div className="flex flex-col items-center text-slate-600">

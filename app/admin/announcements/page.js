@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom'; // Added Portal
+import { createPortal } from 'react-dom'; 
 import { Megaphone, Plus, X, Radio, Loader2, Calendar, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from '@/components/Button';
@@ -13,10 +13,10 @@ export default function AdminAnnouncements() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [form, setForm] = useState({ title: '', body: '' });
-  const [mounted, setMounted] = useState(false); // Added for Portal safety
+  const [mounted, setMounted] = useState(false); 
 
   useEffect(() => { 
-    setMounted(true); // Set mounted to true on load
+    setMounted(true); 
     fetchLogs(); 
   }, []);
 
@@ -51,7 +51,6 @@ export default function AdminAnnouncements() {
     <div className="flex min-h-screen bg-[#F8FAFC] font-sans text-[#0B1F3B]">
       <main className="flex-1 p-8 lg:p-12 max-w-7xl mx-auto">
         
-        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
             <h1 className="text-4xl font-black tracking-tight uppercase leading-none">
@@ -64,9 +63,8 @@ export default function AdminAnnouncements() {
           </Button>
         </div>
 
-        {/* History List */}
         <div className="bg-white border border-[#E5E7EB] rounded-2xl p-8 shadow-sm relative min-h-[500px]">
-          <div className="absolute top-0 left-0 w-1.5 h-full bg-[#1E5EFF]"></div>
+          <div className="absolute top-0 left-0"></div>
           <h2 className="text-sm font-black uppercase tracking-widest mb-10 border-b border-gray-100 pb-6">Transmission History</h2>
 
           <div className="space-y-4">
@@ -75,11 +73,10 @@ export default function AdminAnnouncements() {
                 <div key={ann.id} className="bg-[#F8FAFC] p-6 rounded-2xl flex justify-between items-start border border-transparent hover:border-[#1E5EFF] transition-all">
                    <div>
                       <h4 className="font-black uppercase text-lg mb-1">{ann.title}</h4>
-                      <p className="text-xs text-[#6B7280] font-bold uppercase leading-relaxed">{ann.body}</p>
+                      <p className="text-xs text-[#6B7280] font-bold leading-relaxed">{ann.body}</p>
                    </div>
                    <div className="text-right">
                       <div className="text-[10px] font-black uppercase text-[#0B1F3B]">{new Date(ann.created_at).toLocaleDateString()}</div>
-                      <span className="text-[9px] font-bold uppercase text-[#1E5EFF]">BY: {ann.author}</span>
                    </div>
                 </div>
               ))
@@ -87,12 +84,10 @@ export default function AdminAnnouncements() {
           </div>
         </div>
 
-        {/* --- MODAL PORTAL (MATCHES DASHBOARD EXACTLY) --- */}
         {mounted && createPortal(
           <AnimatePresence>
             {showModal && (
               <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
-                {/* Backdrop with Blur */}
                 <motion.div 
                   initial={{ opacity: 0 }} 
                   animate={{ opacity: 1 }} 
@@ -101,7 +96,6 @@ export default function AdminAnnouncements() {
                   className="absolute inset-0 bg-[#0B1F3B]/80 backdrop-blur-md cursor-pointer" 
                 />
                 
-                {/* Modal Container */}
                 <motion.div 
                   initial={{ scale: 0.95, opacity: 0, y: 20 }} 
                   animate={{ scale: 1, opacity: 1, y: 0 }} 
@@ -110,7 +104,6 @@ export default function AdminAnnouncements() {
                   className="relative bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col"
                 >
                   
-                  {/* Modal Header */}
                   <div className="p-6 border-b border-gray-100 flex justify-between items-center">
                     <h2 className="text-2xl font-black uppercase tracking-tight text-[#0B1F3B]">
                       NEW <span className="text-blue-600">BROADCAST</span>
@@ -160,7 +153,7 @@ export default function AdminAnnouncements() {
               </div>
             )}
           </AnimatePresence>,
-          document.body // This pushes the modal to the top level
+          document.body 
         )}
 
         <AdminFooter />

@@ -37,11 +37,10 @@ export async function PATCH(req) {
     const user = getCurrentUser(req);
     if (!user || user.role !== 'admin') return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { id } = await req.json(); // tenancy_id
+    const { id } = await req.json(); 
 
     await connection.beginTransaction();
 
-    // 1. Get the user_id linked to this tenancy
     const [tenancy] = await connection.query('SELECT user_id FROM room_tenants WHERE id = ?', [id]);
     
     if (tenancy.length === 0) {
@@ -51,10 +50,8 @@ export async function PATCH(req) {
 
     const userId = tenancy[0].user_id;
 
-    // 2. Delete from room_tenants (Frees up the room)
     await connection.query('DELETE FROM room_tenants WHERE id = ?', [id]);
 
-    // 3. Delete from users (Permanent account removal)
     await connection.query('DELETE FROM users WHERE id = ?', [userId]);
 
     await connection.commit();

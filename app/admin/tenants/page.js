@@ -160,7 +160,6 @@ export default function TenantAccessControl() {
         </div>
       </main>
 
-      {/* PORTAL MODAL: ASSIGN ROOM */}
       {mounted && createPortal(
         <AnimatePresence>
           {selectedUser && (
@@ -168,7 +167,7 @@ export default function TenantAccessControl() {
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-[#0B1F3B]/80 backdrop-blur-md" onClick={() => setSelectedUser(null)} />
               <motion.div initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }} className="relative bg-white rounded-[2.5rem] w-full max-w-lg overflow-hidden shadow-2xl">
                 <div className="p-8 border-b flex justify-between items-center bg-[#F8FAFC]">
-                   <h2 className="text-2xl font-black uppercase tracking-tight text-[#0B1F3B]">Assign <span className="text-[#1E5EFF]">Node</span></h2>
+                   <h2 className="text-2xl font-black uppercase tracking-tight text-[#0B1F3B]">Assign <span className="text-[#1E5EFF]">Room</span></h2>
                    <button onClick={() => setSelectedUser(null)} className="p-2 hover:bg-gray-200 rounded-full transition-colors"><X size={20} /></button>
                 </div>
                 <div className="p-8">
@@ -182,11 +181,14 @@ export default function TenantAccessControl() {
                         <label className="text-[10px] font-black text-[#6B7280] uppercase mb-2 ml-1 block tracking-widest">Select Available Unit</label>
                         <select required className="w-full bg-[#F8FAFC] border border-[#E5E7EB] p-4 rounded-2xl text-sm font-bold uppercase outline-none focus:border-[#1E5EFF] transition-all" value={targetRoom} onChange={(e) => setTargetRoom(e.target.value)}>
                             <option value="">-- BROWSE VACANT ROOMS --</option>
-                            {availableRooms.map(room => (
-                            <option key={room.id} value={room.id}>
-                                {room.name} — ({room.capacity - (room.current_tenants || 0)} Slots Left) 
-                            </option>
-                            ))}
+                            {availableRooms.map(room => {
+                                const isPreferred = selectedUser?.preferred_room_id?.toString() === room.id?.toString();
+                                return (
+                                    <option key={room.id} value={room.id}>
+                                        {isPreferred ? ` ${room.name} — USER'S PREFERENCE` : `${room.name} — (${room.capacity - (room.current_tenants || 0)} SLOTS LEFT)`}
+                                    </option>
+                                );
+                            })}
                         </select>
                     </div>
                     <Button type="submit" disabled={submitting || !targetRoom} className="w-full py-5 rounded-2xl h-16 shadow-xl shadow-blue-500/20">
@@ -200,7 +202,6 @@ export default function TenantAccessControl() {
         </AnimatePresence>, document.body
       )}
 
-      {/* PORTAL MODAL: REJECT CONFIRMATION */}
       {mounted && createPortal(
         <AnimatePresence>
           {userToReject && (
@@ -227,14 +228,13 @@ export default function TenantAccessControl() {
         </AnimatePresence>, document.body
       )}
 
-      {/* UPDATED: FIXED TO BOTTOM OF SCREEN */}
       <AnimatePresence>
         {notification && (
           <motion.div 
             initial={{ y: 100, opacity: 0 }} 
             animate={{ y: 0, opacity: 1 }} 
             exit={{ y: 100, opacity: 0 }}
-            className={`fixed bottom-10 left-1/2 -translate-x-1/2 z-[10001] px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 min-w-[300px] border ${
+            className={`fixed top-100 left-1/2 -translate-x-1/2 z-[10001] px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 min-w-[300px] border ${
               notification.type === 'error' ? 'bg-rose-500 border-rose-400 text-white' : 'bg-emerald-500 border-emerald-400 text-white'
             }`}
           >

@@ -9,7 +9,6 @@ export async function GET(request) {
     const decoded = verify(token, process.env.JWT_SECRET);
     const userId = decoded.id;
 
-    // 1. User & Room Details
     const [userData] = await pool.query(`
       SELECT u.name, u.email, u.status,
         r.name as room_name, r.monthly_rate, r.amenities, r.location,
@@ -20,7 +19,6 @@ export async function GET(request) {
       WHERE u.id = ?
     `, [userId]);
 
-    // 2. All payments for stats
     const [payments] = await pool.query(`
       SELECT id, amount, status, method, month_covered, created_at
       FROM payments
@@ -28,7 +26,6 @@ export async function GET(request) {
       ORDER BY created_at DESC
     `, [userId]);
 
-    // 3. Maintenance requests
     const [maintenance] = await pool.query(`
       SELECT id, title, status, created_at, updated_at
       FROM maintenance_requests
@@ -37,7 +34,6 @@ export async function GET(request) {
       LIMIT 5
     `, [userId]);
 
-    // 4. Recent activity (last 5 payments + maintenance merged)
     const recentPayments = payments.slice(0, 3).map(p => ({
       type: 'payment',
       id: p.id,
@@ -58,20 +54,17 @@ export async function GET(request) {
       .sort((a, b) => new Date(b.date) - new Date(a.date))
       .slice(0, 5);
 
-    // 5. Payment stats
     const totalPaid = payments
       .filter(p => p.status === 'confirmed')
       .reduce((sum, p) => sum + Number(p.amount), 0);
     const pendingPayments = payments.filter(p => p.status === 'pending').length;
     const latestPayment = payments[0] ?? null;
 
-    // 6. Next due date
     const moveInDate = userData[0]?.move_in_date || new Date();
     const nextDue = new Date();
     nextDue.setDate(new Date(moveInDate).getDate());
     if (nextDue <= new Date()) nextDue.setMonth(nextDue.getMonth() + 1);
 
-    // 7. Days since move-in
     const moveIn = new Date(userData[0]?.move_in_date);
     const daysSinceMoveIn = Math.floor((new Date() - moveIn) / (1000 * 60 * 60 * 24));
 

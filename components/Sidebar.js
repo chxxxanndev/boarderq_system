@@ -70,7 +70,6 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* MOBILE OVERLAY */}
       {!isCollapsed && (
         <div 
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[140] md:hidden transition-opacity" 
@@ -90,7 +89,6 @@ export default function Sidebar() {
           ${isCollapsed ? 'md:w-20 w-64' : 'w-64'} 
         `}
       >
-        {/* HEADER: LOGO */}
         <div className={`h-[72px] flex items-center justify-between px-6 border-b border-white/10 shrink-0`}>
           <Link 
             href={dashboardLink}
@@ -111,7 +109,6 @@ export default function Sidebar() {
           </button>
         </div>
 
-        {/* NAVIGATION */}
         <nav className="flex-grow py-4 overflow-y-auto scrollbar-hide">
           {getMenuItems().map((item) => {
             if (item.isDropdown) {
@@ -173,7 +170,6 @@ export default function Sidebar() {
                 }`}
               >
                 {isActive && (
-                  /* THE CYAN LEFT BORDER FROM SCREENSHOT */
                   <div className="absolute left-0 w-[4px] h-full bg-[#22D3EE] shadow-[0_0_15px_rgba(34,211,238,0.5)]"></div>
                 )}
                 <item.icon size={20} className={`shrink-0 transition-colors ${isActive ? 'text-[#22D3EE]' : ''}`} />

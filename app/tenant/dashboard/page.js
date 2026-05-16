@@ -9,7 +9,6 @@ import {
 } from 'lucide-react';
 import TenantFooter from '@/components/TenantFooter';
 
-// --- Helpers ---
 function timeAgo(timestamp) {
   const diff = Date.now() - new Date(timestamp).getTime();
   const mins = Math.floor(diff / 60000);
@@ -179,14 +178,13 @@ export default function TenantDashboard() {
   ];
 
   return (
-    <div className="flex min-h-screen bg-[#F8FAFC] font-sans text-[#0B1F3B]">
+    <div className="flex min-h-screen bg-[#F8FAFC] font-sans text-[#0B1F3B] overflow-hidden">
 
-      {/* Toast */}
       <AnimatePresence>
         {notification && (
           <motion.div
             initial={{ y: -100, opacity: 0 }} animate={{ y: 20, opacity: 1 }} exit={{ y: -100, opacity: 0 }}
-            className={`fixed top-0 left-1/2 -translate-x-1/2 z-[10001] px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 min-w-[300px] border ${
+            className={`fixed top-100 left-1/2 -translate-x-1/2 z-[10001] px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 min-w-[300px] border ${
               notification.type === 'error'
                 ? 'bg-rose-500 border-rose-400 text-white'
                 : 'bg-emerald-500 border-emerald-400 text-white'
@@ -198,9 +196,8 @@ export default function TenantDashboard() {
         )}
       </AnimatePresence>
 
-      <main className="flex-1 p-8 lg:p-12">
+        <main className="flex-1 p-4 sm:p-8 lg:p-12 min-w-0">
 
-        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
           <div>
             <h1 className="text-3xl md:text-4xl font-black tracking-tight uppercase leading-none">
@@ -218,15 +215,14 @@ export default function TenantDashboard() {
           )}
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           {stats.map((stat, i) => (
-            <div key={i} className={`p-6 rounded-2xl flex flex-col justify-between h-44 shadow-sm relative overflow-hidden transition-transform hover:scale-[1.02] ${
+            <div key={i} className={`p-6 rounded-2xl flex flex-col justify-between min-h-[9rem] sm:h-44 shadow-sm relative overflow-hidden transition-transform hover:scale-[1.02] ${
               stat.gradient
                 ? 'bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF]'
                 : 'bg-white border border-[#E5E7EB]/50'
             }`}>
-              {!stat.gradient && <div className="absolute top-0 left-0 w-full h-1.5 bg-[#22D3EE]" />}
+              {!stat.gradient && <div className="absolute top-0 left-0 w-full h-1.5" />}
               <div className="flex justify-between items-start z-10">
                 <div className={`p-2 rounded-lg ${stat.gradient ? 'bg-white/20' : 'bg-[#1E5EFF]/10'}`}>
                   <stat.icon className={`w-5 h-5 ${stat.gradient ? 'text-white' : 'text-[#1E5EFF]'}`} />
@@ -235,7 +231,7 @@ export default function TenantDashboard() {
                   stat.badgeColor
                     ? stat.badgeColor
                     : stat.gradient
-                      ? 'bg-white/20 text-white'
+                      ? 'text-white'
                       : 'bg-[#F3F4F6] text-[#6B7280]'
                 }`}>
                   {stat.badge}
@@ -249,18 +245,14 @@ export default function TenantDashboard() {
                   {stat.value}
                 </p>
               </div>
-              <stat.icon className={`absolute -right-4 -bottom-4 w-28 h-28 -rotate-12 opacity-10 ${stat.gradient ? 'text-white' : 'text-[#0B1F3B]'}`} />
             </div>
           ))}
         </div>
 
-        {/* Main Grid */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
 
-          {/* Left: Recent Activity + Maintenance */}
           <div className="xl:col-span-2 space-y-8">
 
-            {/* Recent Activity */}
             <div className="bg-white border border-[#E5E7EB] rounded-2xl shadow-sm overflow-hidden">
               <div className="px-8 py-6 border-b border-[#E5E7EB] bg-[#F8FAFC] flex items-center gap-4">
                 <div className="w-9 h-9 bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF] rounded-xl flex items-center justify-center">
@@ -285,7 +277,6 @@ export default function TenantDashboard() {
               </div>
             </div>
 
-            {/* Maintenance Requests */}
             <div className="bg-white border border-[#E5E7EB] rounded-2xl shadow-sm overflow-hidden">
               <div className="px-8 py-6 border-b border-[#E5E7EB] bg-[#F8FAFC] flex items-center justify-between">
                 <div className="flex items-center gap-4">
@@ -337,10 +328,8 @@ export default function TenantDashboard() {
             </div>
           </div>
 
-          {/* Right Sidebar */}
           <div className="space-y-6">
 
-            {/* Payment Summary */}
             <div className="bg-white border border-[#E5E7EB] rounded-2xl shadow-sm overflow-hidden">
               <div className="px-6 py-5 border-b border-[#E5E7EB] bg-[#F8FAFC]">
                 <div className="flex items-center gap-3">
@@ -374,7 +363,6 @@ export default function TenantDashboard() {
               </div>
             </div>
 
-            {/* Room Info */}
             {data?.user?.amenities && (
               <div className="bg-white border border-[#E5E7EB] rounded-2xl shadow-sm overflow-hidden">
                 <div className="px-6 py-5 border-b border-[#E5E7EB] bg-[#F8FAFC]">
@@ -408,7 +396,6 @@ export default function TenantDashboard() {
               </div>
             )}
 
-            {/* Lease & Move-out Notice */}
             <div className="bg-white border border-[#E5E7EB] rounded-2xl shadow-sm overflow-hidden">
               <div className="px-6 py-5 border-b border-[#E5E7EB] bg-[#F8FAFC]">
                 <div className="flex items-center gap-3">

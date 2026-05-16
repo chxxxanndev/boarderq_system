@@ -11,7 +11,6 @@ import {
 } from 'lucide-react';
 import { motion, useInView, useScroll, useTransform } from 'framer-motion';
 
-// ── Reusable scroll-triggered reveal wrapper ──
 function RevealOnScroll({ children, delay = 0, className = '' }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-60px' });
@@ -28,7 +27,6 @@ function RevealOnScroll({ children, delay = 0, className = '' }) {
   );
 }
 
-// ── Animated counter ──
 function AnimatedNumber({ value, loading }) {
   const [display, setDisplay] = useState(0);
   useEffect(() => {
@@ -48,7 +46,6 @@ function AnimatedNumber({ value, loading }) {
   return <>{loading ? '—' : display}</>;
 }
 
-// ── Typewriter effect ──
 function Typewriter({ phrases }) {
   const [idx, setIdx] = useState(0);
   const [text, setText] = useState('');
@@ -109,26 +106,13 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#0B1F3B] font-sans overflow-x-hidden">
-
-      {/* Decorative background grid
-      <div
-        className="pointer-events-none fixed inset-0 z-0"
-        style={{
-          backgroundImage: 'linear-gradient(rgba(30,94,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(30,94,255,0.03) 1px, transparent 1px)',
-          backgroundSize: '48px 48px',
-        }}
-      /> */}
-
       <main className="relative z-10 max-w-7xl mx-auto px-6 md:px-8 pt-16 pb-24 space-y-24">
 
-        {/* ── HERO ── */}
         <section ref={heroRef}>
           <motion.div style={{ y: heroY, opacity: heroOpacity }} className="text-center relative">
 
-            {/* Glowing blob */}
             <div className="absolute left-1/2 -translate-x-1/2 -top-8 w-[520px] h-[180px] bg-[#1E5EFF]/8 rounded-full blur-3xl pointer-events-none" />
 
-            {/* Greeting badge */}
             <motion.div
               initial={{ opacity: 0, scale: 0.85 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -138,7 +122,6 @@ export default function LandingPage() {
               <span className="text-[10px] font-black text-[#6B7280] uppercase tracking-[0.35em]">Your New Home Awaits</span>
             </motion.div>
 
-            {/* Title */}
             <motion.h1
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
@@ -148,7 +131,6 @@ export default function LandingPage() {
               BOARDER<span className="text-[#1E5EFF] italic">Q</span>
             </motion.h1>
 
-            {/* Animated divider lines */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -172,7 +154,6 @@ export default function LandingPage() {
               />
             </motion.div>
 
-            {/* Welcome message */}
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -190,7 +171,6 @@ export default function LandingPage() {
               </p>
             </motion.div>
 
-            {/* CTA buttons */}
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -217,54 +197,12 @@ export default function LandingPage() {
           </motion.div>
         </section>
 
-        {/* ── LIVE STATS STRIP ── */}
-        <section>
-          {/* <RevealOnScroll>
-            <div className="flex items-center justify-between mb-5 border-b border-[#E5E7EB] pb-4">
-              <h2 className="text-[11px] font-black text-[#0B1F3B] tracking-[0.4em] uppercase flex items-center gap-2">
-                <Activity size={15} className="text-[#1E5EFF]" /> Live Property Status
-              </h2>
-              <span className="flex items-center gap-1.5 text-[10px] font-black text-emerald-500 uppercase tracking-widest">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse inline-block" />
-                Live
-              </span>
-            </div>
-          </RevealOnScroll> */}
-
-          {/* <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { label: 'Total Units',    value: stats.total,       icon: BedDouble,    color: 'text-[#1E5EFF]',  bg: 'bg-[#1E5EFF]/5' },
-              { label: 'Available',      value: stats.available,   icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50'  },
-              { label: 'Occupied',       value: stats.occupied,    icon: Users,        color: 'text-rose-500',    bg: 'bg-rose-50'     },
-              { label: 'In Maintenance', value: stats.maintenance, icon: Wrench,       color: 'text-amber-500',   bg: 'bg-amber-50'    },
-            ].map((s, i) => (
-              <RevealOnScroll key={s.label} delay={i * 0.08}>
-                <div className="bg-white border border-[#E5E7EB] hover:border-[#1E5EFF] rounded-2xl p-6 flex flex-col gap-4 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md group cursor-default">
-                  <div className={`w-10 h-10 ${s.bg} rounded-xl flex items-center justify-center ${s.color} group-hover:scale-110 transition-transform`}>
-                    <s.icon size={20} />
-                  </div>
-                  <div>
-                    <p className="text-3xl font-black text-[#0B1F3B]">
-                      <AnimatedNumber value={s.value} loading={loading} />
-                    </p>
-                    <p className="text-[10px] font-black text-[#6B7280] uppercase tracking-widest mt-0.5">{s.label}</p>
-                  </div>
-                </div>
-              </RevealOnScroll>
-            ))}
-          </div> */}
-        </section>
-
-        {/* ── AVAILABLE ROOMS PREVIEW ── */}
         <section>
           <RevealOnScroll>
             <div className="flex items-center justify-between mb-5 border-b border-[#E5E7EB] pb-4">
               <h2 className="text-[11px] font-black text-[#0B1F3B] tracking-[0.4em] uppercase flex items-center gap-2">
                 <BedDouble size={15} className="text-[#1E5EFF]" /> Featured Vacancies
               </h2>
-              {/* <Link href="/public/rooms" className="text-[10px] font-black text-[#1E5EFF] uppercase tracking-widest flex items-center gap-1 hover:gap-2 transition-all">
-                Browse All Units <ArrowRight size={12} />
-              </Link> */}
             </div>
           </RevealOnScroll>
 
@@ -310,7 +248,6 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ── HOW IT WORKS ── */}
         <section>
           <RevealOnScroll>
             <div className="flex justify-between items-center mb-6 border-b border-[#E5E7EB] pb-4">
@@ -350,7 +287,6 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ── WHY CHOOSE US ── */}
         <section>
           <RevealOnScroll>
             <div className="flex justify-between items-center mb-6 border-b border-[#E5E7EB] pb-4">
@@ -385,7 +321,6 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* ── SYSTEM CAPABILITIES ── */}
         <section>
           <RevealOnScroll>
             <div className="flex justify-between items-center mb-6 border-b border-[#E5E7EB] pb-4">
@@ -421,7 +356,6 @@ export default function LandingPage() {
         </section>
       </main>
 
-      {/* ── FOOTER ── */}
       <footer className="border-t border-[#E5E7EB] pt-12 pb-6">
         <div className="max-w-7xl mx-auto px-6 md:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
@@ -499,7 +433,6 @@ export default function LandingPage() {
 
           <div className="pt-6 border-t border-[#F1F5F9] flex flex-col md:flex-row justify-center items-center gap-4">
             <span className="text-[9px] font-black text-[#CBD5E1] uppercase tracking-[0.4em]">BOARDER-Q © 2026</span>
-            {/* <Link href="/public/login" className="text-[9px] font-black text-[#1E5EFF] uppercase tracking-widest hover:underline">System Login</Link> */}
           </div>
         </div>
       </footer>

@@ -2,7 +2,6 @@
 import { v2 as cloudinary } from 'cloudinary';
 import { NextResponse } from 'next/server';
 
-// 1. Configure Cloudinary using your Environment Variables
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -18,15 +17,13 @@ export async function POST(request) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
     }
 
-    // 2. Convert the file into a Buffer for Cloudinary
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // 3. Use Cloudinary's "Upload Stream" to send the image to the cloud
     const result = await new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         { 
-          folder: 'boarderq_uploads', // This creates a folder in your Cloudinary
+          folder: 'boarderq_uploads', 
           resource_type: 'auto' 
         },
         (error, result) => {
@@ -35,11 +32,9 @@ export async function POST(request) {
         }
       );
       
-      // Write the file buffer to the stream
       uploadStream.end(buffer);
     });
 
-    // 4. Return the permanent HTTPS URL provided by Cloudinary
     console.log("Cloudinary Upload Success:", result.secure_url);
     return NextResponse.json({ url: result.secure_url });
 

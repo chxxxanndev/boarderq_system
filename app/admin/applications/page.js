@@ -1,5 +1,3 @@
-// app/admin/applications/page.js
-
 'use client';
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
@@ -18,7 +16,6 @@ export default function LandlordApplications() {
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
 
-  // Modal States
   const [selectedApp, setSelectedApp] = useState(null);
   const [actionModal, setActionModal] = useState({ show: false, type: null, id: null });
 
@@ -68,7 +65,7 @@ export default function LandlordApplications() {
   const stats = [
     { label: 'Total Received', value: formatValue(statsData?.total), icon: Inbox, bgColor: 'bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF]', textColor: 'text-white' },
     { label: 'Pending Review', value: formatValue(statsData?.pending), icon: Clock, bgColor: 'bg-white', textColor: 'text-[#0B1F3B]' },
-    { label: 'Approved', value: formatValue(statsData?.approved), icon: CheckCircle2, bgColor: 'bg-[#0B1F3B]', textColor: 'text-white' },
+    { label: 'Approved', value: formatValue(statsData?.approved), icon: CheckCircle2, bgColor: 'bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF]', textColor: 'text-white' },
     { label: 'Rejected', value: formatValue(statsData?.rejected), icon: XCircle, bgColor: 'bg-white', textColor: 'text-[#0B1F3B]' },
   ];
 
@@ -79,10 +76,9 @@ export default function LandlordApplications() {
   );
 
   return (
-    <div className="flex min-h-screen bg-[#F8FAFC] font-sans text-[#0B1F3B]">     
-      <main className="flex-1 p-8 lg:p-12">
+    <div className="flex min-h-screen bg-[#F8FAFC] font-sans text-[#0B1F3B] overflow-hidden">     
+  <main className="flex-1 p-4 sm:p-8 lg:p-12 min-w-0">
         
-        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
           <div>
             <h1 className="text-4xl font-black tracking-tight uppercase leading-none">
@@ -93,24 +89,21 @@ export default function LandlordApplications() {
           </div>
         </div>
 
-        {/* Stats Blocks */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           {stats.map((stat, i) => (
             <div key={i} className={`${stat.bgColor} p-6 rounded-2xl flex flex-col justify-between h-40 shadow-sm border border-[#E5E7EB]/50 relative overflow-hidden group transition-all hover:shadow-md`}>
               <div className="z-10">
                 <h2 className={`text-[11px] font-black uppercase tracking-widest mb-1 ${stat.textColor === 'text-white' ? 'opacity-70' : 'text-[#6B7280]'}`}>{stat.label}</h2>
                 <p className={`text-4xl font-black tracking-tighter ${stat.textColor}`}>{stat.value}</p>
               </div>
-              <stat.icon className={`absolute -right-4 -bottom-4 opacity-10 -rotate-12 transition-transform group-hover:rotate-0 ${stat.textColor === 'text-white' ? 'text-white' : 'text-[#0B1F3B]'}`} size={110} />
-              {stat.bgColor === 'bg-white' && <div className="absolute top-0 left-0 w-full h-1.5 bg-[#22D3EE]"></div>}
+              {stat.bgColor === 'bg-white' && <div className="absolute top-0 left-0 w-full h-1.5"></div>}
             </div>
           ))}
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-          {/* Main List Area */}
           <div className="xl:col-span-2 bg-white border border-[#E5E7EB] rounded-2xl p-8 flex flex-col shadow-sm relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-1.5 h-full bg-[#1E5EFF]"></div>
+            <div className="absolute top-0 left-0"></div>
             
             <div className="flex justify-between items-center mb-8 border-b border-[#E5E7EB] pb-5">
               <h2 className="text-sm font-black text-[#0B1F3B] uppercase tracking-widest flex items-center gap-3">
@@ -158,10 +151,8 @@ export default function LandlordApplications() {
 
         </div>
 
-        {/* --- UNIFORM PORTAL MODALS --- */}
         {mounted && createPortal(
           <AnimatePresence>
-            {/* 1. DETAIL VIEW MODAL */}
             {selectedApp && (
               <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -224,7 +215,6 @@ export default function LandlordApplications() {
               </div>
             )}
 
-            {/* 2. CONFIRMATION MODAL */}
             {actionModal.show && (
               <div className="fixed inset-0 z-[10001] flex items-center justify-center p-4">
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}

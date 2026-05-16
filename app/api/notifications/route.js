@@ -10,7 +10,6 @@ export async function GET(req) {
     let notifications = [];
 
     if (user.role === 'admin') {
-      // 1. Pending Applications
       const [apps] = await pool.query(`
         SELECT 
           a.id,
@@ -26,7 +25,6 @@ export async function GET(req) {
         LIMIT 5
       `);
 
-      // 2. Pending Payments
       const [pays] = await pool.query(`
         SELECT
           p.id,
@@ -45,7 +43,6 @@ export async function GET(req) {
         LIMIT 5
       `);
 
-      // 3. Flagged Payments
       const [flagged] = await pool.query(`
         SELECT
           p.id,
@@ -64,7 +61,6 @@ export async function GET(req) {
         LIMIT 3
       `);
 
-      // 4. Pending Maintenance Requests
       const [maint] = await pool.query(`
         SELECT
           m.id,
@@ -82,15 +78,12 @@ export async function GET(req) {
         LIMIT 5
       `);
 
-      // Merge and sort by date descending
       notifications = [...apps, ...pays, ...flagged, ...maint]
         .sort((a, b) => new Date(b.date) - new Date(a.date))
         .slice(0, 15);
 
     } else {
-      // TENANT notifications
 
-      // 1. Latest Announcements
       const [ann] = await pool.query(`
         SELECT
           a.id,
@@ -103,7 +96,6 @@ export async function GET(req) {
         LIMIT 5
       `);
 
-      // 2. Their own payment status updates
       const [pays] = await pool.query(`
         SELECT
           p.id,
@@ -120,7 +112,6 @@ export async function GET(req) {
         LIMIT 5
       `, [user.id]);
 
-      // 3. Their maintenance request status updates
       const [maint] = await pool.query(`
         SELECT
           m.id,

@@ -25,7 +25,6 @@ export default function HelpSupport() {
 
   return (
     <>
-      {/* FLOATING BUTTON */}
       <AnimatePresence>
         {!isHelpOpen && (
           <motion.button
@@ -41,13 +40,11 @@ export default function HelpSupport() {
         )}
       </AnimatePresence>
 
-      {/* MODAL */}
       {createPortal(
         <AnimatePresence mode="wait">
           {isHelpOpen && (
             <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 pointer-events-none">
               
-              {/* Backdrop */}
               <motion.div 
                 initial={{ opacity: 0 }} 
                 animate={{ opacity: 1 }} 
@@ -56,7 +53,6 @@ export default function HelpSupport() {
                 className="absolute inset-0 bg-[#0B1F3B]/60 backdrop-blur-md cursor-pointer pointer-events-auto"
               />
 
-              {/* Modal Card */}
               <motion.div 
                 initial={{ scale: 0.95, opacity: 0, y: 20 }} 
                 animate={{ scale: 1, opacity: 1, y: 0 }} 
@@ -64,7 +60,6 @@ export default function HelpSupport() {
                 onClick={(e) => e.stopPropagation()}
                 className="relative bg-white w-full max-w-xl rounded-[2.5rem] shadow-2xl border border-[#E5E7EB] overflow-hidden flex flex-col max-h-[85vh] pointer-events-auto"
               >
-                {/* Header */}
                 <div className="bg-[#F8FAFC] p-8 pb-6 flex justify-between items-center border-b border-[#E5E7EB]">
                   <div className="flex items-center gap-4">
                     <div className="p-3 bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF] rounded-2xl text-white shadow-lg shadow-blue-500/20">
@@ -87,7 +82,6 @@ export default function HelpSupport() {
                   </button>
                 </div>
 
-                {/* Tabs */}
                 <div className="flex border-b border-[#E5E7EB] bg-white">
                   {tabs.map((tab) => (
                     <button
@@ -105,7 +99,6 @@ export default function HelpSupport() {
                   ))}
                 </div>
 
-                {/* Content */}
                 <div className="p-10 overflow-y-auto bg-white flex-1">
                   {activeTab === 'about' && (
                     <div className="space-y-6">
@@ -155,7 +148,6 @@ export default function HelpSupport() {
                   )}
                 </div>
 
-                {/* Footer */}
                 <div className="p-6 bg-[#F8FAFC] border-t border-[#E5E7EB] text-center text-xs">
                   BOARDER-Q | V2.1.0
                 </div>

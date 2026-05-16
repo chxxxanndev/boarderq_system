@@ -90,7 +90,7 @@ export default function ActiveList() {
         {notification && (
           <motion.div 
             initial={{ y: -100, opacity: 0 }} animate={{ y: 20, opacity: 1 }} exit={{ y: -100, opacity: 0 }}
-            className={`fixed botton-5 left-1/2 -translate-x-1/2 z-[10001] px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 min-w-[300px] border ${
+            className={`fixed top-100 left-1/2 -translate-x-1/2 z-[10001] px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 min-w-[300px] border ${
               notification.type === 'error' ? 'bg-rose-500 border-rose-400 text-white' : 'bg-emerald-500 border-emerald-400 text-white'
             }`}
           >
@@ -118,7 +118,6 @@ export default function ActiveList() {
                     {tenants.length.toString().padStart(2, '0')}
                 </span>
             </div>
-            <Users size={64} className="text-white opacity-20 absolute -right-4 -bottom-4 -rotate-12" />
         </div>
 
         <div className="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden shadow-sm">
@@ -180,7 +179,6 @@ export default function ActiveList() {
       <AdminFooter />
       </main>
 
-      {/* --- MODAL PORTAL --- */}
       {mounted && createPortal(
         <AnimatePresence>
           {tenantToMoveOut && (

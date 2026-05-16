@@ -58,9 +58,6 @@ export default function RoomsPage() {
           <h1 className="text-5xl font-black uppercase tracking-tight mb-3">
             AVAILABLE <span className="text-[#1E5EFF]">ROOMS</span>
           </h1>
-          {/* <p className="text-[#6B7280] text-[10px] font-black uppercase tracking-[0.3em] flex items-center gap-2">
-            Property Asset Oversight
-          </p> */}
         </div>
 
         <div className="flex flex-col lg:flex-row gap-4 mb-10">
@@ -92,7 +89,7 @@ export default function RoomsPage() {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-32 text-[#1E5EFF]">
             <Activity className="animate-spin mb-4" size={32} />
-            <p className="text-[10px] font-black uppercase tracking-[0.4em]">Retrieving Database Nodes...</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.4em]">Fetching Room Records...</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -133,7 +130,6 @@ export default function RoomsPage() {
                     </div>
                     
                     <div className="flex items-center gap-2">
-                         {/* CLICKING THE ARROW GOES TO THE DETAIL PAGE YOU PROVIDED */}
                          <button
                             onClick={() => router.push(`/public/rooms/${room.id}`)}
                             className="w-35 h-14 bg-[#0B1F3B] text-white rounded-2xl flex items-center justify-center hover:bg-[#1E5EFF] transition-all shadow-lg active:scale-95"
@@ -150,7 +146,6 @@ export default function RoomsPage() {
         )}
       </div>
 
-      {/* ── FOOTER ── */}
       <footer className="border-t border-[#E5E7EB] pt-12 pb-6">
         <div className="max-w-7xl mx-auto px-6 md:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
@@ -228,7 +223,6 @@ export default function RoomsPage() {
 
           <div className="pt-6 border-t border-[#F1F5F9] flex flex-col md:flex-row justify-center items-center gap-4">
             <span className="text-[9px] font-black text-[#CBD5E1] uppercase tracking-[0.4em]">BOARDER-Q © 2026</span>
-            {/* <Link href="/public/login" className="text-[9px] font-black text-[#1E5EFF] uppercase tracking-widest hover:underline">System Login</Link> */}
           </div>
         </div>
       </footer>

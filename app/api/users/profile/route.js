@@ -1,11 +1,11 @@
+//\api\users\profile\route.js
 import { NextResponse } from 'next/server';
-import pool from '@/lib/db'; // Using 'pool' to match your db.js
+import pool from '@/lib/db'; 
 import bcrypt from 'bcryptjs';
-import { getCurrentUser } from '@/lib/auth'; // Name matched!
+import { getCurrentUser } from '@/lib/auth';
 
 export async function PUT(req) {
   try {
-    // 1. Get the current user using the function in lib/auth.js
     const user = getCurrentUser(req); 
 
     if (!user || !user.id) {
@@ -14,7 +14,6 @@ export async function PUT(req) {
 
     const { name, email, currentPassword, newPassword } = await req.json();
 
-    // 2. Check if the email is taken by someone else
     const [existing] = await pool.query(
       'SELECT id FROM users WHERE email = ? AND id != ?', 
       [email, user.id]
@@ -24,9 +23,7 @@ export async function PUT(req) {
       return NextResponse.json({ error: 'Email already in use' }, { status: 400 });
     }
 
-    // 3. Logic for Password update
     if (newPassword && newPassword.trim() !== "") {
-      // Get the hashed password from DB to verify current user
       const [rows] = await pool.query('SELECT password FROM users WHERE id = ?', [user.id]);
       
       const isMatch = await bcrypt.compare(currentPassword, rows[0].password);
@@ -40,16 +37,15 @@ export async function PUT(req) {
         [name, email, hashedPass, user.id]
       );
     } else {
-      // Update just Name and Email
       await pool.query(
         'UPDATE users SET name = ?, email = ? WHERE id = ?',
         [name, email, user.id]
       );
     }
 
-    // 4. Return the updated info to sync the Frontend
+    const [updated] = await pool.query('SELECT avatar_url FROM users WHERE id = ?', [user.id]);
     return NextResponse.json({ 
-      user: { id: user.id, name, email, role: user.role } 
+      user: { id: user.id, name, email, role: user.role, avatar_url: updated[0]?.avatar_url || null }
     });
 
   } catch (err) {

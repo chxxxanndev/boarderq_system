@@ -5,7 +5,6 @@ export async function POST(request) {
   try {
     const { room_id, applicant_name, applicant_email, applicant_phone, message } = await request.json();
 
-    // Basic validation
     if (!room_id || !applicant_name || !applicant_email) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }

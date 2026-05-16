@@ -104,31 +104,27 @@ export default function TenantMaintenance() {
     <div className="flex min-h-screen bg-[#F8FAFC] font-sans text-[#0B1F3B]">     
       <main className="relative flex-1 p-6 md:p-12 max-w-6xl mx-auto">
         
-        {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
           <div>
             <h1 className="text-4xl font-black tracking-tight uppercase">MAINTENANCE <span className="text-[#1E5EFF]">TRACKER</span></h1>
             <p className="text-[#6B7280] text-[10px] font-black uppercase tracking-[0.2em] mt-1">Voice your Concerns</p>
           </div>
-          <Button onClick={() => { setShowSuccess(false); setIsModalOpen(true); }} className="rounded-xl bg-[#00BCD4] text-white italic font-black h-14 px-10 shadow-lg shadow-cyan-500/20">
+          <Button onClick={() => { setShowSuccess(false); setIsModalOpen(true); }} className="rounded-xl h-14 px-10 shadow-lg shadow-blue-500/20">
             <Plus className="mr-3 w-5 h-5 not-italic" /> FILE NEW REPAIR
           </Button>
         </div>
 
-        {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-10">
           {stats.map((stat, i) => (
             <div key={i} className={`${stat.bgColor} p-6 rounded-2xl flex flex-col items-center justify-center h-32 md:h-40 shadow-sm border border-[#E5E7EB]/50 text-center relative overflow-hidden transition-all last:col-span-2 md:last:col-span-1`}>
               <h2 className={`text-[9px] md:text-[11px] font-black uppercase mb-1 tracking-widest ${stat.textColor === 'text-white' ? 'opacity-80' : 'text-[#6B7280]'}`}>{stat.label}</h2>
               <p className={`text-3xl md:text-5xl font-black tracking-tighter ${stat.textColor}`}>{String(stat.value).padStart(2, '0')}</p>
-              <Wrench className={`absolute -right-4 -bottom-4 w-20 h-20 opacity-10 -rotate-12 ${stat.textColor === 'text-white' ? 'text-white' : 'text-[#0B1F3B]'}`} />
             </div>
           ))}
         </div>
 
-        {/* Request List */}
         <div className="bg-white border border-[#E5E7EB] rounded-[2.5rem] p-6 md:p-10 shadow-sm relative overflow-hidden min-h-[400px]">
-          <div className="absolute top-0 left-0 w-1.5 h-full bg-[#1E5EFF]"></div>
+          <div className="absolute top-0 left-0"></div>
           <h2 className="text-sm font-black text-[#0B1F3B] uppercase tracking-widest mb-8 border-b pb-6">Service History</h2>
           <div className="space-y-4">
             {requests.map((request) => (
@@ -152,7 +148,6 @@ export default function TenantMaintenance() {
           </div>
         </div>
 
-        {/* --- MODAL PORTAL: ADD TICKET (FIXED) --- */}
         {mounted && createPortal(
           <AnimatePresence>
             {isModalOpen && (
@@ -164,7 +159,6 @@ export default function TenantMaintenance() {
                   onClick={e => e.stopPropagation()}
                   className="relative bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[95vh]"
                 >
-                  {/* Modal Header */}
                   <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-[#F8FAFC] sticky top-0 z-10">
                     <h2 className="text-2xl font-black uppercase tracking-tight text-[#0B1F3B]">
                       ADD <span className="text-[#1E5EFF]">TICKET</span>
@@ -174,7 +168,6 @@ export default function TenantMaintenance() {
                     </button>
                   </div>
 
-                  {/* Modal Body */}
                   <div className="p-8 overflow-y-auto">
                     {showSuccess && (
                       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-6 p-4 bg-[#011B27] border border-[#00FFA3] rounded-xl text-[#00FFA3] text-[10px] font-black uppercase tracking-widest flex items-center gap-3">
@@ -209,7 +202,7 @@ export default function TenantMaintenance() {
                       </div>
                       
                       <button disabled={isSubmitting || showSuccess || isUploading} type="submit" className="w-full h-14 bg-[#00CFE8] text-[#0B1F3B] italic font-black uppercase tracking-widest rounded-xl shadow-lg active:scale-[0.98] transition-all flex items-center justify-center">
-                        {isSubmitting ? <Loader2 className="animate-spin" /> : "INITIALIZE TICKET NODE"}
+                        {isSubmitting ? <Loader2 className="animate-spin" /> : "INITIALIZE TICKET"}
                       </button>
                     </form>
                   </div>
@@ -220,7 +213,6 @@ export default function TenantMaintenance() {
           document.body
         )}
 
-        {/* --- MODAL PORTAL: VIEW DETAILS --- */}
         {mounted && createPortal(
           <AnimatePresence>
             {selectedRequest && (

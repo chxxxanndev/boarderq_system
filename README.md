@@ -368,8 +368,6 @@ CREATE TABLE announcements (
   FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
 );
 
-
-
 ## 🚀 Unified Deployment Workflow (The "Golden Thread")
 
 BoarderQ uses a "Golden Thread" logic to connect tenant identities, room preferences, and legal assignments using the **Email Address** as the unique identifier.
@@ -417,3 +415,44 @@ Unlike traditional systems that use manual "Occupied" toggles, BoarderQ uses **C
 ### ☁️ Integrated Services
 - **Cloudinary:** Used for high-speed delivery of room images and secure storage of payment screenshots (Proof of Payment).
 - **MySQL (Railway):** Relational data management ensuring referential integrity between rooms, tenants, and financial logs.
+
+
+
+🛠 Technologies Used (Boarder-Q Stack)
+1. Frontend (The User Interface)
+Next.js (App Router): The main framework for building the web application.
+React.js: The library used for building the interactive components and managing state.
+Tailwind CSS: Used for all the styling. (You can tell by the utility classes like bg-[#F8FAFC] and rounded-[2rem] in your code).
+Framer Motion: Used for the smooth modal transitions and entrance animations (AnimatePresence and motion.div).
+Lucide React: The icon library used for the UI (e.g., MapPin, Users, ShieldCheck).
+2. Backend (The Logic)
+Next.js API Routes: Server-side functions that handle requests for users, rooms, and payments.
+Node.js: The runtime environment that executes the backend JavaScript code.
+MySQL2: The driver used to allow the app to communicate with your MySQL database using "Promises" (for better performance).
+JWT (JSON Web Tokens): Used for secure user authentication and login sessions.
+3. Cloud Services & Infrastructure
+Railway.app: The cloud platform used to host your MySQL Database and keep it online 24/7.
+Cloudinary API: The cloud storage service used for Image Management. This handles the room photos and the tenant's payment screenshots.
+Vercel (Recommended for deployment): The platform used to host the frontend of the website.
+4. Database Architecture (MySQL)
+Relational Database Design: Using multiple tables (users, rooms, room_tenants, applications, payments) with Foreign Key relationships to ensure data integrity.
+Computed Occupancy Logic: A custom logic we implemented that calculates room availability in real-time based on current tenant records.
+
+
+Framework: Next.js 14+ (App Router Architecture)
+
+UI/UX: Tailwind CSS, Framer Motion (Animations), Lucide Icons.
+
+State Management: React Context API (Sidebar/Theme), React Hooks (useState, useEffect, useParams).
+
+Backend Runtime: Node.js.
+
+Database: MySQL (Relational), Connection Pooling (mysql2/promise).
+
+Authentication: JWT (Stateless Auth), Password Hashing, Role-Based Access Control (RBAC).
+
+Cloud Storage: Cloudinary API (Image hosting & transformation).
+
+Deployment: Railway (Database), Vercel (Frontend).
+
+Advanced Logic: SQL Transactions (ACID compliance), Computed Occupancy algorithms.

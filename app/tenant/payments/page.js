@@ -49,7 +49,6 @@ function Toast({ notification }) {
 function PaymentCalendar({ history }) {
   const [viewYear, setViewYear] = useState(new Date().getFullYear());
 
-  // Build month → status map, preferring confirmed > pending > flagged
   const priority = { confirmed: 3, pending: 2, flagged: 1 };
   const paymentMap = {};
   history?.forEach(p => {
@@ -85,7 +84,6 @@ function PaymentCalendar({ history }) {
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
 
-  // Summary for the viewed year
   const yearPaid     = MONTHS.filter((_, i) => paymentMap[`${viewYear}-${i}`]?.status === 'confirmed').length;
   const yearPending  = MONTHS.filter((_, i) => paymentMap[`${viewYear}-${i}`]?.status === 'pending').length;
   const yearFlagged  = MONTHS.filter((_, i) => paymentMap[`${viewYear}-${i}`]?.status === 'flagged').length;
@@ -95,7 +93,6 @@ function PaymentCalendar({ history }) {
 
   return (
     <div className="bg-white border border-[#E5E7EB] rounded-2xl shadow-sm overflow-hidden">
-      {/* Header */}
       <div className="px-8 py-6 border-b border-[#E5E7EB] bg-[#F8FAFC] flex items-center justify-between">
         <div className="flex items-center gap-4">
           <div className="w-9 h-9 bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF] rounded-xl flex items-center justify-center">
@@ -107,7 +104,6 @@ function PaymentCalendar({ history }) {
           </div>
         </div>
 
-        {/* Year Navigator */}
         <div className="flex items-center gap-2">
           <button
             onClick={() => setViewYear(y => y - 1)}
@@ -127,7 +123,6 @@ function PaymentCalendar({ history }) {
       </div>
 
       <div className="p-8">
-        {/* Year Summary Strip */}
         <div className="grid grid-cols-4 gap-3 mb-8">
           <div className="bg-[#F8FAFC] border border-[#E5E7EB] rounded-xl p-4 text-center">
             <p className="text-[9px] font-black uppercase tracking-widest text-[#6B7280] mb-1">Paid</p>
@@ -147,7 +142,6 @@ function PaymentCalendar({ history }) {
           </div>
         </div>
 
-        {/* Month Grid */}
         <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3">
           {MONTHS.map((month, i) => {
             const key = `${viewYear}-${i}`;
@@ -169,7 +163,6 @@ function PaymentCalendar({ history }) {
                   ${isCurrentMonth && !cfg ? 'border-[#1E5EFF] border-solid' : ''}
                 `}
               >
-                {/* Current month indicator */}
                 {isCurrentMonth && (
                   <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#1E5EFF] rounded-full border-2 border-white" />
                 )}
@@ -197,7 +190,6 @@ function PaymentCalendar({ history }) {
           })}
         </div>
 
-        {/* Legend */}
         <div className="flex items-center gap-6 mt-6 pt-4 border-t border-[#E5E7EB]">
           {[
             { color: 'bg-emerald-500', label: 'Confirmed' },
@@ -320,16 +312,14 @@ export default function TenantPayments() {
 
       <main className="flex-1 p-8 lg:p-12">
 
-        {/* Header */}
         <div className="mb-12">
           <h1 className="text-4xl font-black uppercase tracking-tight">Payment <span className="text-[#1E5EFF]">Portal</span></h1>
           <p className="text-[#6B7280] text-[10px] font-bold tracking-[0.3em] uppercase mt-2">Secure Deployment</p>
         </div>
 
-        {/* Form + QR */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-10">
           <div className="xl:col-span-2 bg-white border border-[#E5E7EB] rounded-[2.5rem] p-10 shadow-sm relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-[#22D3EE] to-[#1E5EFF]" />
+            <div className="absolute top-0 left-0" />
             <h2 className="text-sm font-black uppercase tracking-widest text-[#0B1F3B] mb-8 pb-4 border-b border-[#E5E7EB]">
               Submit Payment
             </h2>
@@ -396,7 +386,6 @@ export default function TenantPayments() {
             </form>
           </div>
 
-          {/* QR Sidebar */}
           <div className="space-y-8">
             <div className="bg-[#0B1F3B] p-10 rounded-[2.5rem] text-center shadow-2xl relative overflow-hidden">
               <QrCode className="mx-auto text-[#22D3EE] mb-6" size={40} />
@@ -436,14 +425,12 @@ export default function TenantPayments() {
             )}
           </div>
 
-                  {/* Payment Calendar */}
         {!historyLoading && (
           <div className="mb-10">
             <PaymentCalendar history={history} />
           </div>
         )}
 
-        {/* Payment History Table */}
         <div className="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden shadow-sm mb-10">
           <div className="px-8 py-6 border-b border-[#E5E7EB] bg-[#F8FAFC] flex items-center gap-4">
             <div className="w-9 h-9 bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF] rounded-xl flex items-center justify-center">

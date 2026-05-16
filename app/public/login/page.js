@@ -56,7 +56,6 @@ export default function LoginPage() {
     }
   };
 
-  // 🔥 Animation Variants
   const containerVariants = {
     hidden: {},
     show: {
@@ -74,10 +73,8 @@ export default function LoginPage() {
   return (
     <div className="h-[calc(100vh-72px)] w-full flex flex-col lg:flex-row bg-white overflow-hidden font-sans">
       
-      {/* LEFT SECTION */}
       <div className="hidden lg:flex flex-1 relative bg-[#F8FAFC] items-center justify-center border-r border-[#E5E7EB]">
         
-        {/* Floating animation */}
         <motion.div 
           animate={{ y: [0, -12, 0] }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
@@ -96,10 +93,8 @@ export default function LoginPage() {
         </motion.div>
       </div>
 
-      {/* RIGHT SECTION */}
       <div className="flex-1 flex flex-col justify-center items-center p-8 md:p-16 relative bg-white">
 
-        {/* 🔥 Animated background */}
         <motion.div
           className="absolute inset-0 pointer-events-none"
           animate={{
@@ -119,7 +114,6 @@ export default function LoginPage() {
           className="w-full max-w-md relative z-10"
         >
           
-          {/* HEADER */}
           <motion.div variants={itemVariants} className="mb-6">
             <h1 className="text-5xl font-black text-[#0B1F3B] tracking-tight uppercase leading-none">
               Sign In
@@ -131,7 +125,6 @@ export default function LoginPage() {
 
           <motion.form variants={itemVariants} onSubmit={handleLogin} className="space-y-6">
             
-            {/* ERROR */}
             <AnimatePresence>
               {error && (
                 <motion.div 
@@ -152,7 +145,6 @@ export default function LoginPage() {
               )}
             </AnimatePresence>
 
-            {/* EMAIL */}
             <motion.div variants={itemVariants} className="space-y-1">
               <label className="text-[10px] font-black uppercase text-[#6B7280] ml-1 tracking-widest">Email Identity</label>
               <motion.div
@@ -168,7 +160,6 @@ export default function LoginPage() {
               </motion.div>
             </motion.div>
 
-            {/* PASSWORD */}
             <motion.div variants={itemVariants} className="space-y-1">
               <div className="flex justify-between">
                 <label className="text-[10px] font-black uppercase text-[#6B7280] ml-1 tracking-widest">Enter Password</label>
@@ -202,7 +193,6 @@ export default function LoginPage() {
               </motion.div>
             </motion.div>
 
-            {/* BUTTON */}
             <motion.button 
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.96 }}
@@ -222,16 +212,14 @@ export default function LoginPage() {
             </motion.button>
           </motion.form>
 
-          {/* FOOTER */}
           <motion.div variants={itemVariants} className="mt-12 text-center pt-8 border-t border-[#F8FAFC]">
             <p className="text-[#6B7280] text-[10px] font-bold uppercase tracking-widest">
               Need to initialize a profile?{' '}
               <Link href="/public/register" className="text-[#1E5EFF] font-black ml-1 hover:underline">
-                Register Node
+                Create Profile
               </Link>
             </p>
           </motion.div>
-
         </motion.div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom'; // Added this
+import { createPortal } from 'react-dom';
 import { 
   Wrench, CheckCircle2, Clock, AlertTriangle, Hammer,
   Search, ChevronRight, HelpCircle, Plus, Filter, Activity, Settings2, Loader2, X, MapPin, User, ImageIcon
@@ -16,10 +16,10 @@ export default function LandlordMaintenance() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [mounted, setMounted] = useState(false); // Added for portal safety
+  const [mounted, setMounted] = useState(false); 
 
   useEffect(() => {
-    setMounted(true); // Added for portal safety
+    setMounted(true); 
     fetchRequests();
   }, []);
 
@@ -80,7 +80,6 @@ export default function LandlordMaintenance() {
     <div className="flex min-h-screen bg-[#F8FAFC] font-sans text-[#0B1F3B]">     
       <main className="flex-1 p-4 md:p-8 lg:p-12 max-w-7xl mx-auto overflow-x-hidden">
         
-        {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div>
             <h1 className="text-3xl md:text-4xl font-black tracking-tight uppercase leading-none text-[#0B1F3B]">
@@ -90,7 +89,6 @@ export default function LandlordMaintenance() {
           </div>
         </div>
 
-        {/* Stats Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-10">
           {stats.map((stat, i) => (
             <div key={i} className={`${stat.bgColor} p-6 rounded-[32px] flex flex-col justify-center items-center h-32 md:h-40 shadow-sm border border-[#E5E7EB]/50 relative overflow-hidden transition-all`}>
@@ -100,12 +98,11 @@ export default function LandlordMaintenance() {
               <p className={`text-3xl md:text-5xl font-black tracking-tighter ${stat.textColor}`}>
                 {String(stat.value).padStart(2, '0')}
               </p>
-              {stat.bgColor === 'bg-white' && <div className="absolute top-0 left-0 w-full h-1.5 bg-[#22D3EE]"></div>}
+              {stat.bgColor === 'bg-white' && <div className="absolute top-0 left-0 w-full h-1.5"></div>}
             </div>
           ))}
         </div>
 
-        {/* Search & Filter Bar */}
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <div className="relative flex-1">
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280]" />
@@ -130,9 +127,8 @@ export default function LandlordMaintenance() {
           </select>
         </div>
 
-        {/* List Area */}
         <div className="bg-white border border-[#E5E7EB] rounded-[40px] p-6 md:p-10 shadow-sm relative min-h-[500px]">
-          <div className="absolute top-0 left-0 w-2 h-full bg-[#1E5EFF]"></div>
+          <div className="absolute top-0 left-0"></div>
 
           <div className="flex justify-between items-center mb-10 border-b border-gray-100 pb-6">
             <h2 className="text-sm font-black text-[#0B1F3B] uppercase tracking-widest flex items-center gap-3">
@@ -190,13 +186,11 @@ export default function LandlordMaintenance() {
           </div>
         </div>
 
-        {/* MODAL PORTAL: WRAPPED IN PORTAL TO PREVENT CUTOFF */}
         {mounted && createPortal(
           <AnimatePresence>
             {selectedRequest && (
               <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
                 
-                {/* Overlay */}
                 <motion.div 
                   initial={{ opacity: 0 }} 
                   animate={{ opacity: 1 }} 
@@ -205,7 +199,6 @@ export default function LandlordMaintenance() {
                   className="absolute inset-0 bg-[#0B1F3B]/80 backdrop-blur-md cursor-pointer"
                 />
 
-                {/* Modal */}
                 <motion.div 
                   initial={{ scale: 0.95, opacity: 0, y: 20 }} 
                   animate={{ scale: 1, opacity: 1, y: 0 }} 
@@ -214,7 +207,6 @@ export default function LandlordMaintenance() {
                   className="bg-white rounded-[32px] w-full max-w-2xl relative z-10 shadow-2xl max-h-[90vh] flex flex-col overflow-hidden"
                 >
 
-                  {/* Header */}
                   <div className="px-8 py-6 flex justify-between items-center border-b border-gray-100 bg-[#F8FAFC]">
                     <h3 className="font-black uppercase tracking-tight text-2xl text-[#0B1F3B]">
                       TICKET <span className="text-[#1E5EFF]">DETAILS</span>
@@ -228,10 +220,8 @@ export default function LandlordMaintenance() {
                     </button>
                   </div>
                   
-                  {/* Scrollable Content */}
                   <div className="flex-1 overflow-y-auto p-8 space-y-8">
 
-                    {/* Photo View */}
                     <div>
                       <label className="text-[10px] font-black text-[#94A3B8] uppercase tracking-[0.2em] block mb-3">
                         Resident Evidence Attachment
@@ -252,7 +242,6 @@ export default function LandlordMaintenance() {
                       )}
                     </div>
 
-                    {/* Description */}
                     <div>
                       <label className="text-[10px] font-black text-[#94A3B8] uppercase tracking-[0.2em] block mb-2">
                         Issue Description
@@ -262,7 +251,6 @@ export default function LandlordMaintenance() {
                       </p>
                     </div>
 
-                    {/* Info Grid */}
                     <div className="grid grid-cols-2 gap-6">
                       <div className="p-4 bg-[#F8FAFC] rounded-xl border border-gray-100">
                         <label className="text-[10px] font-black text-[#94A3B8] uppercase tracking-[0.2em] block mb-1">
@@ -283,7 +271,6 @@ export default function LandlordMaintenance() {
                       </div>
                     </div>
 
-                    {/* Status Controls */}
                     <div>
                       <label className="text-[10px] font-black text-[#6B7280] uppercase block mb-4 tracking-widest text-center">
                         UPDATE STATUS

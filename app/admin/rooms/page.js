@@ -18,13 +18,11 @@ export default function LandlordRooms() {
   const [isUploading, setIsUploading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Modal States
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
   
-  // Custom Alert/Confirm States
-  const [confirmDeleteData, setConfirmDeleteData] = useState(null); // stores room object when deleting
-  const [notification, setNotification] = useState(null); // { message, type: 'success' | 'error' }
+  const [confirmDeleteData, setConfirmDeleteData] = useState(null); 
+  const [notification, setNotification] = useState(null); 
 
   const [mounted, setMounted] = useState(false);
   const fileInputRef = useRef(null);
@@ -50,7 +48,6 @@ export default function LandlordRooms() {
     fetchRooms();
   }, []);
 
-  // Helper to show nice notifications
   const showNotify = (message, type = 'success') => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 4000);
@@ -169,12 +166,11 @@ export default function LandlordRooms() {
     <div className="flex min-h-screen bg-[#F8FAFC] font-sans text-[#0B1F3B]">
       <main className="flex-1 p-6 md:p-12 pb-24 md:pb-12">
 
-        {/* NICE NOTIFICATION TOAST */}
         <AnimatePresence>
           {notification && (
             <motion.div 
               initial={{ y: -100, opacity: 0 }} animate={{ y: 20, opacity: 1 }} exit={{ y: -100, opacity: 0 }}
-              className={`fixed top-0 left-1/2 -translate-x-1/2 z-[10001] px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 min-w-[300px] border ${
+              className={`fixed top-100 left-1/2 -translate-x-1/2 z-[10001] px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 min-w-[300px] border ${
                 notification.type === 'error' ? 'bg-rose-500 border-rose-400 text-white' : 'bg-emerald-500 border-emerald-400 text-white'
               }`}
             >
@@ -184,7 +180,6 @@ export default function LandlordRooms() {
           )}
         </AnimatePresence>
 
-        {/* HEADER */}
         <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-12">
           <div>
             <h1 className="text-4xl font-black tracking-tight uppercase leading-none text-[#0B1F3B]">
@@ -211,7 +206,6 @@ export default function LandlordRooms() {
           </div>
         </div>
 
-        {/* ROOMS GRID */}
         <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-8">
           {filteredRooms.map((room) => {
             const capacity = Number(room.capacity || 0);
@@ -256,7 +250,6 @@ export default function LandlordRooms() {
           })}
         </div>
 
-        {/* MODAL PORTAL: REGISTER / EDIT */}
         {mounted && createPortal(
           <AnimatePresence>
             {isModalOpen && (
@@ -295,7 +288,6 @@ export default function LandlordRooms() {
           </AnimatePresence>, document.body
         )}
 
-        {/* MODAL PORTAL: NICE DELETE CONFIRMATION */}
         {mounted && createPortal(
           <AnimatePresence>
             {confirmDeleteData && (

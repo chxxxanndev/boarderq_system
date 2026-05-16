@@ -11,7 +11,6 @@ import {
 import ProfileSettingsModal from './ProfileSettingsModal';
 import { useSidebar } from '@/context/SidebarContext';
 
-// --- Helpers ---
 function timeAgo(timestamp) {
   const diff = Date.now() - new Date(timestamp).getTime();
   const mins = Math.floor(diff / 60000);
@@ -78,12 +77,10 @@ function NotifItem({ n }) {
   return (
     <div className="px-4 py-3 hover:bg-[#F8FAFC] border-b border-[#E5E7EB] transition-all cursor-pointer">
       <div className="flex items-start gap-3">
-        {/* Icon */}
         <div className={`${config.color} w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5`}>
           <Icon size={14} className="text-white" />
         </div>
 
-        {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2 mb-0.5">
             <span className="text-[9px] font-black uppercase tracking-widest text-[#1E5EFF]">
@@ -98,7 +95,6 @@ function NotifItem({ n }) {
           <p className="text-[11px] font-bold text-[#0B1F3B] leading-snug line-clamp-2">
             {config.getMessage(n)}
           </p>
-          {/* Announcement body preview */}
           {n.type === 'announcement' && n.body && (
             <p className="text-[10px] text-[#6B7280] mt-0.5 line-clamp-1">{n.body}</p>
           )}
@@ -167,7 +163,6 @@ export default function Navbar() {
     <>
       <nav className="sticky top-0 z-[100] w-full h-[72px] px-3 md:px-8 flex items-center justify-between bg-white border-b border-[#E5E7EB] text-[#0B1F3B] shadow-sm transition-all duration-300">
 
-        {/* LEFT: Toggle & Logo */}
         <div className="flex items-center gap-2 md:gap-6 shrink-0">
           {isDashboardPage && (
             <button
@@ -188,7 +183,6 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* CENTER: Public Links */}
         {!isDashboardPage && (
           <div className="flex items-center gap-6 md:gap-10">
             <Link href="/" className={`flex items-center transition-colors ${pathname === '/' ? 'text-[#1E5EFF]' : 'text-[#6B7280] hover:text-[#0B1F3B]'}`}>
@@ -206,7 +200,6 @@ export default function Navbar() {
           </div>
         )}
 
-        {/* RIGHT: Notifications & Profile */}
         <div className="flex items-center gap-2 md:gap-4 shrink-0">
 
           {user.role && isDashboardPage && (
@@ -224,7 +217,6 @@ export default function Navbar() {
 
                 {isNotificationsOpen && (
                   <div className="absolute right-[-40px] sm:right-0 mt-3 w-72 sm:w-96 bg-white border border-[#E5E7EB] rounded-2xl shadow-xl z-[110] overflow-hidden">
-                    {/* Header */}
                     <div className="px-4 py-3 border-b border-[#E5E7EB] flex items-center justify-between bg-[#F8FAFC]">
                       <span className="text-[10px] font-black uppercase tracking-widest text-[#0B1F3B]">Notifications</span>
                       {notifications.length > 0 && (
@@ -234,7 +226,6 @@ export default function Navbar() {
                       )}
                     </div>
 
-                    {/* Items */}
                     <div className="max-h-[420px] overflow-y-auto">
                       {notifications.length > 0 ? (
                         notifications.map((n, i) => (
@@ -248,10 +239,8 @@ export default function Navbar() {
                       )}
                     </div>
 
-                    {/* Footer */}
                       {isNotificationsOpen && (
                         <div className="absolute right-[-40px] sm:right-0 mt-3 w-72 sm:w-96 bg-white border border-[#E5E7EB] rounded-2xl shadow-xl z-[110] overflow-hidden">
-                          {/* Header */}
                           <div className="px-4 py-3 border-b border-[#E5E7EB] flex items-center justify-between bg-[#F8FAFC]">
                             <span className="text-[10px] font-black uppercase tracking-widest text-[#0B1F3B]">Notifications</span>
                             {notifications.length > 0 && (
@@ -261,7 +250,6 @@ export default function Navbar() {
                             )}
                           </div>
 
-                          {/* Items — taller scroll area, no limit */}
                           <div className="max-h-[600px] overflow-y-auto divide-y divide-[#F3F4F6]">
                             {notifications.length > 0 ? (
                               notifications.map((n, i) => (
@@ -275,7 +263,6 @@ export default function Navbar() {
                             )}
                           </div>
 
-                          {/* Footer — just a count, no link */}
                           {notifications.length > 0 && (
                             <div className="px-4 py-2.5 border-t border-[#E5E7EB] bg-[#F8FAFC] text-center">
                               <p className="text-[9px] font-black uppercase tracking-widest text-[#9CA3AF]">
@@ -298,8 +285,11 @@ export default function Navbar() {
                   <p className="text-[11px] font-black uppercase leading-none text-[#0B1F3B]">{user.name}</p>
                   <p className="text-[9px] text-[#1E5EFF] font-black uppercase tracking-widest mt-1 opacity-80">{user.role}</p>
                 </div>
-                <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF] flex items-center justify-center font-black text-white text-[10px] md:text-sm shadow-sm active:scale-90 shrink-0">
-                  {user.name?.charAt(0).toUpperCase() || 'U'}
+                <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg overflow-hidden bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF] flex items-center justify-center font-black text-white text-[10px] md:text-sm shadow-sm active:scale-90 shrink-0">
+                  {user.avatar_url
+                    ? <img src={user.avatar_url} alt="avatar" className="w-full h-full object-cover" />
+                    : user.name?.charAt(0).toUpperCase() || 'U'
+                  }
                 </div>
                 <ChevronDown size={14} className={`text-[#6B7280] transition-transform duration-300 hidden md:block ${isProfileOpen ? 'rotate-180' : ''}`} />
               </button>

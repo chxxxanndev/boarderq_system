@@ -6,7 +6,6 @@ import {
 } from 'lucide-react';
 import AdminFooter from '@/components/AdminFooter';
 
-// --- Helpers ---
 function timeAgo(timestamp) {
   const diff = Date.now() - new Date(timestamp).getTime();
   const mins = Math.floor(diff / 60000);
@@ -49,7 +48,6 @@ const TYPE_CONFIG = {
   },
 };
 
-// --- Activity Item ---
 function ActivityItem({ item }) {
   const config = TYPE_CONFIG[item.type];
   if (!config) return null;
@@ -57,42 +55,42 @@ function ActivityItem({ item }) {
   const statusStyle = STATUS_STYLES[item.status] ?? 'bg-gray-100 text-gray-600';
 
   return (
-    <div className="flex items-start gap-4 p-4 rounded-xl bg-[#F8FAFC] hover:bg-[#EEF2FF] border border-transparent hover:border-[#1E5EFF]/20 transition-all cursor-pointer">
-      <div className={`${config.color} w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm`}>
-        <Icon size={16} className="text-white" />
+    <div className="flex items-start gap-3 p-3 sm:p-4 rounded-xl bg-[#F8FAFC] hover:bg-[#EEF2FF] border border-transparent hover:border-[#1E5EFF]/20 transition-all cursor-pointer">
+      <div className={`${config.color} w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm`}>
+        <Icon size={14} className="text-white" />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="font-bold text-[#0B1F3B] text-sm truncate">{item.actor}</span>
-          <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${statusStyle}`}>
+          <span className="font-bold text-[#0B1F3B] text-xs sm:text-sm truncate">{item.actor}</span>
+          <span className={`text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${statusStyle}`}>
             {item.status?.replace('_', ' ')}
           </span>
         </div>
-        <p className="text-xs text-[#6B7280] mt-0.5 truncate">{config.description(item)}</p>
+        <p className="text-[10px] sm:text-xs text-[#6B7280] mt-0.5 truncate">{config.description(item)}</p>
       </div>
       <div className="flex flex-col items-end gap-1 flex-shrink-0">
-        <span className="text-[10px] text-[#9CA3AF] flex items-center gap-1">
-          <Clock size={10} /> {timeAgo(item.timestamp)}
+        <span className="text-[9px] sm:text-[10px] text-[#9CA3AF] flex items-center gap-1">
+          <Clock size={9} /> {timeAgo(item.timestamp)}
         </span>
-        <span className="text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wide">{config.label}</span>
+        <span className="text-[9px] sm:text-[10px] font-bold text-[#9CA3AF] uppercase tracking-wide hidden sm:block">
+          {config.label}
+        </span>
       </div>
     </div>
   );
 }
 
-// --- Snapshot Sidebar ---
 function SnapshotSidebar({ data, activity }) {
   const occupancyPct = data?.occupancy?.total > 0
     ? Math.round((data.occupancy.occupied / data.occupancy.total) * 100)
     : 0;
 
   return (
-    <div className="bg-white border border-[#E5E7EB] rounded-2xl p-8 shadow-sm flex flex-col gap-6">
+    <div className="bg-white border border-[#E5E7EB] rounded-2xl p-5 sm:p-8 shadow-sm flex flex-col gap-5 sm:gap-6">
       <h2 className="text-sm font-black text-[#0B1F3B] uppercase tracking-widest pb-4 border-b border-[#E5E7EB]">
         Snapshot
       </h2>
 
-      {/* Occupancy Rate */}
       <div>
         <div className="flex justify-between items-center mb-2">
           <p className="text-[10px] font-black uppercase tracking-widest text-[#6B7280]">Occupancy Rate</p>
@@ -111,17 +109,16 @@ function SnapshotSidebar({ data, activity }) {
 
       <div className="border-t border-[#F3F4F6]" />
 
-      {/* Pending Payments */}
-      <div className="flex items-center gap-4">
-        <div className="bg-amber-500 w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0">
-          <CreditCard size={18} className="text-white" />
+      <div className="flex items-center gap-3 sm:gap-4">
+        <div className="bg-amber-500 w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center flex-shrink-0">
+          <CreditCard size={16} className="text-white" />
         </div>
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <p className="text-[10px] font-black uppercase tracking-widest text-[#6B7280]">Pending Payments</p>
-          <p className="text-2xl font-black text-[#0B1F3B] leading-tight">{data?.pendingPayments ?? 0}</p>
+          <p className="text-xl sm:text-2xl font-black text-[#0B1F3B] leading-tight">{data?.pendingPayments ?? 0}</p>
         </div>
         {data?.pendingPayments > 0 && (
-          <span className="text-[10px] font-black bg-amber-100 text-amber-700 px-2 py-1 rounded-full uppercase tracking-wide">
+          <span className="text-[9px] sm:text-[10px] font-black bg-amber-100 text-amber-700 px-2 py-1 rounded-full uppercase tracking-wide whitespace-nowrap">
             Action Needed
           </span>
         )}
@@ -129,7 +126,6 @@ function SnapshotSidebar({ data, activity }) {
 
       <div className="border-t border-[#F3F4F6]" />
 
-      {/* Activity Breakdown */}
       <div>
         <p className="text-[10px] font-black uppercase tracking-widest text-[#6B7280] mb-3">Activity Breakdown</p>
         <div className="space-y-3">
@@ -151,13 +147,12 @@ function SnapshotSidebar({ data, activity }) {
 
       <div className="border-t border-[#F3F4F6]" />
 
-      {/* Newest Tenant */}
       {data?.newestTenant && (
         <div>
           <p className="text-[10px] font-black uppercase tracking-widest text-[#6B7280] mb-3">Newest Tenant</p>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF] flex items-center justify-center flex-shrink-0">
-              <span className="text-white font-black text-sm">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF] flex items-center justify-center flex-shrink-0">
+              <span className="text-white font-black text-xs sm:text-sm">
                 {data.newestTenant.name.charAt(0).toUpperCase()}
               </span>
             </div>
@@ -169,18 +164,17 @@ function SnapshotSidebar({ data, activity }) {
         </div>
       )}
 
-      {/* Top Revenue Room */}
       {data?.topRoom && (
         <>
           <div className="border-t border-[#F3F4F6]" />
           <div>
             <p className="text-[10px] font-black uppercase tracking-widest text-[#6B7280] mb-3">Top Revenue Room</p>
-            <div className="bg-[#F8FAFC] rounded-xl p-4 border border-[#E5E7EB]">
+            <div className="bg-[#F8FAFC] rounded-xl p-3 sm:p-4 border border-[#E5E7EB]">
               <div className="flex items-center gap-2 mb-1">
                 <TrendingUp size={14} className="text-[#1E5EFF]" />
                 <p className="text-sm font-black text-[#0B1F3B]">{data.topRoom.name}</p>
               </div>
-              <p className="text-xl font-black text-[#1E5EFF]">
+              <p className="text-lg sm:text-xl font-black text-[#1E5EFF]">
                 ₱{Number(data.topRoom.total).toLocaleString()}
               </p>
               <p className="text-[10px] text-[#9CA3AF]">total confirmed revenue</p>
@@ -192,7 +186,6 @@ function SnapshotSidebar({ data, activity }) {
   );
 }
 
-// --- Main Dashboard ---
 export default function LandlordDashboard() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -223,12 +216,11 @@ export default function LandlordDashboard() {
 
   return (
     <div className="flex min-h-screen bg-[#F8FAFC] font-sans text-[#0B1F3B]">
-      <main className="flex-1 p-8 lg:p-12 flex flex-col">
+      <main className="flex-1 p-4 sm:p-8 lg:p-12 flex flex-col">
 
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 sm:mb-12">
           <div>
-            <h1 className="text-4xl font-black tracking-tight uppercase leading-none text-[#0B1F3B]">
+            <h1 className="text-3xl sm:text-4xl font-black tracking-tight uppercase leading-none text-[#0B1F3B]">
               DASH<span className="text-[#1E5EFF]">BOARD</span>
             </h1>
             <p className="text-[#6B7280] text-[10px] font-black tracking-[0.3em] uppercase mt-2">
@@ -237,39 +229,46 @@ export default function LandlordDashboard() {
           </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-8 sm:mb-10">
           {stats.map((stat, i) => (
-            <div key={i} className={`${stat.bgColor} p-6 rounded-2xl flex flex-col justify-between h-44 shadow-sm border border-[#E5E7EB]/50 relative overflow-hidden`}>
-              <div>
-                <h2 className={`text-[11px] font-black uppercase tracking-widest mb-1 ${stat.textColor === 'text-white' ? 'opacity-70' : 'text-[#6B7280]'}`}>
+            <div
+              key={i}
+              className={`${stat.bgColor} p-4 sm:p-6 rounded-2xl flex flex-col items-center justify-center h-32 sm:h-44 shadow-sm border border-[#E5E7EB]/50 relative overflow-hidden transition-all text-center`}
+            >
+              <div className="z-10">
+                <h2 className={`text-[8px] sm:text-[11px] font-black uppercase tracking-widest mb-1 ${stat.textColor === 'text-white' ? 'opacity-70' : 'text-[#6B7280]'}`}>
                   {stat.label}
                 </h2>
-                <p className={`text-4xl font-black tracking-tighter ${stat.textColor}`}>{stat.value}</p>
+                <p className={`text-2xl sm:text-4xl font-black tracking-tighter ${stat.textColor}`}>
+                  {stat.value}
+                </p>
               </div>
-              <stat.icon className={`absolute -right-4 -bottom-4 opacity-10 -rotate-12 ${stat.textColor === 'text-white' ? 'text-white' : 'text-[#0B1F3B]'}`} size={120} />
-              {stat.bgColor === 'bg-white' && <div className="absolute top-0 left-0 w-full h-1.5 bg-[#22D3EE]" />}
+              <stat.icon
+                className={`absolute -right-4 -bottom-4 opacity-10 -rotate-12 hidden xs:block ${stat.textColor === 'text-white' ? 'text-white' : 'text-[#0B1F3B]'}`}
+                size={80}
+              />
+              {stat.bgColor === 'bg-white' && (
+                <div className="absolute top-0 left-0 w-full h-1.5" />
+              )}
             </div>
           ))}
         </div>
 
-        {/* Activity + Sidebar */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 sm:gap-8">
 
-          {/* Recent Activity Feed */}
-          <div className="xl:col-span-2 bg-white border border-[#E5E7EB] rounded-2xl p-8 shadow-sm">
-            <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#E5E7EB]">
+          <div className="xl:col-span-2 bg-white border border-[#E5E7EB] rounded-2xl p-5 sm:p-8 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 sm:mb-6 pb-4 border-b border-[#E5E7EB]">
               <h2 className="text-sm font-black text-[#0B1F3B] uppercase tracking-widest">Recent Activity</h2>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center flex-wrap gap-2 sm:gap-3">
                 {Object.entries(TYPE_CONFIG).map(([key, cfg]) => (
-                  <span key={key} className="flex items-center gap-1.5 text-[10px] font-bold text-[#6B7280] uppercase tracking-wide">
+                  <span key={key} className="flex items-center gap-1.5 text-[9px] sm:text-[10px] font-bold text-[#6B7280] uppercase tracking-wide">
                     <span className={`w-2 h-2 rounded-full ${cfg.color}`} />
                     {cfg.label}
                   </span>
                 ))}
               </div>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {activity.length === 0 ? (
                 <p className="text-sm text-[#9CA3AF] text-center py-8">No recent activity.</p>
               ) : (
@@ -280,7 +279,6 @@ export default function LandlordDashboard() {
             </div>
           </div>
 
-          {/* Snapshot Sidebar */}
           <SnapshotSidebar data={data} activity={activity} />
         </div>
 

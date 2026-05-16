@@ -9,7 +9,6 @@ export async function PATCH(request) {
 
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    // Update the tenant's own record with a future move-out date
     await pool.query(
       "UPDATE room_tenants SET move_out_date = ? WHERE user_id = ? AND move_out_date IS NULL",
       [date, user.id]

@@ -10,7 +10,6 @@ export async function POST(request) {
     console.log("--- Login Attempt ---");
     console.log("Email entered:", email);
 
-    // 1. Fetch user
     const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
     
     if (rows.length === 0) {
@@ -23,17 +22,12 @@ export async function POST(request) {
     console.log("Role in DB:", user.role);
     console.log("Hashed Password in DB:", user.password);
 
-    // ... existing user lookup code ...
-    // NEW: Check if account is approved
     if (user.role === 'tenant' && user.status !== 'active') {
     return NextResponse.json({ 
         error: "Access Restricted: Your profile is awaiting final admin approval." 
     }, { status: 403 });
     }
 
-// ... existing password comparison code ...
-
-    // 2. Compare password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     console.log("Password comparison result:", isPasswordValid);
 
@@ -42,15 +36,14 @@ export async function POST(request) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
-    // Inside your Login API POST function
     const token = jwt.sign(
       { 
-        id: user.id,      // <--- THIS IS THE KEY PART
+        id: user.id,     
         email: user.email, 
         role: user.role 
       }, 
       process.env.JWT_SECRET,
-      { expiresIn: '1d' } //Expiration
+      { expiresIn: '1d' } 
     );
     
     console.log("Result: LOGIN SUCCESS!");
