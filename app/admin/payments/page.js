@@ -80,7 +80,7 @@ export default function AdminPayments() {
 
   if (loading) return (
     <div className="h-screen w-full flex items-center justify-center bg-[#F8FAFC] font-sans text-[#1E5EFF]">
-      <Loader2 className="animate-spin mr-2" /> SYNCHRONIZING REVENUE LEDGER...
+      <Loader2 className="animate-spin mr-2" /> PROCESSING FINANCIAL RECORDS...
     </div>
   );
 

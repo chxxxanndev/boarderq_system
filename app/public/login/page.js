@@ -86,7 +86,7 @@ export default function LoginPage() {
           <h2 className="text-6xl font-black text-[#0B1F3B] tracking-tighter uppercase leading-none">
             BOARDER<span className="text-[#1E5EFF] italic">Q</span>
           </h2>
-          <div className="h-1.5 w-16 bg-[#1E5EFF] my-6 rounded-full" />
+          <div className="h-1.5 my-6 rounded-full" />
           <p className="text-[#6B7280] text-xs font-black tracking-[0.5em] uppercase">
             Boarding House Management System
           </p>
@@ -119,7 +119,7 @@ export default function LoginPage() {
               Sign In
             </h1>
             <p className="text-[#6B7280] text-[10px] font-bold tracking-[0.2em] uppercase mt-4 flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-[#1E5EFF]" /> Secure Credential Entry
+            Secure Credential Entry
             </p>
           </motion.div>
 
@@ -163,7 +163,6 @@ export default function LoginPage() {
             <motion.div variants={itemVariants} className="space-y-1">
               <div className="flex justify-between">
                 <label className="text-[10px] font-black uppercase text-[#6B7280] ml-1 tracking-widest">Enter Password</label>
-                <button type="button" className="text-[9px] font-black text-[#1E5EFF] uppercase hover:underline">Forgot Password?</button>
               </div>
 
               <motion.div

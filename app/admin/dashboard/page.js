@@ -208,7 +208,7 @@ export default function LandlordDashboard() {
 
   if (loading) return (
     <div className="h-screen w-full flex items-center justify-center bg-[#F8FAFC] font-sans text-[#1E5EFF]">
-      <Activity className="animate-spin mr-2" /> INITIALIZING...
+      <Activity className="animate-spin mr-2" /> BOOTING CORE SERVICES...
     </div>
   );
 

@@ -60,13 +60,25 @@ export async function GET(request) {
     const pendingPayments = payments.filter(p => p.status === 'pending').length;
     const latestPayment = payments[0] ?? null;
 
-    const moveInDate = userData[0]?.move_in_date || new Date();
-    const nextDue = new Date();
-    nextDue.setDate(new Date(moveInDate).getDate());
-    if (nextDue <= new Date()) nextDue.setMonth(nextDue.getMonth() + 1);
+    // ── Days since move-in — only calculate if move_in_date actually exists ──
+    const rawMoveIn = userData[0]?.move_in_date;
+    const moveIn = rawMoveIn ? new Date(rawMoveIn) : null;
+    const daysSinceMoveIn =
+      moveIn && !isNaN(moveIn.getTime())
+        ? Math.floor((Date.now() - moveIn.getTime()) / (1000 * 60 * 60 * 24))
+        : 0;
 
-    const moveIn = new Date(userData[0]?.move_in_date);
-    const daysSinceMoveIn = Math.floor((new Date() - moveIn) / (1000 * 60 * 60 * 24));
+    // ── Next due date — based on move-in day of month ──
+    let nextDueDate = null;
+    if (moveIn && !isNaN(moveIn.getTime())) {
+      const nextDue = new Date();
+      nextDue.setDate(moveIn.getDate());
+      nextDue.setHours(0, 0, 0, 0);
+      if (nextDue <= new Date()) nextDue.setMonth(nextDue.getMonth() + 1);
+      nextDueDate = nextDue.toLocaleDateString('en-US', {
+        month: 'long', day: '2-digit', year: 'numeric',
+      });
+    }
 
     return NextResponse.json({
       user: userData[0],
@@ -76,8 +88,8 @@ export async function GET(request) {
       pendingPayments,
       maintenance,
       recentActivity,
-      nextDueDate: nextDue.toLocaleDateString('en-US', { month: 'long', day: '2-digit', year: 'numeric' }),
-      daysSinceMoveIn: isNaN(daysSinceMoveIn) ? 0 : daysSinceMoveIn,
+      nextDueDate,
+      daysSinceMoveIn,
     });
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

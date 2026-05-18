@@ -90,16 +90,11 @@ export default function RegisterPage() {
           <h2 className="text-6xl font-black text-[#0B1F3B] tracking-tighter uppercase leading-none">
             JOIN <span className="text-[#1E5EFF] italic">US</span>
           </h2>
-          <div className="h-1.5 w-16 bg-[#1E5EFF] my-6 rounded-full" />
+          <div className="h-1.5 my-6 rounded-full" />
           <p className="text-[#6B7280] text-xs font-black tracking-[0.5em] uppercase">
             Tenant Onboarding Terminal
           </p>
         </motion.div>
-
-        <div className="absolute bottom-10 left-10 flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-            <span className="text-[10px] font-black text-[#6B7280] uppercase tracking-widest">Protocol: Secure Initialization</span>
-        </div>
       </div>
 
       <div className="flex-1 flex flex-col justify-start items-center pt-16 p-8 md:p-1 relative bg-white overflow-y-auto">
@@ -126,7 +121,7 @@ export default function RegisterPage() {
               Register
             </h1>
             <p className="text-[#6B7280] text-[10px] font-bold tracking-[0.2em] uppercase mt-4 flex items-center gap-2">
-              <Activity className="w-4 h-4 text-[#1E5EFF]" /> Initialize Tenant Identity
+            Initialize Tenant Identity
             </p>
           </motion.div>
 
@@ -149,7 +144,7 @@ export default function RegisterPage() {
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] group-focus-within:text-[#1E5EFF] transition-colors" />
                 <input 
                   type="text" name="name" required value={formData.name} onChange={handleChange}
-                  placeholder="e.g. JOHN DOE" 
+                  placeholder="e.g. Xhyndy Orosca" 
                   className="w-full pl-12 pr-6 py-4 bg-[#F8FAFC] border border-[#E5E7EB] rounded-2xl text-[#0B1F3B] font-bold focus:outline-none focus:border-[#1E5EFF] focus:ring-4 focus:ring-[#1E5EFF]/5 transition-all text-sm"
                 />
               </div>
@@ -209,7 +204,7 @@ export default function RegisterPage() {
               disabled={loading}
               className="w-full py-5 mt-4 rounded-2xl bg-[#0B1F3B] text-white font-black tracking-[0.2em] text-xs shadow-xl hover:bg-[#1E5EFF] transition-all flex justify-center items-center gap-3 disabled:opacity-50"
             >
-              {loading ? <Loader2 className="animate-spin" size={18} /> : <>INITIALIZE PROFILE <Zap size={16} /></>}
+              {loading ? <Loader2 className="animate-spin" size={18} /> : <>INITIALIZE PROFILE</>}
             </motion.button>
           </motion.form>
 

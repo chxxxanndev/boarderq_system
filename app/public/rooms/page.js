@@ -24,48 +24,58 @@ const STATUS_DOT = {
 };
 
 const VISIBLE = 3;
-const AUTO_INTERVAL = 4000;
+
+// Smart sort: extract leading number from name, sort numerically
+function smartSort(rooms) {
+  return [...rooms].sort((a, b) => {
+    const numA = parseInt(a.name.match(/\d+/)?.[0] ?? '0', 10);
+    const numB = parseInt(b.name.match(/\d+/)?.[0] ?? '0', 10);
+    if (numA !== numB) return numA - numB;
+    return a.name.localeCompare(b.name);
+  });
+}
 
 export default function RoomsPage() {
   const router = useRouter();
   const [rooms, setRooms] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
   const [loading, setLoading] = useState(true);
 
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState(1);
-  const [paused, setPaused] = useState(false);
-  const timerRef = useRef(null);
 
   useEffect(() => {
     fetch('/api/rooms')
       .then(r => r.json())
       .then(data => {
         const d = Array.isArray(data) ? data : [];
-        setRooms(d);
-        setFiltered(d);
+        const sorted = smartSort(d);
+        setRooms(sorted);
+        setFiltered(sorted);
       })
       .catch(err => console.error('Fetch error:', err))
       .finally(() => setLoading(false));
   }, []);
 
+  // Search only — no status filter
   useEffect(() => {
     let result = [...rooms];
-    if (statusFilter !== 'all') result = result.filter(r => r.computed_status === statusFilter || r.status === statusFilter);
     if (search.trim()) {
       const q = search.toLowerCase();
-      result = result.filter(r => r.name.toLowerCase().includes(q) || (r.location || '').toLowerCase().includes(q));
+      result = result.filter(r =>
+        r.name.toLowerCase().includes(q) ||
+        (r.location || '').toLowerCase().includes(q)
+      );
     }
-    setFiltered(result);
+    setFiltered(smartSort(result));
     setIndex(0);
-  }, [search, statusFilter, rooms]);
+  }, [search, rooms]);
 
   const total = filtered.length;
   const maxIndex = Math.max(0, total - VISIBLE);
 
-  const advance = useCallback((dir) => {
+  const handleManual = (dir) => {
     setDirection(dir);
     setIndex(prev => {
       const next = prev + dir;
@@ -73,18 +83,6 @@ export default function RoomsPage() {
       if (next < 0) return maxIndex;
       return next;
     });
-  }, [maxIndex]);
-
-  // Auto-slide
-  useEffect(() => {
-    if (paused || total <= VISIBLE) return;
-    timerRef.current = setInterval(() => advance(1), AUTO_INTERVAL);
-    return () => clearInterval(timerRef.current);
-  }, [paused, total, advance]);
-
-  const handleManual = (dir) => {
-    clearInterval(timerRef.current);
-    advance(dir);
   };
 
   // Touch swipe
@@ -102,11 +100,11 @@ export default function RoomsPage() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#0B1F3B] font-sans">
-      <div className="max-w-7xl mx-auto px-8 pt-16 pb-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-10 sm:pt-16 pb-24">
 
         {/* Header */}
         <motion.div
-          className="mb-12"
+          className="mb-8 sm:mb-12"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -114,9 +112,9 @@ export default function RoomsPage() {
           <div className="flex items-end justify-between flex-wrap gap-4">
             <div>
               <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[#1E5EFF] mb-3 flex items-center gap-2">
-                <Sparkles size={10} /> Live Listings
+                <Sparkles size={10} /> Interested to secure a Bed Space? Browse our
               </p>
-              <h1 className="text-5xl font-black uppercase tracking-tight">
+              <h1 className="text-4xl sm:text-5xl font-black uppercase tracking-tight">
                 AVAILABLE <span className="text-[#1E5EFF]">ROOMS</span>
               </h1>
             </div>
@@ -128,32 +126,17 @@ export default function RoomsPage() {
           </div>
         </motion.div>
 
-        {/* Filters */}
-        <div className="flex flex-col lg:flex-row gap-4 mb-10">
-          <div className="relative flex-1">
+        {/* Search only — filters removed */}
+        <div className="mb-8 sm:mb-10">
+          <div className="relative">
             <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6B7280]" />
             <input
               type="text"
-              placeholder="SEARCH BY DESIGNATION OR LOCATION..."
+              placeholder="SEARCH BY NAME OR LOCATION..."
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="w-full pl-12 pr-4 py-4 rounded-2xl border border-[#E5E7EB] bg-white text-xs font-black uppercase tracking-widest text-[#0B1F3B] focus:outline-none focus:border-[#1E5EFF] focus:ring-4 focus:ring-[#1E5EFF]/5 transition-all"
             />
-          </div>
-          <div className="flex gap-2 overflow-x-auto pb-2 lg:pb-0">
-            {['all', 'available', 'full', 'maintenance'].map(s => (
-              <button
-                key={s}
-                onClick={() => setStatusFilter(s)}
-                className={`px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] border transition-all whitespace-nowrap ${
-                  statusFilter === s
-                    ? 'bg-[#0B1F3B] text-white border-[#0B1F3B]'
-                    : 'bg-white text-[#6B7280] border-[#E5E7EB] hover:border-[#0B1F3B] hover:text-[#0B1F3B]'
-                }`}
-              >
-                {s}
-              </button>
-            ))}
           </div>
         </div>
 
@@ -168,16 +151,12 @@ export default function RoomsPage() {
             <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#6B7280]">No rooms found.</p>
           </div>
         ) : (
-          <div
-            className="relative"
-            onMouseEnter={() => setPaused(true)}
-            onMouseLeave={() => setPaused(false)}
-          >
+          <div className="relative">
             {/* Controls bar */}
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-6 sm:mb-8">
               {/* Progress bar */}
               <div className="flex items-center gap-3 flex-1">
-                <div className="h-[2px] flex-1 bg-[#E5E7EB] rounded-full overflow-hidden max-w-[200px]">
+                <div className="h-[2px] flex-1 bg-[#E5E7EB] rounded-full overflow-hidden max-w-[160px] sm:max-w-[200px]">
                   <motion.div
                     className="h-full bg-[#1E5EFF] rounded-full"
                     animate={{ width: `${((index + 1) / (maxIndex + 1)) * 100}%` }}
@@ -189,8 +168,8 @@ export default function RoomsPage() {
                 </span>
               </div>
 
-              {/* Dot indicators */}
-              <div className="flex items-center gap-2 mx-6">
+              {/* Dot indicators — hidden on small screens to save space */}
+              <div className="hidden sm:flex items-center gap-2 mx-6">
                 {Array.from({ length: maxIndex + 1 }).map((_, i) => (
                   <button
                     key={i}
@@ -206,13 +185,13 @@ export default function RoomsPage() {
               <div className="flex gap-2">
                 <button
                   onClick={() => handleManual(-1)}
-                  className="w-11 h-11 rounded-2xl border border-[#E5E7EB] bg-white text-[#6B7280] hover:bg-[#0B1F3B] hover:text-white hover:border-[#0B1F3B] flex items-center justify-center transition-all active:scale-90 shadow-sm"
+                  className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl border border-[#E5E7EB] bg-white text-[#6B7280] hover:bg-[#0B1F3B] hover:text-white hover:border-[#0B1F3B] flex items-center justify-center transition-all active:scale-90 shadow-sm"
                 >
                   <ChevronLeft size={18} />
                 </button>
                 <button
                   onClick={() => handleManual(1)}
-                  className="w-11 h-11 rounded-2xl border border-[#0B1F3B] bg-[#0B1F3B] text-white hover:bg-[#1E5EFF] hover:border-[#1E5EFF] flex items-center justify-center transition-all active:scale-90 shadow-sm"
+                  className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl border border-[#0B1F3B] bg-[#0B1F3B] text-white hover:bg-[#1E5EFF] hover:border-[#1E5EFF] flex items-center justify-center transition-all active:scale-90 shadow-sm"
                 >
                   <ChevronRight size={18} />
                 </button>
@@ -230,15 +209,15 @@ export default function RoomsPage() {
                   key={index}
                   custom={direction}
                   variants={{
-                    enter: (d) => ({ opacity: 0, x: d * 100 }),
+                    enter: (d) => ({ opacity: 0, x: d * 60 }),
                     center: { opacity: 1, x: 0 },
-                    exit: (d) => ({ opacity: 0, x: d * -100 }),
+                    exit: (d) => ({ opacity: 0, x: d * -60 }),
                   }}
                   initial="enter"
                   animate="center"
                   exit="exit"
                   transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8"
                 >
                   {padded.map((room, i) =>
                     room ? (
@@ -250,24 +229,13 @@ export default function RoomsPage() {
                 </motion.div>
               </AnimatePresence>
             </div>
-
-            {/* Auto-slide hint */}
-            <div className="flex justify-center mt-8">
-              <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.3em] text-[#CBD5E1]">
-                {paused ? (
-                  <><span className="w-1.5 h-1.5 rounded-full bg-[#CBD5E1]" /> Paused</>
-                ) : (
-                  <><span className="w-1.5 h-1.5 rounded-full bg-[#1E5EFF] animate-pulse" /> Auto-sliding · Hover to pause</>
-                )}
-              </div>
-            </div>
           </div>
         )}
       </div>
 
       {/* Footer */}
       <footer className="border-t border-[#E5E7EB] pt-12 pb-6">
-        <div className="max-w-7xl mx-auto px-6 md:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
 
             <div className="space-y-4">
@@ -371,7 +339,7 @@ function RoomCard({ room, delay, router }) {
       }}
     >
       {/* Image area */}
-      <div className="h-56 bg-[#F8FAFC] relative overflow-hidden">
+      <div className="h-48 sm:h-56 bg-[#F8FAFC] relative overflow-hidden">
         {room.image_url ? (
           <img
             src={room.image_url}
@@ -380,7 +348,6 @@ function RoomCard({ room, delay, router }) {
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center relative">
-            {/* Subtle dot grid pattern */}
             <div
               className="absolute inset-0 opacity-40"
               style={{
@@ -389,38 +356,37 @@ function RoomCard({ room, delay, router }) {
               }}
             />
             <BedDouble size={48} className="text-[#CBD5E1] relative z-10" />
-            <span className="absolute text-[100px] font-black text-[#E5E7EB] select-none leading-none z-0">
+            <span className="absolute text-[80px] sm:text-[100px] font-black text-[#E5E7EB] select-none leading-none z-0">
               {room.name.charAt(0)}
             </span>
           </div>
         )}
 
-        {/* Gradient overlay on image */}
         {room.image_url && (
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
         )}
 
         {/* Status badge */}
-        <div className="absolute top-5 left-5">
+        <div className="absolute top-4 sm:top-5 left-4 sm:left-5">
           <span className={`flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border shadow-sm ${STATUS_COLORS[statusKey]}`}>
             <span className={`w-1.5 h-1.5 rounded-full ${STATUS_DOT[statusKey]} animate-pulse`} />
             {statusKey}
           </span>
         </div>
 
-        {/* Price badge overlaid bottom-right on image */}
-        <div className="absolute bottom-4 right-5 text-right">
+        {/* Price badge */}
+        <div className="absolute bottom-3 sm:bottom-4 right-4 sm:right-5 text-right">
           <p className="text-[8px] font-black text-white/70 uppercase tracking-widest drop-shadow mb-0.5">/ month</p>
-          <p className="text-2xl font-black text-white leading-none drop-shadow-lg">
+          <p className="text-xl sm:text-2xl font-black text-white leading-none drop-shadow-lg">
             ₱{Number(room.monthly_rate).toLocaleString()}
           </p>
         </div>
       </div>
 
       {/* Card body */}
-      <div className="p-8 flex-1 flex flex-col">
-        <div className="mb-6">
-          <h2 className="text-2xl font-black uppercase tracking-tight text-[#0B1F3B] group-hover:text-[#1E5EFF] transition-colors duration-300">
+      <div className="p-6 sm:p-8 flex-1 flex flex-col">
+        <div className="mb-5 sm:mb-6">
+          <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-[#0B1F3B] group-hover:text-[#1E5EFF] transition-colors duration-300">
             {room.name}
           </h2>
           <div className="flex items-center gap-4 mt-2 text-[10px] font-bold text-[#6B7280] uppercase tracking-widest">
@@ -435,15 +401,13 @@ function RoomCard({ room, delay, router }) {
           </div>
         </div>
 
-        {/* Gradient divider */}
-        <div className="h-px bg-gradient-to-r from-[#E5E7EB] via-[#1E5EFF]/20 to-transparent mb-6" />
+        <div className="h-px bg-gradient-to-r from-[#E5E7EB] via-[#1E5EFF]/20 to-transparent mb-5 sm:mb-6" />
 
-        {/* CTA */}
         <div className="mt-auto">
           <motion.button
             onClick={() => router.push(`/public/rooms/${room.id}`)}
             whileTap={{ scale: 0.97 }}
-            className="w-full py-4 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] transition-all duration-300"
+            className="w-full py-3 sm:py-4 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] transition-all duration-300"
             style={{
               background: hovered ? '#0B1F3B' : 'transparent',
               color: hovered ? '#ffffff' : '#0B1F3B',

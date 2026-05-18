@@ -170,7 +170,6 @@ app/
 │   ├── rooms/
 │     ├── page.js
 │     └── [id]/
-│   ├── apply/
 │   ├── login/
 │   ├── register/
 │   └── about/              
@@ -205,7 +204,9 @@ app/
 │   ├── tenant/
 │             ├── dashboard/route.js ( used by tenant/dashboard/page.js)
 │             └── notice/route.js  ( used by tenant/dashboard/page.js)
-│   ├── users/profile (used by components/ProfileSettingsModal.js)
+│   ├── users/ (used by components/ProfileSettingsModal.js)
+│             ├── profile/route.js
+│             └── avatar/route.js
 │   ├── notifications/  (used by components/Navbar.js)
 │   └── maintenance/ (used by admin/maintenance/page.js, tenant/maintenance/page.js)
 │

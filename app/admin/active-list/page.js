@@ -79,7 +79,7 @@ export default function ActiveList() {
 
   if (loading) return (
     <div className="h-screen w-full flex items-center justify-center bg-[#F8FAFC] font-sans text-[#1E5EFF]">
-      <Loader2 className="animate-spin mr-2" /> LOADING RESIDENT DATABASE...
+      <Loader2 className="animate-spin mr-2" /> RETRIEVING RESIDENT RECORDS...
     </div>
   );
 

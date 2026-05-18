@@ -140,7 +140,7 @@ export default function LandlordMaintenance() {
             {loading ? (
               <div className="flex flex-col items-center justify-center py-24 text-[#6B7280]">
                 <Loader2 className="w-10 h-10 animate-spin mb-4 text-[#1E5EFF]" />
-                <p className="text-[10px] font-black uppercase tracking-[0.2em]">Querying Database...</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.2em]">Retrieving System Records...</p>
               </div>
             ) : filteredRequests.length > 0 ? (
               filteredRequests.map((request) => (

@@ -9,6 +9,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Button from '@/components/Button';
 import TenantFooter from '@/components/TenantFooter';
 
+// Helper for Scroll Reveal
+const RevealOnScroll = ({ children, delay = 0 }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, margin: "-50px" }}
+    transition={{ duration: 0.6, delay, ease: "easeOut" }}
+  >
+    {children}
+  </motion.div>
+);
+
 export default function TenantMaintenance() {
   const [user, setUser] = useState(null);
   const [requests, setRequests] = useState([]);
@@ -98,55 +110,85 @@ export default function TenantMaintenance() {
     { label: 'Pending Review', value: requests.filter(r => r.status === 'pending').length, bgColor: 'bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF]', textColor: 'text-white' },
   ];
 
+  const shineStyles = `
+    @keyframes shine {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .header-shine {
+      background: linear-gradient(90deg, #F8FAFC 0%, #EEF2FF 25%, #E0E7FF 50%, #EEF2FF 75%, #F8FAFC 100%);
+      background-size: 200% 100%;
+      animation: shine 4s infinite linear;
+    }
+  `;
+
   if (loading) return <div className="h-screen w-full flex items-center justify-center text-[#1E5EFF]"><Loader2 className="animate-spin mr-2" /> SYNCHRONIZING LOGS...</div>;
 
   return (
     <div className="flex min-h-screen bg-[#F8FAFC] font-sans text-[#0B1F3B]">     
-      <main className="relative flex-1 p-6 md:p-12 max-w-6xl mx-auto">
+      <style>{shineStyles}</style>
+      <main className="relative flex-1 p-6 md:p-12 max-w-6xl mx-auto min-w-0">
         
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
-          <div>
-            <h1 className="text-4xl font-black tracking-tight uppercase">MAINTENANCE <span className="text-[#1E5EFF]">TRACKER</span></h1>
-            <p className="text-[#6B7280] text-[10px] font-black uppercase tracking-[0.2em] mt-1">Voice your Concerns</p>
+        {/* HEADER SECTION WITH SHINE */}
+        <RevealOnScroll>
+          <div className="header-shine border border-[#E5E7EB] p-8 md:p-10 rounded-[2.5rem] flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 shadow-sm">
+            <div>
+              <h1 className="text-4xl font-black tracking-tight uppercase leading-none">MAINTENANCE <span className="text-[#1E5EFF]">TRACKER</span></h1>
+              <p className="text-[#6B7280] text-[10px] font-black uppercase tracking-[0.2em] mt-3">Voice your Concerns & Asset Logistics</p>
+            </div>
+            <Button onClick={() => { setShowSuccess(false); setIsModalOpen(true); }} className="rounded-xl h-14 px-10 shadow-lg shadow-blue-500/20 bg-white border border-[#E5E7EB] hover:border-[#1E5EFF] text-[#0B1F3B] hover:text-[#1E5EFF]">
+              <Plus className="mr-3 w-5 h-5 not-italic" /> FILE NEW REPAIR
+            </Button>
           </div>
-          <Button onClick={() => { setShowSuccess(false); setIsModalOpen(true); }} className="rounded-xl h-14 px-10 shadow-lg shadow-blue-500/20">
-            <Plus className="mr-3 w-5 h-5 not-italic" /> FILE NEW REPAIR
-          </Button>
-        </div>
+        </RevealOnScroll>
 
+        {/* STATS GRID */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-10">
           {stats.map((stat, i) => (
-            <div key={i} className={`${stat.bgColor} p-6 rounded-2xl flex flex-col items-center justify-center h-32 md:h-40 shadow-sm border border-[#E5E7EB]/50 text-center relative overflow-hidden transition-all last:col-span-2 md:last:col-span-1`}>
-              <h2 className={`text-[9px] md:text-[11px] font-black uppercase mb-1 tracking-widest ${stat.textColor === 'text-white' ? 'opacity-80' : 'text-[#6B7280]'}`}>{stat.label}</h2>
-              <p className={`text-3xl md:text-5xl font-black tracking-tighter ${stat.textColor}`}>{String(stat.value).padStart(2, '0')}</p>
-            </div>
+            <RevealOnScroll key={i} delay={i * 0.1}>
+              <div className={`${stat.bgColor} p-6 rounded-2xl flex flex-col items-center justify-center h-32 md:h-40 shadow-sm border border-[#E5E7EB]/50 text-center relative overflow-hidden transition-all last:col-span-2 md:last:col-span-1 hover:scale-[1.02]`}>
+                <h2 className={`text-[9px] md:text-[11px] font-black uppercase mb-1 tracking-widest ${stat.textColor === 'text-white' ? 'opacity-80' : 'text-[#6B7280]'}`}>{stat.label}</h2>
+                <p className={`text-3xl md:text-5xl font-black tracking-tighter ${stat.textColor}`}>{String(stat.value).padStart(2, '0')}</p>
+              </div>
+            </RevealOnScroll>
           ))}
         </div>
 
-        <div className="bg-white border border-[#E5E7EB] rounded-[2.5rem] p-6 md:p-10 shadow-sm relative overflow-hidden min-h-[400px]">
-          <div className="absolute top-0 left-0"></div>
-          <h2 className="text-sm font-black text-[#0B1F3B] uppercase tracking-widest mb-8 border-b pb-6">Service History</h2>
-          <div className="space-y-4">
-            {requests.map((request) => (
-              <div key={request.id} onClick={() => setSelectedRequest(request)} className="group bg-[#F8FAFC] hover:bg-white border border-transparent hover:border-[#1E5EFF] transition-all p-6 rounded-3xl flex items-center justify-between cursor-pointer shadow-sm">
-                <div className="flex items-center gap-6">
-                  <div className="w-14 h-14 bg-white border flex items-center justify-center rounded-2xl group-hover:bg-[#1E5EFF] group-hover:text-white transition-all shadow-sm"><Wrench size={24} /></div>
-                  <div>
-                    <h4 className="font-black text-[#0B1F3B] uppercase text-lg leading-tight mb-1">{request.title}</h4>
-                    <p className="text-[10px] font-bold text-[#6B7280] uppercase tracking-widest flex items-center gap-2">
-                        <Clock size={12} className="text-[#1E5EFF]" /> {new Date(request.created_at).toLocaleDateString()}
-                        {request.photo_url && <span className="text-emerald-500 ml-2 font-black">• WITH PHOTO</span>}
-                    </p>
+        {/* HISTORY SECTION WITH SHINE */}
+        <RevealOnScroll delay={0.4}>
+          <div className="bg-white border border-[#E5E7EB] rounded-[2.5rem] overflow-hidden shadow-sm relative min-h-[400px]">
+            <div className="header-shine px-8 md:px-10 py-6 border-b border-[#E5E7EB]">
+              <h2 className="text-sm font-black text-[#0B1F3B] uppercase tracking-widest">Service History</h2>
+            </div>
+            <div className="p-6 md:p-10 space-y-4">
+              {requests.length === 0 ? (
+                 <div className="py-20 text-center">
+                    <Wrench className="mx-auto text-[#E5E7EB] mb-4" size={48} />
+                    <p className="text-[#6B7280] font-black text-xs uppercase tracking-widest">No repair records found</p>
+                 </div>
+              ) : (
+                requests.map((request) => (
+                  <div key={request.id} onClick={() => setSelectedRequest(request)} className="group bg-[#F8FAFC] hover:bg-white border border-transparent hover:border-[#1E5EFF] transition-all p-6 rounded-3xl flex items-center justify-between cursor-pointer shadow-sm">
+                    <div className="flex items-center gap-6">
+                      <div className="w-14 h-14 bg-white border flex items-center justify-center rounded-2xl group-hover:bg-[#1E5EFF] group-hover:text-white transition-all shadow-sm"><Wrench size={24} /></div>
+                      <div>
+                        <h4 className="font-black text-[#0B1F3B] uppercase text-lg leading-tight mb-1">{request.title}</h4>
+                        <p className="text-[10px] font-bold text-[#6B7280] uppercase tracking-widest flex items-center gap-2">
+                            <Clock size={12} className="text-[#1E5EFF]" /> {new Date(request.created_at).toLocaleDateString()}
+                            {request.photo_url && <span className="text-emerald-500 ml-2 font-black">• WITH PHOTO</span>}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <StatusBadge status={request.status} />
+                      <ChevronRight size={20} className="text-[#E5E7EB] group-hover:text-[#1E5EFF] transition-all" />
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <StatusBadge status={request.status} />
-                  <ChevronRight size={20} className="text-[#E5E7EB] group-hover:text-[#1E5EFF] transition-all" />
-                </div>
-              </div>
-            ))}
+                ))
+              )}
+            </div>
           </div>
-        </div>
+        </RevealOnScroll>
 
         {mounted && createPortal(
           <AnimatePresence>
@@ -159,11 +201,11 @@ export default function TenantMaintenance() {
                   onClick={e => e.stopPropagation()}
                   className="relative bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[95vh]"
                 >
-                  <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-[#F8FAFC] sticky top-0 z-10">
+                  <div className="p-6 border-b border-gray-100 flex justify-between items-center header-shine sticky top-0 z-10">
                     <h2 className="text-2xl font-black uppercase tracking-tight text-[#0B1F3B]">
                       ADD <span className="text-[#1E5EFF]">TICKET</span>
                     </h2>
-                    <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-gray-200 rounded-full transition-colors text-gray-400">
+                    <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-gray-200 rounded-full transition-colors text-gray-400 bg-white shadow-sm">
                       <X size={20} />
                     </button>
                   </div>
@@ -219,9 +261,9 @@ export default function TenantMaintenance() {
               <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setSelectedRequest(null)} className="absolute inset-0 bg-[#0B1F3B]/80 backdrop-blur-md cursor-pointer" />
                 <motion.div initial={{ scale: 0.95, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0, y: 20 }} onClick={e => e.stopPropagation()} className="relative bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-                  <div className="p-6 border-b flex justify-between items-center bg-[#F8FAFC] sticky top-0 z-10">
+                  <div className="p-6 border-b flex justify-between items-center header-shine sticky top-0 z-10">
                     <h2 className="text-2xl font-black uppercase tracking-tight text-[#0B1F3B]">TICKET <span className="text-[#1E5EFF]">DETAILS</span></h2>
-                    <button onClick={() => setSelectedRequest(null)} className="text-gray-400 hover:text-[#0B1F3B] transition-colors"><X size={20} /></button>
+                    <button onClick={() => setSelectedRequest(null)} className="text-gray-400 hover:text-[#0B1F3B] transition-colors bg-white p-2 rounded-full shadow-sm"><X size={20} /></button>
                   </div>
                   <div className="p-8 space-y-6 overflow-y-auto">
                     {selectedRequest.photo_url && (
@@ -247,7 +289,9 @@ export default function TenantMaintenance() {
           document.body
         )}
 
-        <TenantFooter />
+        <RevealOnScroll delay={0.6}>
+          <TenantFooter />
+        </RevealOnScroll>
       </main>
     </div>
   );
