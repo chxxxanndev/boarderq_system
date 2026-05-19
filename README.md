@@ -40,8 +40,6 @@
 - Manage maintenance requests
 
 ### Tenant Dashboard
-- Browse available rooms with photos and details
-- Submit rental applications
 - Upload payment proofs (GCash / Cash)
 - Submit and track maintenance requests
 - View announcements from the landlord
