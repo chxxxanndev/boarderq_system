@@ -25,7 +25,6 @@ const STATUS_DOT = {
 
 const VISIBLE = 3;
 
-// Smart sort: extract leading number from name, sort numerically
 function smartSort(rooms) {
   return [...rooms].sort((a, b) => {
     const numA = parseInt(a.name.match(/\d+/)?.[0] ?? '0', 10);
@@ -58,7 +57,6 @@ export default function RoomsPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Search only — no status filter
   useEffect(() => {
     let result = [...rooms];
     if (search.trim()) {
@@ -85,7 +83,6 @@ export default function RoomsPage() {
     });
   };
 
-  // Touch swipe
   const touchStartX = useRef(null);
   const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; };
   const handleTouchEnd = (e) => {
@@ -102,7 +99,6 @@ export default function RoomsPage() {
     <div className="min-h-screen bg-[#F8FAFC] text-[#0B1F3B] font-sans">
       <div className="max-w-7xl mx-auto px-4 sm:px-8 pt-10 sm:pt-16 pb-24">
 
-        {/* Header */}
         <motion.div
           className="mb-8 sm:mb-12"
           initial={{ opacity: 0, y: -20 }}
@@ -126,7 +122,6 @@ export default function RoomsPage() {
           </div>
         </motion.div>
 
-        {/* Search only — filters removed */}
         <div className="mb-8 sm:mb-10">
           <div className="relative">
             <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6B7280]" />
@@ -140,7 +135,6 @@ export default function RoomsPage() {
           </div>
         </div>
 
-        {/* Carousel */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-32 text-[#1E5EFF]">
             <Activity className="animate-spin mb-4" size={32} />
@@ -152,9 +146,7 @@ export default function RoomsPage() {
           </div>
         ) : (
           <div className="relative">
-            {/* Controls bar */}
             <div className="flex items-center justify-between mb-6 sm:mb-8">
-              {/* Progress bar */}
               <div className="flex items-center gap-3 flex-1">
                 <div className="h-[2px] flex-1 bg-[#E5E7EB] rounded-full overflow-hidden max-w-[160px] sm:max-w-[200px]">
                   <motion.div
@@ -168,7 +160,6 @@ export default function RoomsPage() {
                 </span>
               </div>
 
-              {/* Dot indicators — hidden on small screens to save space */}
               <div className="hidden sm:flex items-center gap-2 mx-6">
                 {Array.from({ length: maxIndex + 1 }).map((_, i) => (
                   <button
@@ -181,7 +172,6 @@ export default function RoomsPage() {
                 ))}
               </div>
 
-              {/* Arrow buttons */}
               <div className="flex gap-2">
                 <button
                   onClick={() => handleManual(-1)}
@@ -198,7 +188,6 @@ export default function RoomsPage() {
               </div>
             </div>
 
-            {/* Slide track */}
             <div
               className="overflow-hidden"
               onTouchStart={handleTouchStart}
@@ -233,7 +222,6 @@ export default function RoomsPage() {
         )}
       </div>
 
-      {/* Footer */}
       <footer className="border-t border-[#E5E7EB] pt-12 pb-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
@@ -338,7 +326,6 @@ function RoomCard({ room, delay, router }) {
         transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
       }}
     >
-      {/* Image area */}
       <div className="h-48 sm:h-56 bg-[#F8FAFC] relative overflow-hidden">
         {room.image_url ? (
           <img
@@ -366,7 +353,6 @@ function RoomCard({ room, delay, router }) {
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
         )}
 
-        {/* Status badge */}
         <div className="absolute top-4 sm:top-5 left-4 sm:left-5">
           <span className={`flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border shadow-sm ${STATUS_COLORS[statusKey]}`}>
             <span className={`w-1.5 h-1.5 rounded-full ${STATUS_DOT[statusKey]} animate-pulse`} />
@@ -374,7 +360,6 @@ function RoomCard({ room, delay, router }) {
           </span>
         </div>
 
-        {/* Price badge */}
         <div className="absolute bottom-3 sm:bottom-4 right-4 sm:right-5 text-right">
           <p className="text-[8px] font-black text-white/70 uppercase tracking-widest drop-shadow mb-0.5">/ month</p>
           <p className="text-xl sm:text-2xl font-black text-white leading-none drop-shadow-lg">
@@ -383,7 +368,6 @@ function RoomCard({ room, delay, router }) {
         </div>
       </div>
 
-      {/* Card body */}
       <div className="p-6 sm:p-8 flex-1 flex flex-col">
         <div className="mb-5 sm:mb-6">
           <h2 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-[#0B1F3B] group-hover:text-[#1E5EFF] transition-colors duration-300">

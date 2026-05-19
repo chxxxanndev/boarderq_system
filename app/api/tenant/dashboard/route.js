@@ -60,7 +60,6 @@ export async function GET(request) {
     const pendingPayments = payments.filter(p => p.status === 'pending').length;
     const latestPayment = payments[0] ?? null;
 
-    // ── Days since move-in — only calculate if move_in_date actually exists ──
     const rawMoveIn = userData[0]?.move_in_date;
     const moveIn = rawMoveIn ? new Date(rawMoveIn) : null;
     const daysSinceMoveIn =
@@ -68,7 +67,6 @@ export async function GET(request) {
         ? Math.floor((Date.now() - moveIn.getTime()) / (1000 * 60 * 60 * 24))
         : 0;
 
-    // ── Next due date — based on move-in day of month ──
     let nextDueDate = null;
     if (moveIn && !isNaN(moveIn.getTime())) {
       const nextDue = new Date();

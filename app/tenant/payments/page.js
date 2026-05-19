@@ -4,7 +4,6 @@ import { ShieldCheck, Loader2, QrCode, UploadCloud, FileCheck, Clock, CheckCircl
 import TenantFooter from '@/components/TenantFooter';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Helper for Scroll Reveal
 const RevealOnScroll = ({ children, delay = 0 }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}

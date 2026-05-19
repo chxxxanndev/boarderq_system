@@ -24,13 +24,13 @@ export default function AboutPage() {
     { 
       name: "Abal, Che Ann P.", 
       role: "Full-Stack Developer", 
-      image: "/images/cheann.jpg",
+      image: "/images/Cheangg.jpg",
       focus: "Logic & Integration"
     },
     { 
       name: "Lagpac, Sheila Mae A.", 
       role: "UI/UX & Database Designer", 
-      image: "/images/sheila.jpg",
+      image: "/images/maymaygwapa.jpg",
       focus: "Interface & Schema"
     },
     { 

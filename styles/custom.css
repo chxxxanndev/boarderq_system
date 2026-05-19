@@ -1,4 +1,3 @@
-/* ══════════════════ CUSTOM THEME VARIABLES ══════════════════ */
 :root {
   --bg: #0f172a;
   --card: #1e293b;
@@ -11,13 +10,10 @@
   --accent5: #f472b6; /* Pink */
 }
 
-/* ══════════════════ TYPOGRAPHY ══════════════════ */
 .font-syne { font-family: 'Syne', sans-serif; }
 .font-mono { font-family: 'DM Mono', monospace; }
 .font-sans { font-family: 'DM Sans', sans-serif; }
 
-/* ══════════════════ STATUS BADGES ══════════════════ */
-/* These match your original HTML styles exactly */
 .status {
   padding: 2px 8px;
   border-radius: 4px;
@@ -34,7 +30,6 @@
 .status.pending { background: rgba(192, 132, 252, 0.15); color: var(--accent3); border: 1px solid rgba(192, 132, 252, 0.3); }
 .status.overdue { background: rgba(244, 114, 182, 0.15); color: var(--accent5); border: 1px solid rgba(244, 114, 182, 0.3); }
 
-/* ══════════════════ TABLE STYLES ══════════════════ */
 .data-table {
   width: 100%;
   border-collapse: collapse;
@@ -61,7 +56,6 @@
   background: rgba(255,255,255,0.02);
 }
 
-/* ══════════════════ DECORATIVE ELEMENTS ══════════════════ */
 .kw {
   color: var(--accent1);
   font-family: 'DM Mono', monospace;
@@ -92,7 +86,6 @@
 .av-green { background: var(--accent2); color: #000; }
 .av-orange { background: var(--accent4); color: #000; }
 
-/* ══════════════════ TOAST NOTIFICATION ══════════════════ */
 .toast {
   position: fixed;
   bottom: 24px;

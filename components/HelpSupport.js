@@ -69,7 +69,6 @@ export default function HelpSupport() {
                 onClick={(e) => e.stopPropagation()}
                 className="relative bg-white w-full max-w-xl rounded-[2.5rem] shadow-2xl border border-[#E5E7EB] overflow-hidden flex flex-col max-h-[85vh] pointer-events-auto"
               >
-                {/* Header */}
                 <div className="bg-[#F8FAFC] p-6 sm:p-8 pb-5 sm:pb-6 flex justify-between items-center border-b border-[#E5E7EB]">
                   <div className="flex items-center gap-4">
                     <div className="p-3 bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF] rounded-2xl text-white shadow-lg shadow-blue-500/20">
@@ -95,7 +94,6 @@ export default function HelpSupport() {
                   </button>
                 </div>
 
-                {/* Tabs */}
                 <div className="flex border-b border-[#E5E7EB] bg-white">
                   {tabs.map((tab) => (
                     <button
@@ -113,9 +111,7 @@ export default function HelpSupport() {
                   ))}
                 </div>
 
-                {/* Tab Content */}
                 <div className="p-6 sm:p-10 overflow-y-auto bg-white flex-1">
-                  {/* About */}
                   {activeTab === 'about' && (
                     <div className="space-y-6">
                       <div className="inline-block px-3 py-1 bg-[#22D3EE]/10 border border-[#22D3EE]/20 rounded-md">
@@ -138,7 +134,6 @@ export default function HelpSupport() {
                     </div>
                   )}
 
-                  {/* FAQ */}
                   {activeTab === 'faq' && (
                     <div className="space-y-4">
                       {[
@@ -175,7 +170,6 @@ export default function HelpSupport() {
                     </div>
                   )}
 
-                  {/* Contact */}
                   {activeTab === 'contact' && (
                     <div className="space-y-4">
                       <a
@@ -246,7 +240,6 @@ export default function HelpSupport() {
                   )}
                 </div>
 
-                {/* Footer */}
                 <div className="p-4 sm:p-6 bg-[#F8FAFC] border-t border-[#E5E7EB] text-center">
                   <span className="text-[9px] font-black text-[#9CA3AF] uppercase tracking-widest">
                     BOARDER-Q v1.0

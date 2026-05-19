@@ -9,7 +9,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Button from '@/components/Button';
 import TenantFooter from '@/components/TenantFooter';
 
-// Helper for Scroll Reveal
 const RevealOnScroll = ({ children, delay = 0 }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
@@ -129,7 +128,6 @@ export default function TenantMaintenance() {
       <style>{shineStyles}</style>
       <main className="relative flex-1 p-6 md:p-12 max-w-6xl mx-auto min-w-0">
         
-        {/* HEADER SECTION WITH SHINE */}
         <RevealOnScroll>
           <div className="header-shine border border-[#E5E7EB] p-8 md:p-10 rounded-[2.5rem] flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 shadow-sm">
             <div>
@@ -142,7 +140,6 @@ export default function TenantMaintenance() {
           </div>
         </RevealOnScroll>
 
-        {/* STATS GRID */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-10">
           {stats.map((stat, i) => (
             <RevealOnScroll key={i} delay={i * 0.1}>
@@ -154,7 +151,6 @@ export default function TenantMaintenance() {
           ))}
         </div>
 
-        {/* HISTORY SECTION WITH SHINE */}
         <RevealOnScroll delay={0.4}>
           <div className="bg-white border border-[#E5E7EB] rounded-[2.5rem] overflow-hidden shadow-sm relative min-h-[400px]">
             <div className="header-shine px-8 md:px-10 py-6 border-b border-[#E5E7EB]">

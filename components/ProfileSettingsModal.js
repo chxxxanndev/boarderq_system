@@ -49,7 +49,6 @@ export default function ProfileSettingsModal({ isOpen, onClose, user, onUpdate }
     setCrop(undefined);
     setCompletedCrop(null);
     setShowCropper(true);
-    // reset input so same file can be picked again
     e.target.value = '';
   };
 
@@ -141,7 +140,6 @@ export default function ProfileSettingsModal({ isOpen, onClose, user, onUpdate }
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className="relative w-full max-w-lg bg-white rounded-t-[2.5rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
           >
-            {/* Header */}
             <div className="flex items-center justify-between px-8 py-6 border-b border-[#E5E7EB] bg-[#F8FAFC]">
               <div>
                 <h3 className="font-black text-2xl tracking-tight uppercase text-[#0B1F3B]">USER <span className="text-[#1E5EFF]">PROFILE</span></h3>
@@ -152,7 +150,6 @@ export default function ProfileSettingsModal({ isOpen, onClose, user, onUpdate }
 
             <form onSubmit={handleSubmit} className="p-8 space-y-6 overflow-y-auto">
 
-              {/* Avatar Section */}
               <div className="flex flex-col items-center gap-3">
                 <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
                   <div className="w-24 h-24 rounded-2xl overflow-hidden bg-gradient-to-br from-[#22D3EE] to-[#1E5EFF] flex items-center justify-center shadow-lg">
@@ -229,7 +226,6 @@ export default function ProfileSettingsModal({ isOpen, onClose, user, onUpdate }
             </form>
           </motion.div>
 
-          {/* Cropper Modal */}
           <AnimatePresence>
             {showCropper && rawImage && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}

@@ -9,7 +9,6 @@ import {
 } from 'lucide-react';
 import TenantFooter from '@/components/TenantFooter';
 
-// Helper for Scroll Reveal
 const RevealOnScroll = ({ children, delay = 0 }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
@@ -189,7 +188,6 @@ export default function TenantDashboard() {
     },
   ];
 
-  // CSS for the shining gradient effect
   const shineStyles = `
     @keyframes shine {
       0% { background-position: -200% 0; }
@@ -224,7 +222,6 @@ export default function TenantDashboard() {
 
       <main className="flex-1 p-4 sm:p-8 lg:p-12 min-w-0">
         
-        {/* WELCOME HEADER WITH SHINE */}
         <RevealOnScroll>
           <div className="header-shine border border-[#E5E7EB] p-6 md:p-8 rounded-2xl flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12 shadow-sm">
             <div>
@@ -244,7 +241,6 @@ export default function TenantDashboard() {
           </div>
         </RevealOnScroll>
 
-        {/* STATS GRID */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           {stats.map((stat, i) => (
             <RevealOnScroll key={i} delay={i * 0.1}>
@@ -285,7 +281,6 @@ export default function TenantDashboard() {
 
           <div className="xl:col-span-2 space-y-8">
 
-            {/* RECENT ACTIVITY */}
             <RevealOnScroll delay={0.2}>
               <div className="bg-white border border-[#E5E7EB] rounded-2xl shadow-sm overflow-hidden">
                 <div className="px-8 py-6 border-b border-[#E5E7EB] header-shine flex items-center gap-4">
@@ -312,7 +307,6 @@ export default function TenantDashboard() {
               </div>
             </RevealOnScroll>
 
-            {/* MAINTENANCE */}
             <RevealOnScroll delay={0.3}>
               <div className="bg-white border border-[#E5E7EB] rounded-2xl shadow-sm overflow-hidden">
                 <div className="px-8 py-6 border-b border-[#E5E7EB] header-shine flex items-center justify-between">
@@ -368,7 +362,6 @@ export default function TenantDashboard() {
 
           <div className="space-y-6">
 
-            {/* PAYMENT SUMMARY */}
             <RevealOnScroll delay={0.4}>
               <div className="bg-white border border-[#E5E7EB] rounded-2xl shadow-sm overflow-hidden">
                 <div className="px-6 py-5 border-b border-[#E5E7EB] header-shine">
@@ -404,7 +397,6 @@ export default function TenantDashboard() {
               </div>
             </RevealOnScroll>
 
-            {/* ROOM INFO */}
             {data?.user?.amenities && (
               <RevealOnScroll delay={0.5}>
                 <div className="bg-white border border-[#E5E7EB] rounded-2xl shadow-sm overflow-hidden">
@@ -440,7 +432,6 @@ export default function TenantDashboard() {
               </RevealOnScroll>
             )}
 
-            {/* LEASE STATUS */}
             <RevealOnScroll delay={0.6}>
               <div className="bg-white border border-[#E5E7EB] rounded-2xl shadow-sm overflow-hidden">
                 <div className="px-6 py-5 border-b border-[#E5E7EB] header-shine">

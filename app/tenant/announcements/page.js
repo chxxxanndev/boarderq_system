@@ -5,7 +5,6 @@ import { Calendar, ChevronRight, Radio, Zap, BellRing, Loader2, Clock, X, User, 
 import { motion, AnimatePresence } from 'framer-motion';
 import TenantFooter from '@/components/TenantFooter';
 
-// Helper for Scroll Reveal
 const RevealOnScroll = ({ children, delay = 0 }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
@@ -34,7 +33,6 @@ export default function TenantAnnouncements() {
       .catch(() => setLoading(false));
   }, []);
 
-  // CSS for the shining gradient effect
   const shineStyles = `
     @keyframes shine {
       0% { background-position: -200% 0; }
@@ -52,7 +50,6 @@ export default function TenantAnnouncements() {
       <style>{shineStyles}</style>
       <main className="flex-1 p-4 sm:p-8 lg:p-12 max-w-6xl mx-auto min-w-0">
 
-        {/* MAIN HEADER WITH SHINE */}
         <RevealOnScroll>
           <div className="header-shine border border-[#E5E7EB] p-8 sm:p-10 rounded-[2.5rem] flex flex-col md:flex-row md:items-end gap-4 mb-8 sm:mb-12 shadow-sm">
             <div>
@@ -84,7 +81,6 @@ export default function TenantAnnouncements() {
                     </div>
 
                     <div className="flex-1 w-full">
-                      {/* SUB-HEADER WITH SHINE */}
                       <div className="header-shine -mx-5 -mt-5 sm:-mx-8 sm:-mt-8 px-5 py-4 sm:px-8 sm:py-5 mb-4 sm:mb-6 border-b border-[#E5E7EB] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
                           <h3 className="text-lg sm:text-2xl font-black text-[#0B1F3B] uppercase group-hover:text-[#1E5EFF] transition-colors">{ann.title}</h3>
@@ -153,7 +149,6 @@ export default function TenantAnnouncements() {
                 onClick={e => e.stopPropagation()}
                 className="relative bg-white rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
               >
-                {/* MODAL HEADER WITH SHINE */}
                 <div className="px-6 sm:px-10 py-6 sm:py-8 flex justify-between items-center border-b border-gray-100 header-shine">
                   <h3 className="font-black uppercase tracking-tight text-xl sm:text-2xl text-[#0B1F3B]">
                     BROADCAST <span className="text-[#1E5EFF]">DETAILS</span>
