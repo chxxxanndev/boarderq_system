@@ -120,7 +120,9 @@ app/
 │   │   ├── login/route.js
 │   │   ├── me/route.js
 │   │   └── register/route.js
-│   ├── payments/route.js
+│   ├── payments/
+│   │   ├── history/route.js
+│   │   └── route.js
 │   ├── tenant/
 │   │   ├── dashboard/route.js
 │   │   └── notice/route.js

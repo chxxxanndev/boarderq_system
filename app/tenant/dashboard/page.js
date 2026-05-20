@@ -161,7 +161,8 @@ export default function TenantDashboard() {
       label: 'Room Assignment',
       value: data?.user?.room_name || 'PENDING',
       icon: Home,
-      badge: data?.user?.location || 'N/A',
+      badge: null,                          // remove the badge, location goes below
+      location: data?.user?.location || null,
       gradient: true,
     },
     {
@@ -226,9 +227,9 @@ export default function TenantDashboard() {
           <div className="header-shine border border-[#E5E7EB] p-6 md:p-8 rounded-2xl flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12 shadow-sm">
             <div>
               <h1 className="text-3xl md:text-4xl font-black tracking-tight uppercase leading-none">
-                Welcome back, <span className="text-[#1E5EFF]">{data?.user?.name?.split(' ')[0] ?? 'RESIDENT'}</span>
+                Hello, <span className="text-[#1E5EFF]">{data?.user?.name?.split(' ')[0] ?? 'RESIDENT'}</span>
               </h1>
-              <p className="text-[#6B7280] text-[10px] font-black tracking-[0.3em] uppercase mt-2">Resident Dashboard Oversight</p>
+              <p className="text-[#6B7280] text-[10px] font-black tracking-[0.3em] uppercase mt-2">Resident Portal</p>
             </div>
             {data?.daysSinceMoveIn > 0 && (
               <div className="bg-white border border-[#E5E7EB] px-5 py-2 rounded-xl flex items-center gap-3 shadow-sm">
@@ -268,9 +269,12 @@ export default function TenantDashboard() {
                   <h2 className={`text-[10px] font-black uppercase tracking-widest mb-1 ${stat.gradient ? 'text-white/70' : 'text-[#6B7280]'}`}>
                     {stat.label}
                   </h2>
-                  <p className={`text-2xl font-black tracking-tight ${stat.gradient ? 'text-white' : 'text-[#0B1F3B]'}`}>
+                  <p className={`text-base sm:text-xl font-black tracking-tight leading-tight break-words ${stat.gradient ? 'text-white' : 'text-[#0B1F3B]'}`}>
                     {stat.value}
                   </p>
+                  {stat.location && (
+                    <p className="text-[9px] font-bold text-white/60 mt-1 leading-snug break-words">{stat.location}</p>
+                  )}
                 </div>
               </div>
             </RevealOnScroll>

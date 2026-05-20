@@ -61,7 +61,9 @@ export async function GET(request) {
     const latestPayment = payments[0] ?? null;
 
     const rawMoveIn = userData[0]?.move_in_date;
-    const moveIn = rawMoveIn ? new Date(rawMoveIn) : null;
+    const moveIn = rawMoveIn
+      ? (rawMoveIn instanceof Date ? rawMoveIn : new Date(rawMoveIn))
+      : null;
     const daysSinceMoveIn =
       moveIn && !isNaN(moveIn.getTime())
         ? Math.floor((Date.now() - moveIn.getTime()) / (1000 * 60 * 60 * 24))
